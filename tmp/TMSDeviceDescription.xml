@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+	<specVersion>
+		<major>1</major>
+		<minor>0</minor>
+	</specVersion>
+	<device>
+		<dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">DMS-1.50</dlna:X_DLNADOC>
+		<dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">M-DMS-1.50</dlna:X_DLNADOC>
+		<dlna:X_DLNACAP xmlns:dlna="urn:schemas-dlna-org:device-1-0">av-upload,image-upload,audio-upload,create-item-with-OCM-destroy-item</dlna:X_DLNACAP>
+<pv:extension xmlns:pv="http://www.pv.com/pvns/"></pv:extension><pv:platformID xmlns:pv="http://www.pv.com/pvns/">Linux 3.10.107; x86_64</pv:platformID><deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType>
+		<UDN>uuid:55076f6e-6b79-4d65-6403-0014fd166a46</UDN>
+		<friendlyName>Twonky Server at N4800</friendlyName>
+		<manufacturer>PacketVideo</manufacturer>
+		<manufacturerURL>http://www.pv.com</manufacturerURL>
+		<modelName>TwonkyServer</modelName>
+		<modelURL>http://www.twonky.com</modelURL>
+		<modelDescription>TwonkyServer (Linux-PC, T0)</modelDescription>
+		<modelNumber>7.2.8</modelNumber>
+		<serialNumber>7.2.8</serialNumber>
+		<UPC></UPC>
+		<presentationURL>http://192.168.0.90:9000/</presentationURL>
+		<iconList>
+			<icon>
+				<mimetype>image/jpeg</mimetype>
+				<height>48</height>
+				<width>48</width>
+				<depth>24</depth>
+				<url>/images/twonkyicon-48x48.jpg</url>
+			</icon>
+			<icon>
+				<mimetype>image/jpeg</mimetype>
+				<height>120</height>
+				<width>120</width>
+				<depth>24</depth>
+				<url>/images/twonkyicon-120x120.jpg</url>
+			</icon>
+			<icon>
+				<mimetype>image/png</mimetype>
+				<height>48</height>
+				<width>48</width>
+				<depth>24</depth>
+				<url>/images/twonkyicon-48x48.png</url>
+			</icon>
+			<icon>
+				<mimetype>image/png</mimetype>
+				<height>120</height>
+				<width>120</width>
+				<depth>24</depth>
+				<url>/images/twonkyicon-120x120.png</url>
+			</icon>
+		</iconList>
+		<serviceList>
+			<service>
+				<serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
+				<serviceId>urn:upnp-org:serviceId:ConnectionManager</serviceId>
+				<SCPDURL>/TMSConnectionManager.xml</SCPDURL>
+				<eventSubURL>/TMSConnectionManager/Event</eventSubURL>
+				<controlURL>/TMSConnectionManager/Control</controlURL>
+			</service>
+			<service>
+				<serviceType>urn:schemas-upnp-org:service:ContentDirectory:1</serviceType>
+				<serviceId>urn:upnp-org:serviceId:ContentDirectory</serviceId>
+				<SCPDURL>/TMSContentDirectory.xml</SCPDURL>
+				<eventSubURL>/TMSContentDirectory/Event</eventSubURL>
+				<controlURL>/TMSContentDirectory/Control</controlURL>
+			</service>
+			<service>
+				<serviceType>urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1</serviceType> 
+				<serviceId>urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar</serviceId> 
+				<SCPDURL>/TMSMediaReceiverRegistrar.xml</SCPDURL> 
+				<eventSubURL>/TMSMediaReceiverRegistrar/Event</eventSubURL> 
+				<controlURL>/TMSMediaReceiverRegistrar/Control</controlURL> 
+			</service>
+		</serviceList>
+	</device>
+</root>

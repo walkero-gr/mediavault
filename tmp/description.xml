@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0" xmlns:dlna="urn:schemas-dlna-org:device-1-0">
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <URLBase>http://192.168.0.92:8096</URLBase>
+   <device>
+      <dlna:X_DLNACAP />
+      <dlna:X_DLNADOC>DMS-1.50</dlna:X_DLNADOC>
+      <dlna:X_DLNADOC>M-DMS-1.50</dlna:X_DLNADOC>
+      <deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType>
+      <friendlyName>Jellyfin - RPi-Jellyfin</friendlyName>
+      <manufacturer>Jellyfin</manufacturer>
+      <manufacturerURL>https://github.com/jellyfin/jellyfin</manufacturerURL>
+      <modelDescription>UPnP/AV 1.0 Compliant Media Server</modelDescription>
+      <modelName>Jellyfin Server</modelName>
+      <modelNumber>01</modelNumber>
+      <modelURL>https://github.com/jellyfin/jellyfin</modelURL>
+      <serialNumber>83cc3fd68b6b4dafa611971bdc8a2914</serialNumber>
+      <UPC />
+      <UDN>uuid:83cc3fd68b6b4dafa611971bdc8a2914</UDN>
+      <iconList>
+         <icon>
+            <mimetype>image/png</mimetype>
+            <width>240</width>
+            <height>240</height>
+            <depth>24</depth>
+            <url>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/icons/logo240.png</url>
+         </icon>
+         <icon>
+            <mimetype>image/jpeg</mimetype>
+            <width>240</width>
+            <height>240</height>
+            <depth>24</depth>
+            <url>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/icons/logo240.jpg</url>
+         </icon>
+         <icon>
+            <mimetype>image/png</mimetype>
+            <width>120</width>
+            <height>120</height>
+            <depth>24</depth>
+            <url>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/icons/logo120.png</url>
+         </icon>
+         <icon>
+            <mimetype>image/jpeg</mimetype>
+            <width>120</width>
+            <height>120</height>
+            <depth>24</depth>
+            <url>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/icons/logo120.jpg</url>
+         </icon>
+         <icon>
+            <mimetype>image/png</mimetype>
+            <width>48</width>
+            <height>48</height>
+            <depth>24</depth>
+            <url>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/icons/logo48.png</url>
+         </icon>
+         <icon>
+            <mimetype>image/jpeg</mimetype>
+            <width>48</width>
+            <height>48</height>
+            <depth>24</depth>
+            <url>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/icons/logo48.jpg</url>
+         </icon>
+      </iconList>
+      <presentationURL>http://192.168.0.92:8096/web/index.html</presentationURL>
+      <serviceList>
+         <service>
+            <serviceType>urn:schemas-upnp-org:service:ContentDirectory:1</serviceType>
+            <serviceId>urn:upnp-org:serviceId:ContentDirectory</serviceId>
+            <SCPDURL>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/contentdirectory/contentdirectory.xml</SCPDURL>
+            <controlURL>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/contentdirectory/control</controlURL>
+            <eventSubURL>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/contentdirectory/events</eventSubURL>
+         </service>
+         <service>
+            <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
+            <serviceId>urn:upnp-org:serviceId:ConnectionManager</serviceId>
+            <SCPDURL>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/connectionmanager/connectionmanager.xml</SCPDURL>
+            <controlURL>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/connectionmanager/control</controlURL>
+            <eventSubURL>/dlna/83cc3fd68b6b4dafa611971bdc8a2914/connectionmanager/events</eventSubURL>
+         </service>
+      </serviceList>
+   </device>
+</root>
