@@ -1,7 +1,7 @@
 import urllib2
 
 service_type = "urn:schemas-upnp-org:service:ContentDirectory:1"
-soap_action = "Browse"
+soap_action = "GetSystemUpdateID"
 
 soap_encoding = "http://schemas.xmlsoap.org/soap/encoding/"
 soap_env = "http://schemas.xmlsoap.org/soap/envelope/"
@@ -11,25 +11,24 @@ soap_body = \
 '<?xml version="1.0"?>\n' \
 '<s:Envelope xmlns:s="%s" s:encodingStyle="%s">\n' \
 '  <s:Body>\n' \
-'    <m:%s xmlns:m="%s">\n' \
-'      <Result/>\n' \
-'    </m:%s>\n' \
+'    <u:%s xmlns:u="%s">\n' \
+'    </u:%s>\n' \
 '   </s:Body>\n' \
 '</s:Envelope>\n' % (soap_env, soap_encoding, soap_action, service_type, soap_action)
 
-print soap_body, "\n"
+# print soap_body, "\n"
 
 headers = {
     'POST': "%s HTTP/1.1" % ("/contentdirectory/control"),
     'SOAPAction': '"%s#%s"' % (service_type, soap_action),
-    'Host': 'http://192.168.0.92:8096',
+    'Host': '192.168.0.92:8096',
     'Content-Type': 'text/xml',
     'Content-Length': len(soap_body),
 }
 
-ctrl_url = "http://192.168.0.92:8096/contentdirectory/control"
+ctrl_url = "http://192.168.0.92:8096/dlna/83cc3fd68b6b4dafa611971bdc8a2914/contentdirectory/control"
 
-print headers, "\n"
+# print headers, "\n"
 
 request = urllib2.Request(ctrl_url, soap_body, headers)
 try:
