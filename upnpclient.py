@@ -596,18 +596,19 @@ class SOAP(object):
     def call(self, action_name, arg_in={}, debug=False):
         arg_values = '\n'.join( ['<%s>%s</%s>' % (k, v, k) for k, v in arg_in.items()] )
         body = \
-            '<?xml version="1.0"?>\n' \
-            '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">\n' \
-            '  <SOAP-ENV:Body>\n' \
-            '    <m:%(action_name)s xmlns:m="%(service_type)s">\n' \
+            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' \
+            '<s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' \
+            '  <s:Body>\n' \
+            '    <u:%(action_name)s xmlns:u="%(service_type)s">\n' \
             '      %(arg_values)s\n' \
-            '    </m:%(action_name)s>\n' \
-            '   </SOAP-ENV:Body>\n' \
-            '</SOAP-ENV:Envelope>\n' % {
+            '</u:%(action_name)s>\n' \
+            '</s:Body>\n' \
+            '</s:Envelope>\n' % {
                 'action_name': action_name,
                 'service_type': self.service_type,
                 'arg_values': arg_values,
             }
+
         headers = {
             'SOAPAction': '"%s#%s"' % (self.service_type, action_name),
             'Host': self._host,
@@ -616,14 +617,11 @@ class SOAP(object):
         }
 
         # Uncomment this for debugging.
-        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1)))
+        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPHandler(debuglevel=0)))
         request = urllib2.Request(self.url, body, headers)
         try:
             response = urllib2.urlopen(request)
         except urllib2.HTTPError, e:
-            print '~~~~~~~~~~~~~'
-            print e
-            print "\n"
             soap_error_xml = xml.dom.minidom.parseString(e.read())
             raise SOAPError(
                 int(_XMLGetNodeText(soap_error_xml.getElementsByTagName('errorCode')[0])),

@@ -59,22 +59,22 @@ def main(argv):
     # server = upnpclient.Server('http://192.168.0.90:9000/TMSDeviceDescription.xml') # Twonky
     server = upnpclient.Server('http://192.168.0.90:32469/DeviceDescription.xml') # Plex Media Server
 
-    action = server.find_action('GetSortCapabilities')
-    response = action.call()
-    print response
-    sys.exit()
-
-    # action = server.find_action('Browse')
-    # response = action.call({
-    #     'ObjectID': '',
-    #     'StartingIndex': 0,
-    #     'BrowseFlag': 'BrowseDirectChildren',
-    #     'Filter': '',
-    #     'RequestedCount': 10,
-    #     'SortCriteria': ''
-    # })
+    # action = server.find_action('GetSortCapabilities')
+    # response = action.call()
     # print response
     # sys.exit()
+
+    action = server.find_action('Browse')
+    response = action.call({
+        'ObjectID': '0',
+        'StartingIndex': 0,
+        'BrowseFlag': 'BrowseDirectChildren',
+        'Filter': '*',
+        'RequestedCount': 10,
+        'SortCriteria': ''
+    })
+    print response
+    sys.exit()
 
     xmlRespDict = xmltodict.parse(response['Result'])
     # print xmlRespDict
