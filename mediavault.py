@@ -55,9 +55,9 @@ def main(argv):
 
 
 
-    # server = upnpclient.Server('http://192.168.0.92:8096/dlna/83cc3fd68b6b4dafa611971bdc8a2914/description.xml') # Jellyfin
+    server = upnpclient.Server('http://192.168.0.92:8096/dlna/83cc3fd68b6b4dafa611971bdc8a2914/description.xml') # Jellyfin
     # server = upnpclient.Server('http://192.168.0.90:9000/TMSDeviceDescription.xml') # Twonky
-    server = upnpclient.Server('http://192.168.0.90:32469/DeviceDescription.xml') # Plex Media Server
+    # server = upnpclient.Server('http://192.168.0.90:32469/DeviceDescription.xml') # Plex Media Server
 
     # action = server.find_action('GetSortCapabilities')
     # response = action.call()
@@ -66,28 +66,41 @@ def main(argv):
 
     action = server.find_action('Browse')
     response = action.call({
-        'ObjectID': '0',
+        'ObjectID': 'movies_d7fb232f7120f755f003ec911c734400',
         'StartingIndex': 0,
         'BrowseFlag': 'BrowseDirectChildren',
         'Filter': '*',
-        'RequestedCount': 10,
+        'RequestedCount': 100,
         'SortCriteria': ''
     })
-    print response
-    sys.exit()
+    # print response
+    # print '=============================================================================================='
+    # sys.exit()
 
     xmlRespDict = xmltodict.parse(response['Result'])
     # print xmlRespDict
-    for container in xmlRespDict['DIDL-Lite']['container']:
-        # print container
-        print container['@id']
-        print container['@parentID']
-        print container['dc:title']
-        # print container['upnp:class']
-        # print container['upnp:icon']
-        # print container['upnp:albumArtURI']['#text']
-        print "\n"
+    # for container in xmlRespDict['DIDL-Lite']['container']:
+    #     # print container
+    #     print container['@id']
+    #     print container['@parentID']
+    #     print container['dc:title']
+    #     # print container['upnp:class']
+    #     # print container['upnp:icon']
+    #     # print container['upnp:albumArtURI']['#text']
+    #     print "\n"
     
+    for item in xmlRespDict['DIDL-Lite']['item']:
+        # print item
+        print item['dc:title']
+        # print item['upnp:actor']
+        print item['dc:description']
+        # print item['upnp:longDescription']
+        print item['upnp:icon']
+        # print item['res']['@duration']
+        # print item['res'][0]['@duration']
+        print item['res'][0]['#text']
+        print '=============================================================================================='
+
     sys.exit()
 
 
