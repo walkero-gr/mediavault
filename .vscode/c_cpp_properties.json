@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "MediaVault on AmigaOS 4",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${AOS4_NLIB_INC}",
+                "${AOS4_SDK_INC}",
+                "${AOS4_NET_INC}",
+                "${VBCC}/targets/ppc-amigaos/include/"
+            ],
+            "defines": [
+                "__amigaos4__",
+                "__USE_INLINE__"
+            ],
+            "compilerPath": "${VBCC}/bin/vc",
+            "cStandard": "c99",
+            "cppStandard": "c++98",
+            "intelliSenseMode": "${default}"
+        },
+    ],
+    "version": 4
+}
