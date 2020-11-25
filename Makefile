@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 25-11-2020 18:34:57
+# Created on: 25-11-2020 19:42:10
 #
 #
 
@@ -14,7 +14,7 @@
 ##
 ###################################################################
 
-MediaVault_OBJ := \
+MediaVault.OS4_OBJ := \
 	 src/mediavault.o
 
 
@@ -39,7 +39,7 @@ CFLAGS := $(INCPATH) -Wall -Werror -Wwrite-strings -D__USE_INLINE__
 
 .PHONY: all all-before all-after clean clean-custom realclean
 
-all: all-before MediaVault all-after
+all: all-before MediaVault.OS4 all-after
 
 all-before:
 #	You can add rules here to execute before the project is built
@@ -49,11 +49,11 @@ all-after:
 
 clean: clean-custom
 	@echo "Cleaning compiler objects..."
-	@rm -f  $(MediaVault_OBJ)
+	@rm -f  $(MediaVault.OS4_OBJ)
 
 realclean:
 	@echo "Cleaning compiler objects and targets..."
-	@rm -f  $(MediaVault_OBJ) MediaVault
+	@rm -f  $(MediaVault.OS4_OBJ) MediaVault.OS4
 
 
 ###################################################################
@@ -62,11 +62,11 @@ realclean:
 ##
 ###################################################################
 
-MediaVault: $(MediaVault_OBJ)
-	@echo "Linking MediaVault"
-	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) -lauto
-	@echo "Removing stale debug target: MediaVault"
-	@rm -f MediaVault.debug
+MediaVault.OS4: $(MediaVault.OS4_OBJ)
+	@echo "Linking MediaVault.OS4"
+	@gcc:bin/gcc -o MediaVault.OS4 $(MediaVault.OS4_OBJ) -lauto
+	@echo "Removing stale debug target: MediaVault.OS4"
+	@rm -f MediaVault.OS4.debug
 
 
 ###################################################################
