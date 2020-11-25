@@ -1,32 +1,85 @@
-
 #include <sys/types.h>
-#include <proto/socket.h>
-// #include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <netinet/in.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char **argv)
+#define BUFLEN 512
+#define SSDPADDR "239.255.255.250"
+#define SSDPPORT 1900
+
+void die(const char *s)
 {
-  int socket_handle ;
-  struct sockaddr_in socket_details ;
-  char * input_buffer;
-  char * httpget = "GET HTTP 1.1 / \x0D\x0A\n\x0D\x0A\n" ;
+    perror(s);
+    exit(EXIT_FAILURE);
+}
 
-  input_buffer = malloc(200000);
+int main ( void ) {
+    int socketHandle;
+    struct sockaddr_in ssdpAddr;
+    unsigned int addrLen;
+    char buf[BUFLEN];
+    int reqRecv;
+    const char *reqMsg = "M-SEARCH * HTTP/1.1\r\n"\
+    					  "HOST:239.255.255.250:1900\r\n"\
+    					  "ST:upnp:rootdevice\r\nMX:2\r\n"\
+    					  "MX: 3\r\n"\
+    					  "MAN:\"ssdp:discover\"\r\n"\
+    					  "\r\n";
+    fd_set readFds;
+    struct timeval timeout;
 
-  socket_handle = socket ( AF_INET, SOCK_STREAM, 0) ;
-  socket_details.sin_family = AF_INET ;
-  socket_details.sin_addr.s_addr=inet_addr("192.168.0.90");
-  socket_details.sin_port = htons(80);
-  // bzero ( &(socket_details.sin_zero), 8 ) ;
 
-  if ( connect (socket_handle,(struct sockaddr*)&socket_details, sizeof ( struct sockaddr)) == -1 ){
-      printf ( "Couldnt connect to server\n" ) ;
-  }
-  printf ( "Sending %d bytes\n", send ( socket_handle , httpget, strlen(httpget), 0 ) ) ;
-  printf ( "Received %d bytes\n", recv ( socket_handle , input_buffer , 200000, 0 ) ) ;
-  printf ( "%s\n", input_buffer ) ;
+    if ((socketHandle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+    {
+        die("Socket error");
+    }
 
-  return 0;
+    memset((char *) &ssdpAddr, 0, sizeof(ssdpAddr));
+    ssdpAddr.sin_family = AF_INET ;
+    ssdpAddr.sin_port = htons(SSDPPORT);
+    
+    if (inet_aton(SSDPADDR, &ssdpAddr.sin_addr) == 0)
+    {
+        fprintf(stderr, "inet_aton() failed\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    addrLen=sizeof(ssdpAddr);
+    
+    if (sendto(socketHandle, reqMsg, strlen(reqMsg), 0, (struct sockaddr*)&ssdpAddr, addrLen) == -1)
+    {
+        die("sendto()");
+    }
+    
+    
+    FD_ZERO(&readFds);
+    FD_SET(socketHandle, &readFds);
+    timeout.tv_sec = 5;
+    timeout.tv_usec = 0;
+    while(select(socketHandle + 1, &readFds, NULL, NULL, &timeout) >0) 
+    {
+        if(FD_ISSET(socketHandle, &readFds))
+        {
+        	memset(buf, '\0', BUFLEN);
+	    	if ((reqRecv = recvfrom(socketHandle, buf, BUFLEN, 0, (struct sockaddr*)&ssdpAddr, &addrLen)) < 0)
+	    	// if ((reqRecv = recv(socketHandle, buf, BUFLEN, 0)) < 0)
+		    {
+		        die("recvfrom()");
+		    }
+		    
+		    if(strncmp(buf, "HTTP/1.1 200 OK", 12) != 0)
+		    {
+		        die("err: ssdp failed");
+		    }
+		    
+		    printf("Request Recv:%d\n", reqRecv);
+		    puts(buf);
+		    free(buf);
+		}
+    }
+    
+    return 0 ;
 }

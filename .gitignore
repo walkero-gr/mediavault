@@ -1,3 +1,5 @@
 src/*_cat.*
 src/*.o
+MediaVault
 MediaVault.*
+*.bak
