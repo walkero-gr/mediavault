@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 25-11-2020 19:42:10
+# Created on: 01-12-2020 17:35:51
 #
 #
 
@@ -28,7 +28,7 @@ CC := gcc:bin/gcc
 
 INCPATH := -I.
 
-CFLAGS := $(INCPATH) -Wall -Werror -Wwrite-strings -D__USE_INLINE__
+CFLAGS := $(INCPATH) -gstabs -Wall -Werror -Wwrite-strings -D__USE_INLINE__
 
 
 ###################################################################
@@ -63,10 +63,10 @@ realclean:
 ###################################################################
 
 MediaVault.OS4: $(MediaVault.OS4_OBJ)
-	@echo "Linking MediaVault.OS4"
-	@gcc:bin/gcc -o MediaVault.OS4 $(MediaVault.OS4_OBJ) -lauto
-	@echo "Removing stale debug target: MediaVault.OS4"
-	@rm -f MediaVault.OS4.debug
+	@echo "Linking MediaVault.OS4.debug"
+	@gcc:bin/gcc -o MediaVault.OS4.debug $(MediaVault.OS4_OBJ) -lauto
+	@echo "Creating debug target: MediaVault.OS4"
+	@cp -f -p MediaVault.OS4.debug MediaVault.OS4
 
 
 ###################################################################
