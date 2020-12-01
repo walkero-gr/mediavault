@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 01-12-2020 17:35:51
+# Created on: 01-12-2020 22:50:24
 #
 #
 
@@ -15,7 +15,7 @@
 ###################################################################
 
 MediaVault.OS4_OBJ := \
-	 src/mediavault.o
+	 src/upnpfuncs.o src/mediavault.o
 
 
 ###################################################################
@@ -82,5 +82,7 @@ MediaVault.OS4: $(MediaVault.OS4_OBJ)
 	@echo "Compiling $<"
 	@$(CC) -c $< -o $*.o $(CFLAGS)
 
-src/mediavault.o: src/mediavault.c
+src/mediavault.o: src/mediavault.c src/mediavault.h
+
+src/upnpfuncs.o: src/upnpfuncs.c
 

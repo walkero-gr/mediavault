@@ -1,0 +1,35 @@
+
+  Notes relating to project: MediaVault
+
+*************************************************************
+
+
+
+
+
+//// TO DO
+*******
+DONE - Create a unique list of the UPnP servers
+DONE - Move UPnP functions to separate source file
+Make a SOAP request function
+Get the server metadata for each UPnP server and add them at the UPnP server list
+Create the first browse request
+Open libraries manually
+Update the Makefile.docker to compile
+Setup CI/CD
+Create first window
+Create server list
+Click on window server list and make Browse SOAP request
+Create about window
+Connect filetypes with players
+Make preferences window
+Show metadata in the window
+Add images on lists
+
+//// BUGS
+******
+
+
+
+
+
