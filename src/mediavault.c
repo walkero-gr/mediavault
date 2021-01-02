@@ -2,6 +2,8 @@
 #include "mediavault.h"
 
 extern void discoverUPnPServers( void );
+extern void freeUpnpServers( void );
+extern void getMetadata( char *location );
 
 void die(const char *s)
 {
@@ -12,6 +14,7 @@ void die(const char *s)
 int main(int argc, char **argv)
 {
   discoverUPnPServers();
-    
+  freeUpnpServers();
+  //getMetadata((char *)"dummy");
   return 0 ;
 }

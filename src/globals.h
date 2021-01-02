@@ -18,8 +18,7 @@
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 
-// static const char USED min_stack[] = "$STACK:102400";
-// STATIC CONST_STRPTR stack USED = "$STACK:102400";
+STATIC CONST_STRPTR stack USED = "$STACK:102400";
 
 void die(const char *s);
 

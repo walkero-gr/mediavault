@@ -27,6 +27,10 @@ typedef struct upnpServer *upnpServerPtr;
 upnpServerPtr upnpServerHead = NULL;
 upnpServerPtr upnpServerCurr = NULL;
 
+struct metadata {
+  char friendlyName[128];
+};
+
 
 int isUpnpServerEmpty()
 {
@@ -120,7 +124,11 @@ void printUpnpServers( void )
 
 void parseUpnpServerData(char *upnpServerData)
 {
-  char *data;
+  //STRPTR data = malloc(BUFLEN * sizeof(char));
+  STRPTR data = AllocVecTags(sizeof(char) * BUFLEN,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+    TAG_DONE);
   char tmpServer[128] = "";
   char tmpUsn[128] = "";
   char tmpLocation[128] = "";
@@ -156,74 +164,198 @@ void parseUpnpServerData(char *upnpServerData)
     }
   }
   //puts(upnpServerData);
+  if(data != NULL) {
+    FreeVec(data);
+  }
+}
 
+void getMetadata( char *location )
+{
+  // http://192.168.0.92:8096/dlna/83cc3fd68b6b4dafa611971bdc8a2914/description.xml
+  // http://192.168.0.90:9000/TMSDeviceDescription.xml
+  // http://192.168.0.90:32469/DeviceDescription.xml
+  // http://192.168.0.1:5000/rootDesc.xml
+  int socketHandle;
+  int reqRecv;
+  unsigned int addrLen;
+  long conn;
+  //char *xmlResponse;
+  STRPTR xmlResponse = AllocVecTags(sizeof(char) * 1024 * 5,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+    TAG_DONE);
+
+  //char buf[BUFLEN];
+  //char *buf;
+  STRPTR buf = AllocVecTags(sizeof(char) * BUFLEN,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+    TAG_DONE);
+
+  struct sockaddr_in ssdpAddr;
+  const char reqMsg[] = "GET /dlna/83cc3fd68b6b4dafa611971bdc8a2914/description.xml HTTP/1.1\r\nHost: 192.168.0.92\r\n\r\n";
+  fd_set readFds;
+  struct timeval timeout;
+  timeout.tv_sec = 5;
+  timeout.tv_usec = 0;
+
+
+  if ((socketHandle = socket(AF_INET, SOCK_STREAM, IPPROTO_IP)) == -1) {
+    die("Socket error");
+  }
+
+  //memset((char *) &ssdpAddr, 0, sizeof(ssdpAddr));
+  FD_ZERO(&ssdpAddr); // This is a memset to zero
+  ssdpAddr.sin_addr.s_addr = inet_addr("192.168.0.92");
+  ssdpAddr.sin_family = AF_INET ;
+  ssdpAddr.sin_port = htons(8096);
+    
+  //if (inet_aton("192.168.0.92", &ssdpAddr.sin_addr) == 0) {
+  //  fprintf(stderr, "inet_aton() failed\n");
+  //  exit(EXIT_FAILURE);
+  //}
+    
+  addrLen = sizeof(ssdpAddr);
+  if((conn = connect(socketHandle, (struct sockaddr*)&ssdpAddr, addrLen)) == -1) {
+    die("Connect failed: ");
+  }
+  
+  //if (sendto(socketHandle, reqMsg, strlen(reqMsg), 0, (struct sockaddr*)&ssdpAddr, addrLen) == -1) {
+  if (send(socketHandle, reqMsg, strlen(reqMsg), 0) == -1) {
+    die("send() failed");
+  }
+    
+  FD_ZERO(&readFds);
+  FD_SET(socketHandle, &readFds);
+//  strcpy(xmlResponse, ".");
+  while(select(socketHandle + 1, &readFds, NULL, NULL, &timeout) > 0) {
+    if(FD_ISSET(socketHandle, &readFds)) {
+      //memset(buf, '\0', BUFLEN);
+      if ((reqRecv = recv(socketHandle, buf, BUFLEN, 0)) < 0)
+      {
+        die("recv() failed");
+      }
+      
+      //if(strncmp(buf, "HTTP/1.1 200 OK", 12) != 0)
+      //{
+      //  die("err: ssdp failed");
+      // }
+      
+      printf("Request Recv:%d\n", reqRecv);
+      //puts(buf);
+      Strlcat(xmlResponse, buf, sizeof(xmlResponse));
+      //strcat(xmlResponse, buf);
+    }
+  }
+
+
+
+  printf("%s\n", xmlResponse);
+  //puts(xmlResponse);
+  shutdown(socketHandle, 2);
+}
+
+void addUPnPMetadata()
+{
+  printf("#################################################################\n");
+  upnpServerPtr currentPtr = upnpServerHead;
+  while (currentPtr != NULL) {
+    printf("GET Metadata for %s\n", currentPtr->server);
+    printf("Retrieve XML from %s\n", currentPtr->location);
+    getMetadata(currentPtr->location);
+    currentPtr = currentPtr->next;
+  }
+}
+
+int socketCreateUDP(void)
+{
+  int hSocket;
+  if ((hSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
+    die("Socket error");
+  }
+  return hSocket;
+}
+
+struct sockaddr_in
+socketConnectAton(int hsocket, const char *address, int port)
+{
+  struct sockaddr_in ssdpAddr;
+  memset((char *) &ssdpAddr, 0, sizeof(ssdpAddr));
+
+  ssdpAddr.sin_family = AF_INET ;
+  ssdpAddr.sin_port = htons(port);
+
+  if (inet_aton(address, &ssdpAddr.sin_addr) == 0) {
+    fprintf(stderr, "inet_aton() failed\n");
+    exit(EXIT_FAILURE);
+  }
+
+  return ssdpAddr;
 }
 
 void discoverUPnPServers( void )
 {
-    int socketHandle;
-    struct sockaddr_in ssdpAddr;
-    unsigned int addrLen;
-    char buf[BUFLEN];
-    int reqRecv;
-    const char *reqMsg = "M-SEARCH * HTTP/1.1\r\n"\
-                          "HOST:239.255.255.250:1900\r\n"\
-                          "ST:upnp:rootdevice\r\nMX:2\r\n"\
-                          "MX: 3\r\n"\
-                          "MAN:\"ssdp:discover\"\r\n"\
-                          "\r\n";
-    fd_set readFds;
-    struct timeval timeout;
+  int socketHandle;
+  int reqRecv;
+  unsigned int addrLen;
 
+  STRPTR buf = AllocVecTags(sizeof(char) * BUFLEN,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+    TAG_DONE);
 
-    if ((socketHandle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
-    {
-        die("Socket error");
-    }
+  struct sockaddr_in ssdpAddr;
 
-    memset((char *) &ssdpAddr, 0, sizeof(ssdpAddr));
-    ssdpAddr.sin_family = AF_INET ;
-    ssdpAddr.sin_port = htons(SSDPPORT);
+  fd_set readFds;
+  struct timeval timeout;
+  timeout.tv_sec = 5;
+  timeout.tv_usec = 0;
+  
+  socketHandle = socketCreateUDP();
+
+  ssdpAddr = socketConnectAton(socketHandle, SSDPADDR, SSDPPORT);
+
+  addrLen = sizeof(ssdpAddr);
+  if (sendto(socketHandle, discoverMsg, strlen(discoverMsg), 0, (struct sockaddr*)&ssdpAddr, addrLen) == -1) {
+    die("sendto()");
+  }
     
-    if (inet_aton(SSDPADDR, &ssdpAddr.sin_addr) == 0)
-    {
-        fprintf(stderr, "inet_aton() failed\n");
-        exit(EXIT_FAILURE);
+  FD_ZERO(&readFds);
+  FD_SET(socketHandle, &readFds);
+  while(select(socketHandle + 1, &readFds, NULL, NULL, &timeout) >0) {
+    if(FD_ISSET(socketHandle, &readFds)) {
+      memset(buf, '\0', BUFLEN);
+      if ((reqRecv = recvfrom(socketHandle, buf, BUFLEN, 0, (struct sockaddr*)&ssdpAddr, &addrLen)) < 0)
+      {
+        die("recvfrom() failed");
+      }
+      
+      if(strncmp(buf, "HTTP/1.1 200 OK", 12) != 0)
+      {
+        die("err: ssdp failed");
+      }
+      
+      printf("Request Recv:%d\n", reqRecv);
+      //puts(buf);
+      parseUpnpServerData(buf);
     }
-    
-    addrLen=sizeof(ssdpAddr);
-    
-    if (sendto(socketHandle, reqMsg, strlen(reqMsg), 0, (struct sockaddr*)&ssdpAddr, addrLen) == -1)
-    {
-        die("sendto()");
-    }
-    
-    
-    FD_ZERO(&readFds);
-    FD_SET(socketHandle, &readFds);
-    timeout.tv_sec = 5;
-    timeout.tv_usec = 0;
-    while(select(socketHandle + 1, &readFds, NULL, NULL, &timeout) >0) 
-    {
-        if(FD_ISSET(socketHandle, &readFds))
-        {
-            memset(buf, '\0', BUFLEN);
-            if ((reqRecv = recvfrom(socketHandle, buf, BUFLEN, 0, (struct sockaddr*)&ssdpAddr, &addrLen)) < 0)
-            {
-                die("recvfrom()");
-            }
-            
-            if(strncmp(buf, "HTTP/1.1 200 OK", 12) != 0)
-            {
-                die("err: ssdp failed");
-            }
-            
-            printf("Request Recv:%d\n", reqRecv);
-            // puts(buf);
-            parseUpnpServerData(buf);
-        }
-    }
+  }
 
   printf("#################################################################\n");
   printUpnpServers();
+  //addUPnPMetadata();
+  if(buf != NULL) {
+    FreeVec(buf);
+  }
+  shutdown(socketHandle, 2);
+}
+
+void freeUpnpServers( void )
+{
+  if(upnpServerCurr != NULL) {
+    free(upnpServerCurr);
+  }
+  if(upnpServerHead != NULL) {
+    free(upnpServerHead);
+  }
 }

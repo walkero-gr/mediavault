@@ -11,8 +11,8 @@
 *******
 DONE - Create a unique list of the UPnP servers
 DONE - Move UPnP functions to separate source file
-Make a SOAP request function
 Get the server metadata for each UPnP server and add them at the UPnP server list
+Make a SOAP request function
 Create the first browse request
 Open libraries manually
 Update the Makefile.docker to compile
