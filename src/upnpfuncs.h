@@ -27,13 +27,13 @@
 #include <netinet/in.h>
 
 /* Prototypes */
-#include <proto/exec.h>
-#include <proto/utility.h>
+//#include <proto/exec.h>
+//#include <proto/utility.h>
 
 /* ANSI C */
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 
 #include "globals.h"
 
@@ -41,11 +41,13 @@ const unsigned int BUFLEN = 512;
 const char SSDPADDR[16] = "239.255.255.250";
 const unsigned int SSDPPORT = 1900;
 
-const char discoverMsg[105] = "M-SEARCH * HTTP/1.1\r\n"\
+const char DISCOVERMSG[105] = "M-SEARCH * HTTP/1.1\r\n"\
                               "HOST:239.255.255.250:1900\r\n"\
                               "ST:upnp:rootdevice\r\nMX:2\r\n"\
                               "MX: 3\r\n"\
                               "MAN:\"ssdp:discover\"\r\n"\
                               "\r\n";
+
+#include "globals.h"
 
 #endif

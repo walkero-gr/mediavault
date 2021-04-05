@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 01-12-2020 22:50:24
+# Created on: 06-04-2021 00:13:30
 #
 #
 
@@ -14,8 +14,9 @@
 ##
 ###################################################################
 
-MediaVault.OS4_OBJ := \
-	 src/upnpfuncs.o src/mediavault.o
+MediaVault_OBJ := \
+	 src/mediavault.o src/libshandler.o src/upnpfuncs.o \
+	
 
 
 ###################################################################
@@ -28,7 +29,7 @@ CC := gcc:bin/gcc
 
 INCPATH := -I.
 
-CFLAGS := $(INCPATH) -gstabs -Wall -Werror -Wwrite-strings -D__USE_INLINE__
+CFLAGS := $(INCPATH) -Wall -Werror -Wwrite-strings
 
 
 ###################################################################
@@ -39,7 +40,7 @@ CFLAGS := $(INCPATH) -gstabs -Wall -Werror -Wwrite-strings -D__USE_INLINE__
 
 .PHONY: all all-before all-after clean clean-custom realclean
 
-all: all-before MediaVault.OS4 all-after
+all: all-before MediaVault all-after
 
 all-before:
 #	You can add rules here to execute before the project is built
@@ -49,11 +50,11 @@ all-after:
 
 clean: clean-custom
 	@echo "Cleaning compiler objects..."
-	@rm -f  $(MediaVault.OS4_OBJ)
+	@rm -f  $(MediaVault_OBJ)
 
 realclean:
 	@echo "Cleaning compiler objects and targets..."
-	@rm -f  $(MediaVault.OS4_OBJ) MediaVault.OS4
+	@rm -f  $(MediaVault_OBJ) MediaVault
 
 
 ###################################################################
@@ -62,11 +63,11 @@ realclean:
 ##
 ###################################################################
 
-MediaVault.OS4: $(MediaVault.OS4_OBJ)
-	@echo "Linking MediaVault.OS4.debug"
-	@gcc:bin/gcc -o MediaVault.OS4.debug $(MediaVault.OS4_OBJ) -lauto
-	@echo "Creating debug target: MediaVault.OS4"
-	@cp -f -p MediaVault.OS4.debug MediaVault.OS4
+MediaVault: $(MediaVault_OBJ)
+	@echo "Linking MediaVault"
+	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) 
+	@echo "Removing stale debug target: MediaVault"
+	@rm -f MediaVault.debug
 
 
 ###################################################################
@@ -84,5 +85,9 @@ MediaVault.OS4: $(MediaVault.OS4_OBJ)
 
 src/mediavault.o: src/mediavault.c src/mediavault.h
 
-src/upnpfuncs.o: src/upnpfuncs.c
+src/libshandler.o: src/libshandler.c src/libshandler.h
+
+src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h
+
+src/oofuncs.o: src/oofuncs.c
 

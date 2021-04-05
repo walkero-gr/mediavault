@@ -18,6 +18,19 @@
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 
+#include <proto/dos.h>
+#include <proto/exec.h>
+#include <proto/utility.h>
+
+#include <string.h>
+
+extern struct ExecIFace *IExec;
+extern struct DOSIFace *IDOS;
+struct Library 	*IntuitionBase; 	struct IntuitionIFace 	*IIntuition;
+struct Library 	*UtilityBase;			struct UtilityIFace 		*IUtility;
+
+
+
 STATIC CONST_STRPTR stack USED = "$STACK:102400";
 
 void die(const char *s);

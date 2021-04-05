@@ -49,10 +49,10 @@ struct upnpServer *newUpnpServerList(
   if(item == NULL) {
     die("\n Node creation failed \n");
   }
-  Strlcpy(item->server, serverPtr, sizeof(item->server));
-  Strlcpy(item->usn, usnPtr, sizeof(item->usn));
-  Strlcpy(item->location, locationPtr, sizeof(item->location));
-  Strlcpy(item->st, stPtr, sizeof(item->st));
+  IUtility->Strlcpy(item->server, serverPtr, sizeof(item->server));
+  IUtility->Strlcpy(item->usn, usnPtr, sizeof(item->usn));
+  IUtility->Strlcpy(item->location, locationPtr, sizeof(item->location));
+  IUtility->Strlcpy(item->st, stPtr, sizeof(item->st));
   item->next = NULL;
 
   upnpServerHead = upnpServerCurr = item;
@@ -96,10 +96,10 @@ struct upnpServer *addUpnpServer(
   if(item == NULL) {
     die("\n Node creation failed \n");
   }
-  Strlcpy(item->server, serverPtr, sizeof(item->server));
-  Strlcpy(item->usn, usnPtr, sizeof(item->usn));
-  Strlcpy(item->location, locationPtr, sizeof(item->location));
-  Strlcpy(item->st, stPtr, sizeof(item->st));
+  IUtility->Strlcpy(item->server, serverPtr, sizeof(item->server));
+  IUtility->Strlcpy(item->usn, usnPtr, sizeof(item->usn));
+  IUtility->Strlcpy(item->location, locationPtr, sizeof(item->location));
+  IUtility->Strlcpy(item->st, stPtr, sizeof(item->st));
   item->next = NULL;
 
   if(add_to_end) {
@@ -125,7 +125,7 @@ void printUpnpServers( void )
 void parseUpnpServerData(char *upnpServerData)
 {
   //STRPTR data = malloc(BUFLEN * sizeof(char));
-  STRPTR data = AllocVecTags(sizeof(char) * BUFLEN,
+  STRPTR data = IExec->AllocVecTags(sizeof(char) * BUFLEN,
       AVT_Type,            MEMF_SHARED,
       AVT_ClearWithValue,  "\0",
     TAG_DONE);
@@ -136,25 +136,25 @@ void parseUpnpServerData(char *upnpServerData)
 
   data = strtok(upnpServerData, "\n");
   printf("--- %s\n", data);
-  if(Strnicmp(data, "HTTP/1.1 200 OK", 12) == 0) {
+  if(IUtility->Strnicmp(data, "HTTP/1.1 200 OK", 12) == 0) {
     while((data = strtok(NULL, "\n")) != NULL) { 
-      if(Strnicmp(data, "SERVER: ", 8) == 0) {
-        Strlcpy(tmpServer, data+8, strlen(data)-8);
+      if(IUtility->Strnicmp(data, "SERVER: ", 8) == 0) {
+        IUtility->Strlcpy(tmpServer, data+8, strlen(data)-8);
         printf("--- %s\n", data);
         printf("##### %s ####\n", tmpServer);
       }
-      if(Strnicmp(data, "USN: ", 5) == 0) {
-        Strlcpy(tmpUsn, data+5, strlen(data)-5);
+      if(IUtility->Strnicmp(data, "USN: ", 5) == 0) {
+        IUtility->Strlcpy(tmpUsn, data+5, strlen(data)-5);
         printf("--- %s\n", data);
         printf("##### %s ####\n", tmpUsn);
       }
-      if(Strnicmp(data, "LOCATION: ", 10) == 0) {
-        Strlcpy(tmpLocation, data+10, strlen(data)-10);
+      if(IUtility->Strnicmp(data, "LOCATION: ", 10) == 0) {
+        IUtility->Strlcpy(tmpLocation, data+10, strlen(data)-10);
         printf("--- %s\n", data);
         printf("##### %s ####\n", tmpLocation);
       }
-      if(Strnicmp(data, "ST: ", 4) == 0) {
-        Strlcpy(tmpSt, data+4, strlen(data)-4);
+      if(IUtility->Strnicmp(data, "ST: ", 4) == 0) {
+        IUtility->Strlcpy(tmpSt, data+4, strlen(data)-4);
         printf("--- %s\n", data);
         printf("##### %s ####\n", tmpSt);
       }
@@ -165,7 +165,7 @@ void parseUpnpServerData(char *upnpServerData)
   }
   //puts(upnpServerData);
   if(data != NULL) {
-    FreeVec(data);
+    IExec->FreeVec(data);
   }
 }
 
@@ -180,14 +180,14 @@ void getMetadata( char *location )
   unsigned int addrLen;
   long conn;
   //char *xmlResponse;
-  STRPTR xmlResponse = AllocVecTags(sizeof(char) * 1024 * 5,
+  STRPTR xmlResponse = IExec->AllocVecTags(sizeof(char) * 1024 * 5,
       AVT_Type,            MEMF_SHARED,
       AVT_ClearWithValue,  "\0",
     TAG_DONE);
 
   //char buf[BUFLEN];
   //char *buf;
-  STRPTR buf = AllocVecTags(sizeof(char) * BUFLEN,
+  STRPTR buf = IExec->AllocVecTags(sizeof(char) * BUFLEN,
       AVT_Type,            MEMF_SHARED,
       AVT_ClearWithValue,  "\0",
     TAG_DONE);
@@ -243,7 +243,7 @@ void getMetadata( char *location )
       
       printf("Request Recv:%d\n", reqRecv);
       //puts(buf);
-      Strlcat(xmlResponse, buf, sizeof(xmlResponse));
+      IUtility->Strlcat(xmlResponse, buf, sizeof(xmlResponse));
       //strcat(xmlResponse, buf);
     }
   }
@@ -276,8 +276,8 @@ int socketCreateUDP(void)
   return hSocket;
 }
 
-struct sockaddr_in
-socketConnectAton(int hsocket, const char *address, int port)
+
+struct sockaddr_in socketConnectAton(int hsocket, const char *address, int port)
 {
   struct sockaddr_in ssdpAddr;
   memset((char *) &ssdpAddr, 0, sizeof(ssdpAddr));
@@ -293,13 +293,20 @@ socketConnectAton(int hsocket, const char *address, int port)
   return ssdpAddr;
 }
 
+
+//int socketSend()
+//{
+
+//}
+
+
 void discoverUPnPServers( void )
 {
   int socketHandle;
   int reqRecv;
   unsigned int addrLen;
 
-  STRPTR buf = AllocVecTags(sizeof(char) * BUFLEN,
+  STRPTR buf = IExec->AllocVecTags(sizeof(char) * BUFLEN,
       AVT_Type,            MEMF_SHARED,
       AVT_ClearWithValue,  "\0",
     TAG_DONE);
@@ -312,11 +319,14 @@ void discoverUPnPServers( void )
   timeout.tv_usec = 0;
   
   socketHandle = socketCreateUDP();
+  if(socketHandle == -1) {
+    die("Socket creation failed!");
+  }
 
   ssdpAddr = socketConnectAton(socketHandle, SSDPADDR, SSDPPORT);
 
   addrLen = sizeof(ssdpAddr);
-  if (sendto(socketHandle, discoverMsg, strlen(discoverMsg), 0, (struct sockaddr*)&ssdpAddr, addrLen) == -1) {
+  if (sendto(socketHandle, DISCOVERMSG, strlen(DISCOVERMSG), 0, (struct sockaddr*)&ssdpAddr, addrLen) == -1) {
     die("sendto()");
   }
     
@@ -345,7 +355,7 @@ void discoverUPnPServers( void )
   printUpnpServers();
   //addUPnPMetadata();
   if(buf != NULL) {
-    FreeVec(buf);
+    IExec->FreeVec(buf);
   }
   shutdown(socketHandle, 2);
 }
