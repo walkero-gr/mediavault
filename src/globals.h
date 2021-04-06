@@ -21,17 +21,20 @@
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/utility.h>
+#include <proto/intuition.h>
 
 #include <string.h>
 
 extern struct ExecIFace *IExec;
 extern struct DOSIFace *IDOS;
 struct Library 	*IntuitionBase; 	struct IntuitionIFace 	*IIntuition;
+struct Library 	*LayoutBase;			struct LayoutIFace 			*ILayout;
 struct Library 	*UtilityBase;			struct UtilityIFace 		*IUtility;
 
+Class *LayoutClass;
+Class *PageClass;
 
-
-STATIC CONST_STRPTR stack USED = "$STACK:102400";
+static CONST_STRPTR stack USED = "$STACK:102400";
 
 void die(const char *s);
 

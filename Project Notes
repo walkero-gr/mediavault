@@ -17,7 +17,7 @@ DONE - Move UPnP functions to separate source file
 DONE - Open libraries manually
 - Update the Makefile.docker to compile
 - Setup CI/CD
-- Create first window
+DONE - Create first window
 - Create server list
 - Click on window server list and make Browse SOAP request
 - Create about window

@@ -8,6 +8,8 @@ extern void getMetadata( char *location );
 extern void OpenLibs(void);
 extern void CleanExit(const char *str);
 
+extern void showGUI(void);
+
 void die(const char *s)
 {
     perror(s);
@@ -19,7 +21,8 @@ int main(int argc, char **argv)
 
 	OpenLibs();
 
-  discoverUPnPServers();
+	showGUI();
+  //discoverUPnPServers();
   //freeUpnpServers();
   //getMetadata((char *)"dummy");
   
