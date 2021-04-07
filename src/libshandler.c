@@ -27,11 +27,11 @@ void CleanExit(const char *str)
 
 void OpenLibs(void)
 {
-  if ((IntuitionBase = IExec->OpenLibrary( "intuition.library", 53 ))) {
+  if ((IntuitionBase = IExec->OpenLibrary( "intuition.library", 54 ))) {
     IIntuition = (struct IntuitionIFace *)IExec->GetInterface( IntuitionBase, "main", 1, NULL );
     if(!IIntuition)  CleanExit("Can't open intuition.library Interface");
   }
-  else CleanExit("Can't open intuition.library version 53");
+  else CleanExit("Can't open intuition.library version 54");
 
   if ((UtilityBase = IExec->OpenLibrary( "utility.library", 53 ))) {
     IUtility = (struct UtilityIFace *)IExec->GetInterface( UtilityBase, "main", 1, NULL );
@@ -52,9 +52,3 @@ void OpenLibs(void)
 	else CleanExit("Can't open Label Image");
 
 }
-
-
-	//LayoutBase = (struct Library *)IExec->OpenLibrary("gadgets/layout.gadget",0L);
-	//ButtonBase = (struct Library *)IExec->OpenLibrary("gadgets/button.gadget",0L);
-	//PaletteBase = (struct Library *)IExec->OpenLibrary("gadgets/palette.gadget",0L);
-	//LabelBase = (struct Library *)IExec->OpenLibrary("images/label.image",0L);

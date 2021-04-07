@@ -20,13 +20,20 @@
 
 #include <classes/window.h>
 
+#include <images/bitmap.h>
 #include <images/label.h>
+#include <intuition/icclass.h> 
+#include <intuition/menuclass.h>
 
 #include <libraries/gadtools.h>
 
+#include <gadgets/button.h>
 #include <gadgets/chooser.h>
 #include <gadgets/layout.h>
+#include <gadgets/scroller.h> 
 #include <gadgets/string.h>
+#include <gadgets/texteditor.h>
+
 
 #include <stdio.h>
 
@@ -43,7 +50,7 @@ enum
 enum
 {
   OID_MAIN,
-  OID_ABOUT_MAIN,
+  OID_ABOUT,
   OID_LAST
 };
 
@@ -56,18 +63,27 @@ enum
   GID_CHOOSER_GENRES,
   GID_CHOOSER_COUNTRIES,
   GID_CHOOSER_LANGUAGES,
+  GID_ABOUT_LAYOUT_ROOT,
+  GID_ABOUT_LAYOUT_TEXT,
+  GID_ABOUT_TEXT,
+  GID_ABOUT_TEXT_SCROLLER,
+  GID_ABOUT_BUTTON_OK,
   GID_LAST
 };
 
 enum
 {
-    PROJECT_MENU
+   MID_PROJECT = 1,  /* Zero is an invalid value for a menu ID */
+   MID_ABOUT,
+   MID_ICONIFY,
+   MID_QUIT,
+   MID_LAST
 };
 
 struct Window *windows[WID_LAST];
-struct Gadget *gadgets[GID_LAST];
+Object *gadgets[GID_LAST];
 Object *objects[OID_LAST];
-
+Object *menus[MID_LAST];
 
 static CONST char* screenTitle = "MediaVault";
 static CONST char* windowTitle = "MediaVault";
@@ -79,7 +95,6 @@ struct NewMenu mainMenu[] =
     { NM_ITEM, "Iconify", "I", 0, 0, 0 },
     { NM_ITEM, NM_BARLABEL, 0, 0, 0, 0 },
     { NM_ITEM, "Quit...", "Q", 0, 0, 0 },
-
     { NM_END, NULL, 0, 0, 0, 0 }
 }; 
 
@@ -111,6 +126,20 @@ CONST_STRPTR countries[] =
   "Germany",
   NULL
 };
+
+// For the scroller at the About window
+const uint32 textToScroller[] = {
+    GA_TEXTEDITOR_Prop_Entries,    SCROLLER_Total,
+    GA_TEXTEDITOR_Prop_First,	     SCROLLER_Top,
+    GA_TEXTEDITOR_Prop_Visible,    SCROLLER_Visible,
+    TAG_END
+};   
+const uint32 scrollerToText[] = {
+    SCROLLER_Total,	  	GA_TEXTEDITOR_Prop_Entries,
+    SCROLLER_Top,				GA_TEXTEDITOR_Prop_First,
+    SCROLLER_Visible,		GA_TEXTEDITOR_Prop_Visible,
+    TAG_END
+};  
 
 #include "globals.h"
 
