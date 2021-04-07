@@ -18,21 +18,17 @@
 #ifndef _GUI_H
 #define _GUI_H
 
-//#include <dos/dos.h>
 #include <classes/window.h>
 
 #include <images/label.h>
 
-//#include <gadgets/button.h>
+#include <libraries/gadtools.h>
+
 #include <gadgets/chooser.h>
 #include <gadgets/layout.h>
 #include <gadgets/string.h>
 
-//#include <proto/intuition.h>
-//#include <proto/exec.h>
-//#include <proto/window.h>
-//#include <proto/layout.h>
-//#include <proto/button.h>
+#include <stdio.h>
 
 struct Screen 	*screen;
 struct MsgPort 	*appPort;
@@ -63,6 +59,10 @@ enum
   GID_LAST
 };
 
+enum
+{
+    PROJECT_MENU
+};
 
 struct Window *windows[WID_LAST];
 struct Gadget *gadgets[GID_LAST];
@@ -71,6 +71,17 @@ Object *objects[OID_LAST];
 
 static CONST char* screenTitle = "MediaVault";
 static CONST char* windowTitle = "MediaVault";
+
+struct NewMenu mainMenu[] =
+{
+    { NM_TITLE, "Project ", 0, 0, 0, 0 },
+    { NM_ITEM, "About...", "?", 0, 0, 0 },
+    { NM_ITEM, "Iconify", "I", 0, 0, 0 },
+    { NM_ITEM, NM_BARLABEL, 0, 0, 0, 0 },
+    { NM_ITEM, "Quit...", "Q", 0, 0, 0 },
+
+    { NM_END, NULL, 0, 0, 0, 0 }
+}; 
 
 CONST_STRPTR genres[] =
 {

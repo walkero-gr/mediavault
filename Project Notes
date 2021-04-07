@@ -25,6 +25,9 @@ DONE - Create first window
 - Make preferences window
 - Show metadata in the window
 - Add images on lists
+DONE - Create Project menu
+- Make Iconify menu item to work
+- Make About menu item to open the about window
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)

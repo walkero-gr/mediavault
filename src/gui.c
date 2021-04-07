@@ -30,10 +30,16 @@ void showGUI(void)
 				IIntuition->UnlockPubScreen(NULL, screen);
 			
 				if (windows[WID_MAIN]) {
+				  struct Menu *menuStrip;
+					struct MenuItem *item;
+
 				  uint32 signal = 0;
+				  uint16 code = 0,
+                 selection;
+          BOOL done = FALSE;
+          
 		      IIntuition->GetAttr(WINDOW_SigMask, objects[OID_MAIN], &signal);
-		
-				  BOOL done = FALSE;
+		 
 				  while (!done) {
 				    uint32 wait = IExec->Wait(signal | SIGBREAKF_CTRL_C);
 				    if ( wait & SIGBREAKF_CTRL_C ) {
@@ -43,7 +49,6 @@ void showGUI(void)
 				    
 				    if ( wait & signal ) {
 		        	uint32 result = WMHI_LASTMSG;
-		          int16 code = 0;
 		
 		          while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code)) != WMHI_LASTMSG) {
 		          	switch (result & WMHI_CLASSMASK) {
@@ -57,6 +62,38 @@ void showGUI(void)
 		                break;
 									case WMHI_UNICONIFY:
 										windows[WID_MAIN] = (struct Window *)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN);
+										break;
+									case WMHI_MENUPICK:
+										menuStrip = windows[WID_MAIN]->MenuStrip;
+										selection = code;
+										uint16 menuNum, itemNum;
+										
+										while ((selection != MENUNULL) && (done == FALSE)) {
+
+                      item = IIntuition->ItemAddress(menuStrip, selection);
+                        
+                      menuNum = MENUNUM(selection);
+											itemNum = ITEMNUM(selection); 
+
+									    switch (menuNum)
+									    {
+									      case PROJECT_MENU:
+							            switch (itemNum)
+							            {
+							                case 0: 
+							                	printf("About\n");
+							                  break;
+							                case 1:
+							                  printf("Iconify\n");
+							                  break;
+							                case 3:
+							                  done = TRUE;
+							                  break;
+							            }
+							            break;
+									    }
+                      selection = item->NextSelect;
+                    }
 										break;
 								}
 							}
@@ -85,7 +122,8 @@ static void buildMainWindow(void) {
     WA_FadeTime,            500000, /* Duration of transition in microseconds */
     WA_NewLookMenus,				TRUE,
 		WINDOW_Iconifiable, 		TRUE,
-		WINDOW_IconifyGadget,  	TRUE,  
+		WINDOW_IconifyGadget,  	TRUE,
+		WINDOW_NewMenu,					mainMenu,  
 		WINDOW_AppPort, 				appPort,
 		WINDOW_Position, 				WPOS_CENTERSCREEN,
 		WINDOW_Layout, IIntuition->NewObject(NULL, "layout.gadget",
