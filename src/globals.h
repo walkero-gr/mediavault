@@ -28,11 +28,13 @@
 extern struct ExecIFace *IExec;
 extern struct DOSIFace *IDOS;
 struct Library 	*IntuitionBase; 	struct IntuitionIFace 	*IIntuition;
+struct Library 	*LabelBase;				struct LabelIFace 			*ILabel;
 struct Library 	*LayoutBase;			struct LayoutIFace 			*ILayout;
 struct Library 	*UtilityBase;			struct UtilityIFace 		*IUtility;
 
 Class *LayoutClass;
-Class *PageClass;
+Class *LabelClass;
+//Class *PageClass;
 
 static CONST_STRPTR stack USED = "$STACK:102400";
 

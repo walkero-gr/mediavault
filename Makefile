@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 06-04-2021 16:43:08
+# Created on: 06-04-2021 19:12:00
 #
 #
 
@@ -65,7 +65,7 @@ realclean:
 
 MediaVault: $(MediaVault_OBJ)
 	@echo "Linking MediaVault"
-	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) 
+	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) -lauto
 	@echo "Removing stale debug target: MediaVault"
 	@rm -f MediaVault.debug
 
@@ -91,5 +91,5 @@ src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h
 
 src/oofuncs.o: src/oofuncs.c
 
-src/gui.o: src/gui.c
+src/gui.o: src/gui.c src/gui.h
 

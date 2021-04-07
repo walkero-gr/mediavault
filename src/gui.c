@@ -16,17 +16,17 @@
 
 #include "gui.h"
 
-static Object *rootWindow(void);
+static void buildMainWindow(void);
 
 void showGUI(void)
 {
   appPort = (struct MsgPort *)IExec->AllocSysObject(ASOT_PORT, NULL);
   if (appPort) {
-	screen = IIntuition->LockPubScreen(NULL);
+		screen = IIntuition->LockPubScreen(NULL);
 		if(screen) {
-		  objMain = rootWindow();
-		  if (objMain) {
-		  	windows[WID_MAIN] = (struct Window*)IIntuition->IDoMethod(objMain, WM_OPEN, NULL);
+		  buildMainWindow();
+		  if (objects[OID_MAIN]) {
+		  	windows[WID_MAIN] = (struct Window*)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, NULL);
 				IIntuition->UnlockPubScreen(NULL, screen);
 			
 				if (windows[WID_MAIN]) {
@@ -71,34 +71,92 @@ void showGUI(void)
 }
 
 
-static Object *rootWindow(void) {
+static void buildMainWindow(void) {
 	objects[OID_MAIN] = IIntuition->NewObject(NULL, "window.class",
-		WA_ScreenTitle, "MediaVault",
-		WA_Title, "MediaVault",
-		WA_Activate, TRUE,
-		WA_DepthGadget, TRUE,
-		WA_DragBar, TRUE,
-		WA_CloseGadget, TRUE,
-		WA_SizeGadget, TRUE,
-
-		// If on the Workbench screen, this tells window.class that
-		// we can handle the iconify/uniconify when changing screens.
-		WINDOW_Iconifiable, TRUE,
-
-		WINDOW_AppPort, appPort,
-		WINDOW_Position, WPOS_CENTERMOUSE,
+		WA_ScreenTitle, 				screenTitle,
+		WA_Title, 							windowTitle,
+		WA_Activate, 						TRUE,
+		WA_CloseGadget, 				TRUE,
+		WA_DepthGadget, 				TRUE,
+		WA_DragBar, 						TRUE,
+		WA_SizeGadget, 					TRUE,
+		WA_Opaqueness,          255,    /* Initial opaqueness on opening (0..255) */
+    WA_OverrideOpaqueness,  TRUE,   /* Override global settings? (TRUE|FALSE) */
+    WA_FadeTime,            500000, /* Duration of transition in microseconds */
+    WA_NewLookMenus,				TRUE,
+		WINDOW_Iconifiable, 		TRUE,
+		WINDOW_IconifyGadget,  	TRUE,  
+		WINDOW_AppPort, 				appPort,
+		WINDOW_Position, 				WPOS_CENTERSCREEN,
 		WINDOW_Layout, IIntuition->NewObject(NULL, "layout.gadget",
 			LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
 			LAYOUT_SpaceOuter, TRUE,
 			LAYOUT_DeferLayout, TRUE,
-			LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
-				GA_Text, "Click Me",
+				LAYOUT_AddChild,   objects[GID_FILTERS_LAYOUT] = IIntuition->NewObject(NULL, "layout.gadget",
+					LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
+					LAYOUT_BevelStyle,      BVS_GROUP,
+					LAYOUT_Label,           "Filter stations by",
+					
+					LAYOUT_AddChild,   objects[GID_FILTERS_LAYOUT_LINE1] = IIntuition->NewObject(NULL, "layout.gadget",
+						LAYOUT_AddChild, IIntuition->NewObject(NULL, "string.gadget",
+								GA_ID, 								GID_FILTERS_NAME,
+								GA_RelVerify, 				TRUE,
+								GA_TabCycle, 					TRUE,
+								STRINGA_MinVisible, 	10,
+								STRINGA_MaxChars, 		64,
+								TAG_DONE),
+								CHILD_Label, IIntuition->NewObject(NULL, "label.image",
+									LABEL_Text, 	"_Name",
+									LABEL_Key, 		"n",
+									TAG_DONE),	
+								
+							LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+		          	GA_ID,            		GID_CHOOSER_GENRES,
+		          	GA_RelVerify,        	TRUE,
+		          	CHOOSER_LabelArray,  	genres,
+		          	CHOOSER_Selected,    	0,
+		          	GA_Underscore,		 		0,
+								TAG_DONE),
+		      			CHILD_NominalSize, TRUE,
+								CHILD_Label, IIntuition->NewObject(NULL, "label.image",
+									LABEL_Text, 	"_Genre",
+									LABEL_Key, 		"g",
+									TAG_DONE),		
+						TAG_DONE),
+						
+						LAYOUT_AddChild,   objects[GID_FILTERS_LAYOUT_LINE2] = IIntuition->NewObject(NULL, "layout.gadget",
+							LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+		          	GA_ID,            		GID_CHOOSER_COUNTRIES,
+		          	GA_RelVerify,        	TRUE,
+		          	CHOOSER_LabelArray,  	countries,
+		          	CHOOSER_Selected,    	0,
+		          	GA_Underscore,		 		0,
+								TAG_DONE),
+		      			CHILD_NominalSize, TRUE,
+								CHILD_Label, IIntuition->NewObject(NULL, "label.image",
+									LABEL_Text, 	"_Country",
+									LABEL_Key, 		"c",
+									TAG_DONE),
+									
+							LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+		          	GA_ID,            		GID_CHOOSER_LANGUAGES,
+		          	GA_RelVerify,        	TRUE,
+		          	CHOOSER_LabelArray,  	languages,
+		          	CHOOSER_Selected,    	0,
+		          	GA_Underscore,		 		0,
+								TAG_DONE),
+		      			CHILD_NominalSize, TRUE,
+								CHILD_Label, IIntuition->NewObject(NULL, "label.image",
+									LABEL_Text, 	"_Language",
+									LABEL_Key, 		"l",
+									TAG_DONE),		
+						TAG_DONE),
+							
+					LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
+						GA_Text, "Filter Stations",
+						TAG_DONE),
 				TAG_DONE),
 			TAG_DONE),
 		TAG_DONE);
-		
-		//if (objects[OID_LAYOUT_ROOT]) {
-		  return objects[OID_MAIN];
-		//}
 }  
   

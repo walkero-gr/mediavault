@@ -27,7 +27,7 @@ DONE - Create first window
 - Add images on lists
 
 ## Radio
-- Add Radio section with filter fields at the top (Genre, Language, Country, Name)
+DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
 - Make request based on info at the search fields
 - List radio stations
 - Mark stations as favorites

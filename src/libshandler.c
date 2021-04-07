@@ -7,9 +7,12 @@
 
 void CleanExit(const char *str)
 {
-  if(strcmp(str,"JustExit"))    IDOS->Printf("Error::%s\n",str);
+  if(strcmp(str,"JustExit")) IDOS->Printf("Error::%s\n",str);
 
-	if(ILayout)					IExec->DropInterface((APTR) ILayout);
+	if(ILabel)						IExec->DropInterface((APTR) ILabel);
+	if(LabelBase)			 		IIntuition->CloseClass((APTR) LabelBase);
+
+	if(ILayout)						IExec->DropInterface((APTR) ILayout);
 	if(LayoutBase)			 	IIntuition->CloseClass((APTR) LayoutBase);
 	
 	if(IUtility)					IExec->DropInterface((APTR) IUtility);
@@ -41,5 +44,17 @@ void OpenLibs(void)
 	  if(!ILayout)  CleanExit("Can't open Layout Gadget Interface");
 	}
 	else CleanExit("Can't open Layout Gadget");
+	
+	if ((LabelBase = (APTR) IIntuition->OpenClass( "images/label.image", 1, &LabelClass ))) {
+	  ILabel	= (struct LabelIFace *)IExec->GetInterface( LabelBase, "main", 1, NULL );
+	  if(!ILabel)  CleanExit("Can't open Label Image Interface");
+	}
+	else CleanExit("Can't open Label Image");
 
 }
+
+
+	//LayoutBase = (struct Library *)IExec->OpenLibrary("gadgets/layout.gadget",0L);
+	//ButtonBase = (struct Library *)IExec->OpenLibrary("gadgets/button.gadget",0L);
+	//PaletteBase = (struct Library *)IExec->OpenLibrary("gadgets/palette.gadget",0L);
+	//LabelBase = (struct Library *)IExec->OpenLibrary("images/label.image",0L);
