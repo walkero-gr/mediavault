@@ -9,18 +9,12 @@
 
 //// TO DO
 *******
-DONE - Create a unique list of the UPnP servers
-DONE - Move UPnP functions to separate source file
-- Get the server metadata for each UPnP server and add them at the UPnP server list
-- Make a SOAP request function
-- Create the first browse request
+
 DONE - Open libraries manually
 - Update the Makefile.docker to compile
 - Setup CI/CD
 DONE - Create first window
-- Create server list
-- Click on window server list and make Browse SOAP request
-- Create about window
+DONE - Create about window
 - Connect filetypes with players
 - Make preferences window
 - Show metadata in the window
@@ -35,6 +29,17 @@ DONE - Add Radio filter section with fields at the top of the window (Genre, Lan
 - Make request based on info at the search fields
 - List radio stations
 - Mark stations as favorites
+
+## Podcasts
+
+## UPnP
+DONE - Create a unique list of the UPnP servers
+DONE - Move UPnP functions to separate source file
+- Get the server metadata for each UPnP server and add them at the UPnP server list
+- Make a SOAP request function
+- Create the first browse request
+- Create server list
+- Click on window server list and make Browse SOAP request
 
 //// BUGS
 ******

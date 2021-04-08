@@ -213,7 +213,16 @@ static void buildMainWindow(void) {
 }  
 
 static void buildAboutWindow(void) {
-  CONST_STRPTR aboutText = VSTRING " TEST this";
+  CONST_STRPTR aboutText = VSTRING \
+  	"Copyright (c) 2021 George Sokianos\n\n"
+  	"MediaVault is a media frontend for different sources.\n\n" \
+		"My plan for MediaVault is to create an app where people can find and listen on online " \
+		"radio stations, podcasts and even to support UPnP servers to listen music or watch movies.\n\n" \
+		"Created by George Sokianos\n" \
+		"Contact email: walkero@gmail.com\n" \
+		"Report bugs at https://github.com/walkero-gr/mediavault/issues/\n\n"
+		"Dedicated to my beloved family, who support me all these years\nAris, Nefeli and Marily!\n\n" \
+		"Distributed without warranty under the terms of the GNU General Public License.";
   
 	objects[OID_ABOUT] = IIntuition->NewObject(NULL, "window.class",
 		WA_ScreenTitle, 		"About",
@@ -260,8 +269,8 @@ static void buildAboutWindow(void) {
 			LAYOUT_AddChild, gadgets[GID_ABOUT_BUTTON_OK] = IIntuition->NewObject(NULL, "button.gadget",
 				GA_ID, 							GID_ABOUT_BUTTON_OK,
 				GA_RelVerify, 			TRUE,
+				GA_Text, 						"_Okay",
 				BUTTON_AutoButton, 	0,
-				GA_Text, 						"OK",
 			TAG_DONE),                
 			CHILD_MaxHeight, 40,
 	  TAG_DONE), 
