@@ -14,7 +14,6 @@
 
 */
 
-
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 
@@ -25,8 +24,12 @@
 
 #include <string.h>
 
+#include "version.h"
+
 extern struct ExecIFace *IExec;
 extern struct DOSIFace *IDOS;
+
+struct Library 	*ApplicationBase; struct ApplicationIFace *IApplication;
 struct Library 	*IntuitionBase; 	struct IntuitionIFace 	*IIntuition;
 struct Library 	*LabelBase;				struct LabelIFace 			*ILabel;
 struct Library 	*LayoutBase;			struct LayoutIFace 			*ILayout;
@@ -34,9 +37,9 @@ struct Library 	*UtilityBase;			struct UtilityIFace 		*IUtility;
 
 Class *LayoutClass;
 Class *LabelClass;
-//Class *PageClass;
 
 static CONST_STRPTR stack USED = "$STACK:102400";
+static CONST_STRPTR version USED = VERSTAG;
 
 void die(const char *s);
 

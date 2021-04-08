@@ -26,8 +26,9 @@ DONE - Create first window
 - Show metadata in the window
 - Add images on lists
 DONE - Create Project menu
-- Make Iconify menu item to work
-- Make About menu item to open the about window
+DONE - Make Iconify menu item to work
+DONE - Make About menu item to open the about window
+DONE - Make Quit menu item to quit the app
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)

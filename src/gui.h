@@ -34,8 +34,9 @@
 #include <gadgets/string.h>
 #include <gadgets/texteditor.h>
 
-
 #include <stdio.h>
+
+#include "version.h"
 
 struct Screen 	*screen;
 struct MsgPort 	*appPort;
@@ -85,18 +86,8 @@ Object *gadgets[GID_LAST];
 Object *objects[OID_LAST];
 Object *menus[MID_LAST];
 
-static CONST char* screenTitle = "MediaVault";
-static CONST char* windowTitle = "MediaVault";
-
-struct NewMenu mainMenu[] =
-{
-    { NM_TITLE, "Project ", 0, 0, 0, 0 },
-    { NM_ITEM, "About...", "?", 0, 0, 0 },
-    { NM_ITEM, "Iconify", "I", 0, 0, 0 },
-    { NM_ITEM, NM_BARLABEL, 0, 0, 0, 0 },
-    { NM_ITEM, "Quit...", "Q", 0, 0, 0 },
-    { NM_END, NULL, 0, 0, 0, 0 }
-}; 
+static CONST char* screenTitle = APPNAME;
+static CONST char* windowTitle = APPNAME;
 
 CONST_STRPTR genres[] =
 {

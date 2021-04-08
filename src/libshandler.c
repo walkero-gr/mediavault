@@ -20,16 +20,28 @@ void CleanExit(const char *str)
   
   if(IIntuition)				IExec->DropInterface((APTR) IIntuition);
   if(IntuitionBase)    	IExec->CloseLibrary(IntuitionBase);
-  
+
+  if(IApplication)			IExec->DropInterface((APTR) IApplication);
+  if(ApplicationBase)   IExec->CloseLibrary(ApplicationBase);
+
   exit(0);
 }
 
 
 void OpenLibs(void)
 {
+  if ((ApplicationBase = IExec->OpenLibrary( "application.library", 53 ))) {
+    IApplication = (struct ApplicationIFace *)IExec->GetInterface( ApplicationBase, "application", 2, NULL );
+    if(!IApplication)  CleanExit("Can't open application.library Interface");
+  }
+  else CleanExit("Can't open application.library version 53");
+  
   if ((IntuitionBase = IExec->OpenLibrary( "intuition.library", 54 ))) {
-    IIntuition = (struct IntuitionIFace *)IExec->GetInterface( IntuitionBase, "main", 1, NULL );
-    if(!IIntuition)  CleanExit("Can't open intuition.library Interface");
+    if (LIB_IS_AT_LEAST(IntuitionBase, 54, 6)) {
+    	IIntuition = (struct IntuitionIFace *)IExec->GetInterface( IntuitionBase, "main", 1, NULL );
+    	if(!IIntuition)  CleanExit("Can't open intuition.library Interface");
+    }
+    else CleanExit("Can't open intuition.library version 54.6 and above");
   }
   else CleanExit("Can't open intuition.library version 54");
 

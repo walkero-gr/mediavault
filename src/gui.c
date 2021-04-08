@@ -32,11 +32,13 @@ void showGUI(void)
 		  buildAboutWindow();
 		  
 		  if (objects[OID_MAIN]) {
-		  	windows[WID_MAIN] = (struct Window*)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, NULL);
+		  	windows[WID_MAIN] = (struct Window*)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, TAG_DONE);
 				IIntuition->UnlockPubScreen(NULL, screen);
 			
 				if (windows[WID_MAIN]) {
-				  uint32 signal = 0;
+				  //Object *obj;
+				  uint32 	signal = 0,
+				  				selectedMenu = MID_LAST;
 				  uint16 code = 0;
           BOOL done = FALSE;
           
@@ -52,32 +54,53 @@ void showGUI(void)
 				    if ( wait & signal ) {
 		        	uint32 result = WMHI_LASTMSG;
 		
-		          while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code)) != WMHI_LASTMSG) {
+		          while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE)) != WMHI_LASTMSG) {
 		          	switch (result & WMHI_CLASSMASK) {
 		           		case WMHI_CLOSEWINDOW:
 		              	windows[WID_MAIN] = NULL;
 		                done = TRUE;
 		                break;
 		              case WMHI_ICONIFY:
-		                IIntuition->IDoMethod(objects[OID_MAIN], WM_ICONIFY);
+		                IIntuition->IDoMethod(objects[OID_MAIN], WM_ICONIFY, TAG_DONE);
 		                windows[WID_MAIN] = NULL;
 		                break;
 									case WMHI_UNICONIFY:
-										windows[WID_MAIN] = (struct Window *)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN);
+										windows[WID_MAIN] = (struct Window *)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, TAG_DONE);
 										break;
+									case WMHI_MENUPICK:
+										selectedMenu = NO_MENU_ID;
+                    while ((selectedMenu = IIntuition->IDoMethod(menus[MID_PROJECT], MM_NEXTSELECT, 0, selectedMenu, TAG_DONE)) != NO_MENU_ID) {
+                      switch (selectedMenu) {
+                        case MID_ICONIFY:
+                       		IIntuition->IDoMethod(objects[OID_MAIN], WM_ICONIFY, TAG_DONE);
+		                			windows[WID_MAIN] = NULL;
+                        	break;
+                        case MID_ABOUT:
+													windows[WID_ABOUT] = (struct Window*)IIntuition->IDoMethod(objects[OID_ABOUT], WM_OPEN, TAG_DONE);
+													IIntuition->SetWindowPointer(windows[WID_MAIN], WA_BusyPointer, TRUE, TAG_DONE);
+													IIntuition->SetAttrs(objects[OID_MAIN], WA_BusyPointer, TRUE, TAG_DONE);
+                        	break;
+                        case MID_QUIT:
+                        	done = TRUE;
+                        	break;
+                      }  
+                    }
+
+									  break;
 								}
 							}
 							
-							while ((result = IIntuition->IDoMethod(objects[OID_ABOUT], WM_HANDLEINPUT, &code))) {
+							while ((result = IIntuition->IDoMethod(objects[OID_ABOUT], WM_HANDLEINPUT, &code, TAG_DONE))) {
 								switch(result & WMHI_CLASSMASK) {
 									case WMHI_CLOSEWINDOW:
-										IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE);
+										IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE, TAG_DONE);
+										IIntuition->SetAttrs(objects[OID_MAIN], WA_BusyPointer, FALSE, TAG_DONE);
 										IIntuition->SetWindowPointer(windows[WID_MAIN], WA_BusyPointer, FALSE, TAG_DONE);
 										break;
 									case WMHI_GADGETUP:
 										switch(result & WMHI_GADGETMASK) {
 											case GID_ABOUT_BUTTON_OK:
-												IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE);
+												IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE, TAG_DONE);
 												IIntuition->SetAttrs(objects[OID_MAIN], WA_BusyPointer, FALSE, TAG_DONE);
 												IIntuition->SetWindowPointer(windows[WID_MAIN], WA_BusyPointer, FALSE, TAG_DONE);
 												break;		
@@ -93,6 +116,7 @@ void showGUI(void)
 		
 		IIntuition->DisposeObject(objects[OID_ABOUT]);
 	  IIntuition->DisposeObject(objects[OID_MAIN]);
+	  IIntuition->DisposeObject(menus[MID_PROJECT]);
   }
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
@@ -189,7 +213,7 @@ static void buildMainWindow(void) {
 }  
 
 static void buildAboutWindow(void) {
-  CONST_STRPTR aboutText = "MediaVault about dummy text";
+  CONST_STRPTR aboutText = VSTRING " TEST this";
   
 	objects[OID_ABOUT] = IIntuition->NewObject(NULL, "window.class",
 		WA_ScreenTitle, 		"About",
@@ -273,6 +297,11 @@ static void buildMainMenu(void) {
 		TAG_END);
 }
 
+/**
+ * The following code is from MenuClass.c as found at the SDK 53.30 examples
+ *
+ * Copyright of Hyperion Entertainment CVBA
+ */
 static struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen) {
    struct Image *i = NULL;
    APTR prev_win;
