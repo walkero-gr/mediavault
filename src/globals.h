@@ -29,14 +29,16 @@
 extern struct ExecIFace *IExec;
 extern struct DOSIFace *IDOS;
 
-struct Library 	*ApplicationBase; struct ApplicationIFace *IApplication;
-struct Library 	*IntuitionBase; 	struct IntuitionIFace 	*IIntuition;
-struct Library 	*LabelBase;				struct LabelIFace 			*ILabel;
-struct Library 	*LayoutBase;			struct LayoutIFace 			*ILayout;
-struct Library 	*UtilityBase;			struct UtilityIFace 		*IUtility;
+struct Library *ApplicationBase; 	struct ApplicationIFace *IApplication;
+struct Library *IntuitionBase; 		struct IntuitionIFace 	*IIntuition;
+struct Library *LabelBase;				struct LabelIFace 			*ILabel;
+struct Library *LayoutBase;				struct LayoutIFace 			*ILayout;
+struct Library *UtilityBase;			struct UtilityIFace 		*IUtility;
+struct Library *ListBrowserBase;	struct ListBrowserIFace *IListBrowser;
 
 Class *LayoutClass;
 Class *LabelClass;
+Class *ListBrowserClass;
 
 static CONST_STRPTR stack USED = "$STACK:102400";
 static CONST_STRPTR version USED = VERSTAG;

@@ -33,7 +33,7 @@
 
 #define APPNAME			"MediaVault"
 #define VERS				APPNAME " " STR(VERSION) "." STR(REVISION)
-#define VSTRING			APPNAME " " STR(VERSION) "." STR(REVISION) " (" RELEASE_DATE ")\r\n"
+#define VSTRING			APPNAME " " STR(VERSION) "." STR(REVISION) " (" RELEASE_DATE ")"
 #define VERSTAG			"\0$VER: " STR(VERSION) "." STR(REVISION) " (" RELEASE_DATE ")"
 
 #endif

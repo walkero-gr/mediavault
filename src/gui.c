@@ -27,6 +27,7 @@ void showGUI(void)
   if (appPort) {
 		
 		if((screen = IIntuition->LockPubScreen(NULL))) {
+		  drInfo = IIntuition->GetScreenDrawInfo(screen);
 		  buildMainMenu();
 		  buildMainWindow();
 		  buildAboutWindow();
@@ -36,7 +37,6 @@ void showGUI(void)
 				IIntuition->UnlockPubScreen(NULL, screen);
 			
 				if (windows[WID_MAIN]) {
-				  //Object *obj;
 				  uint32 	signal = 0,
 				  				selectedMenu = MID_LAST;
 				  uint16 code = 0;
@@ -110,22 +110,34 @@ void showGUI(void)
 							} 
 				    }
 				  }
+		
+					IIntuition->DisposeObject(objects[OID_ABOUT]);
+	  			IIntuition->DisposeObject(objects[OID_MAIN]);
+	  			IIntuition->DisposeObject(menus[MID_PROJECT]);
 				}
 			}
+			IIntuition->FreeScreenDrawInfo(screen, drInfo);
 		}
-		
-		IIntuition->DisposeObject(objects[OID_ABOUT]);
-	  IIntuition->DisposeObject(objects[OID_MAIN]);
-	  IIntuition->DisposeObject(menus[MID_PROJECT]);
   }
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
 
 
 static void buildMainWindow(void) {
+	//struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
+
+  columninfo = IListBrowser->AllocLBColumnInfo(2,
+    LBCIA_Column, 0,
+        LBCIA_Title, " GUI Attributes",
+        LBCIA_Width, 80,
+    LBCIA_Column, 1,
+        LBCIA_Title, " BOOL",
+        LBCIA_Width, 20,
+    TAG_DONE);
+
 	objects[OID_MAIN] = IIntuition->NewObject(NULL, "window.class",
-		WA_ScreenTitle, 				screenTitle,
-		WA_Title, 							windowTitle,
+		WA_ScreenTitle, 				VSTRING,
+		WA_Title, 							APPNAME,
 		WA_Activate, 						TRUE,
 		WA_CloseGadget, 				TRUE,
 		WA_DepthGadget, 				TRUE,
@@ -133,7 +145,7 @@ static void buildMainWindow(void) {
 		WA_SizeGadget, 					TRUE,
 		WA_Opaqueness,          255,    /* Initial opaqueness on opening (0..255) */
     WA_OverrideOpaqueness,  TRUE,   /* Override global settings? (TRUE|FALSE) */
-    WA_FadeTime,            500000, /* Duration of transition in microseconds */
+    WA_FadeTime,            250000, /* Duration of transition in microseconds */
     WA_NewLookMenus,				TRUE,
 		WINDOW_Iconifiable, 		TRUE,
 		WINDOW_IconifyGadget,  	TRUE,
@@ -144,76 +156,121 @@ static void buildMainWindow(void) {
 			LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
 			LAYOUT_SpaceOuter, TRUE,
 			LAYOUT_DeferLayout, TRUE,
-				LAYOUT_AddChild,   gadgets[GID_FILTERS_LAYOUT] = IIntuition->NewObject(NULL, "layout.gadget",
+				LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
 					LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
-					LAYOUT_BevelStyle,      BVS_GROUP,
-					LAYOUT_Label,           "Filter stations by",
 					
-					LAYOUT_AddChild,   gadgets[GID_FILTERS_LAYOUT_LINE1] = IIntuition->NewObject(NULL, "layout.gadget",
-						LAYOUT_AddChild, IIntuition->NewObject(NULL, "string.gadget",
+					// START - Top Filter Section
+					LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+						LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,		
+						LAYOUT_BevelStyle,      BVS_GROUP,
+						LAYOUT_Label,           "Filter stations by",
+					
+						// Top filter section with the Name Text Box with Label
+						LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+							LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
+							LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+								LABEL_DrawInfo, drInfo,
+								LABEL_Text, "_Name",
+								TAG_END),
+							LAYOUT_AddChild, IIntuition->NewObject(NULL, "string.gadget",
 								GA_ID, 								GID_FILTERS_NAME,
 								GA_RelVerify, 				TRUE,
 								GA_TabCycle, 					TRUE,
+								GA_ActivateKey,				"n",
 								STRINGA_MinVisible, 	10,
 								STRINGA_MaxChars, 		64,
 								TAG_DONE),
-								CHILD_Label, IIntuition->NewObject(NULL, "label.image",
-									LABEL_Text, 	"_Name",
-									LABEL_Key, 		"n",
-									TAG_DONE),	
-								
-							LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
-		          	GA_ID,            		GID_CHOOSER_GENRES,
-		          	GA_RelVerify,        	TRUE,
-		          	CHOOSER_LabelArray,  	genres,
-		          	CHOOSER_Selected,    	0,
-		          	GA_Underscore,		 		0,
-								TAG_DONE),
-		      			CHILD_NominalSize, TRUE,
-								CHILD_Label, IIntuition->NewObject(NULL, "label.image",
-									LABEL_Text, 	"_Genre",
-									LABEL_Key, 		"g",
-									TAG_DONE),		
-						TAG_DONE),
+							TAG_DONE),
 						
-						LAYOUT_AddChild,   gadgets[GID_FILTERS_LAYOUT_LINE2] = IIntuition->NewObject(NULL, "layout.gadget",
-							LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
-		          	GA_ID,            		GID_CHOOSER_COUNTRIES,
-		          	GA_RelVerify,        	TRUE,
-		          	CHOOSER_LabelArray,  	countries,
-		          	CHOOSER_Selected,    	0,
-		          	GA_Underscore,		 		0,
-								TAG_DONE),
-		      			CHILD_NominalSize, TRUE,
-								CHILD_Label, IIntuition->NewObject(NULL, "label.image",
-									LABEL_Text, 	"_Country",
-									LABEL_Key, 		"c",
+						// Top filter section with the select boxes
+						LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+							// Genres Select Box with Label
+							LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+								LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
+								LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+									LABEL_DrawInfo, drInfo,
+									LABEL_Text, "_Genre",
+									TAG_END),							
+								LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+			          	GA_ID,            		GID_CHOOSER_GENRES,
+			          	GA_RelVerify,        	TRUE,
+									GA_TabCycle, 					TRUE,
+			          	GA_Underscore,		 		0,
+									GA_ActivateKey,				"g",
+			          	CHOOSER_LabelArray,  	genres,
+			          	CHOOSER_Selected,    	0,
 									TAG_DONE),
-									
-							LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
-		          	GA_ID,            		GID_CHOOSER_LANGUAGES,
-		          	GA_RelVerify,        	TRUE,
-		          	CHOOSER_LabelArray,  	languages,
-		          	CHOOSER_Selected,    	0,
-		          	GA_Underscore,		 		0,
 								TAG_DONE),
-		      			CHILD_NominalSize, TRUE,
-								CHILD_Label, IIntuition->NewObject(NULL, "label.image",
-									LABEL_Text, 	"_Language",
-									LABEL_Key, 		"l",
-									TAG_DONE),		
-						TAG_DONE),
+								
+							// Countries Select Box with Label
+							LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+								LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
+								LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+									LABEL_DrawInfo, drInfo,
+									LABEL_Text, "_Country",
+									TAG_END),						
+								LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+			          	GA_ID,            		GID_CHOOSER_COUNTRIES,
+			          	GA_RelVerify,        	TRUE,
+									GA_TabCycle, 					TRUE,
+			          	GA_Underscore,		 		0,
+									GA_ActivateKey,				"c",
+			          	CHOOSER_LabelArray,  	countries,
+			          	CHOOSER_Selected,    	0,
+									TAG_DONE),
+								TAG_DONE),
 							
-					LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
-						GA_Text, "Filter Stations",
+							// Languages Select Box with Label
+							LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+								LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
+								LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+									LABEL_DrawInfo, drInfo,
+									LABEL_Text, "_Language",
+									TAG_END),									
+								LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+			          	GA_ID,            		GID_CHOOSER_LANGUAGES,
+			          	GA_RelVerify,        	TRUE,
+									GA_TabCycle, 					TRUE,
+			          	GA_Underscore,		 		0,
+									GA_ActivateKey,				"l",
+			          	CHOOSER_LabelArray,  	languages,
+			          	CHOOSER_Selected,    	0,
+									TAG_DONE),
+								TAG_DONE),
+							TAG_DONE),
+								
+							// Filters Button
+							LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
+								GA_ID,		GID_FILTER_BUTTON,
+								GA_Text, 	"Filter Stations",
+								TAG_DONE),
 						TAG_DONE),
+						CHILD_WeightedHeight, 0,
+					// END - Top Filter Section
+					
+					// START - Bottom List Section											
+					LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+						LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,						
+						LAYOUT_AddChild, IIntuition->NewObject(NULL, "listbrowser.gadget",
+	            GA_ID,                     GID_RADIO_LISTBROWSER,
+							GA_RelVerify,              TRUE,
+	            GA_TabCycle,               TRUE,
+	            LISTBROWSER_AutoFit,       TRUE,
+	            //LISTBROWSER_Labels,        &listbrowser_list,
+	            LISTBROWSER_ColumnInfo,    columninfo,
+	            LISTBROWSER_ColumnTitles,  TRUE,
+	            LISTBROWSER_ShowSelected,  TRUE,
+	            LISTBROWSER_Striping,      LBS_ROWS,
+	            TAG_DONE),
+          	TAG_DONE),    		  
+						CHILD_MinHeight, 	300,
 				TAG_DONE),
 			TAG_DONE),
 		TAG_DONE);
 }  
 
 static void buildAboutWindow(void) {
-  CONST_STRPTR aboutText = VSTRING \
+  CONST_STRPTR aboutText = VSTRING "\n" \
   	"Copyright (c) 2021 George Sokianos\n\n"
   	"MediaVault is a media frontend for different sources.\n\n" \
 		"My plan for MediaVault is to create an app where people can find and listen on online " \
@@ -225,23 +282,28 @@ static void buildAboutWindow(void) {
 		"Distributed without warranty under the terms of the GNU General Public License.";
   
 	objects[OID_ABOUT] = IIntuition->NewObject(NULL, "window.class",
-		WA_ScreenTitle, 		"About",
-		WA_Title, 					"About",
-		WA_Activate, 				TRUE,
-		WA_DepthGadget, 		TRUE,
-		WA_DragBar, 				TRUE,
-		WA_CloseGadget, 		TRUE,
-		WA_SizeGadget, 			FALSE,
-		WINDOW_Iconifiable, TRUE,
-		WINDOW_AppPort,			appPort,
-		WINDOW_SharedPort, 	appPort,
-		WINDOW_Position, 		WPOS_CENTERSCREEN,
-		WINDOW_Layout, gadgets[GID_ABOUT_LAYOUT_ROOT] = IIntuition->NewObject(NULL, "layout.gadget",
+		WA_ScreenTitle, 				VSTRING,
+		WA_Title, 							"About " APPNAME,
+		WA_Activate, 						TRUE,
+		WA_DepthGadget, 				TRUE,
+		WA_DragBar, 						TRUE,
+		WA_CloseGadget, 				TRUE,
+		WA_SizeGadget, 					FALSE,
+		WA_Opaqueness,         	255,    /* Initial opaqueness on opening (0..255) */
+    WA_OverrideOpaqueness,  TRUE,   /* Override global settings? (TRUE|FALSE) */
+    WA_FadeTime,            250000, /* Duration of transition in microseconds */
+		WINDOW_Iconifiable, 		TRUE,
+		WINDOW_AppPort,					appPort,
+		WINDOW_SharedPort, 			appPort,
+		WINDOW_Position, 				WPOS_CENTERSCREEN,
+		WINDOW_Layout, IIntuition->NewObject(NULL, "layout.gadget",
+			GA_ID, 								GID_ABOUT_LAYOUT_ROOT,
 			LAYOUT_Orientation, 	LAYOUT_ORIENT_VERT,
 			LAYOUT_SpaceOuter, 		TRUE,
 			LAYOUT_DeferLayout, 	TRUE,
                
-			LAYOUT_AddChild, gadgets[GID_ABOUT_LAYOUT_TEXT] = IIntuition->NewObject(NULL, "layout.gadget",
+			LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+				GA_ID, 									GID_ABOUT_LAYOUT_TEXT,
 				LAYOUT_Orientation, 		LAYOUT_ORIENT_HORIZ,
 				LAYOUT_VertAlignment, 	LALIGN_CENTER,
 				LAYOUT_HorizAlignment,	LALIGN_CENTER,
@@ -249,6 +311,7 @@ static void buildAboutWindow(void) {
 				LAYOUT_BevelState, 			IDS_SELECTED,
 				LAYOUT_BackFill, 				LAYERS_NOBACKFILL,
 				LAYOUT_AddChild, gadgets[GID_ABOUT_TEXT] = IIntuition->NewObject(NULL, "texteditor.gadget",
+					GA_ID,										GID_ABOUT_TEXT,
 					GA_RelVerify, 						TRUE,
 					GA_TEXTEDITOR_Contents, 	aboutText,
 					GA_TEXTEDITOR_CursorX, 		0,
@@ -264,9 +327,9 @@ static void buildAboutWindow(void) {
 				TAG_DONE),
 			TAG_DONE),
 			CHILD_MinWidth, 	520,	  
-			CHILD_MinHeight, 	300,	 
+			CHILD_MinHeight,  200,	 
 			
-			LAYOUT_AddChild, gadgets[GID_ABOUT_BUTTON_OK] = IIntuition->NewObject(NULL, "button.gadget",
+			LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
 				GA_ID, 							GID_ABOUT_BUTTON_OK,
 				GA_RelVerify, 			TRUE,
 				GA_Text, 						"_Okay",
@@ -275,6 +338,12 @@ static void buildAboutWindow(void) {
 			CHILD_MaxHeight, 40,
 	  TAG_DONE), 
 	TAG_DONE);
+	
+	IIntuition->SetAttrs(gadgets[GID_ABOUT_TEXT], 
+		ICA_TARGET, 	gadgets[GID_ABOUT_TEXT_SCROLLER],
+		ICA_MAP, 			textToScroller,
+		TAG_END); 
+
 }
 
 static void buildMainMenu(void) {

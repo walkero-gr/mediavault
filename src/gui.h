@@ -27,9 +27,12 @@
 
 #include <libraries/gadtools.h>
 
+#include <proto/listbrowser.h>
+
 #include <gadgets/button.h>
 #include <gadgets/chooser.h>
 #include <gadgets/layout.h>
+//#include <gadgets/listbrowser.h>
 #include <gadgets/scroller.h> 
 #include <gadgets/string.h>
 #include <gadgets/texteditor.h>
@@ -37,9 +40,6 @@
 #include <stdio.h>
 
 #include "version.h"
-
-struct Screen 	*screen;
-struct MsgPort 	*appPort;
 
 enum
 {
@@ -58,12 +58,12 @@ enum
 enum
 {
   GID_FILTERS_LAYOUT,
-  GID_FILTERS_LAYOUT_LINE1,
-  GID_FILTERS_LAYOUT_LINE2,
   GID_FILTERS_NAME,
+  GID_FILTER_BUTTON,
   GID_CHOOSER_GENRES,
   GID_CHOOSER_COUNTRIES,
   GID_CHOOSER_LANGUAGES,
+  GID_RADIO_LISTBROWSER,
   GID_ABOUT_LAYOUT_ROOT,
   GID_ABOUT_LAYOUT_TEXT,
   GID_ABOUT_TEXT,
@@ -81,13 +81,18 @@ enum
    MID_LAST
 };
 
-struct Window *windows[WID_LAST];
+struct Screen 			*screen;
+struct MsgPort 			*appPort;
+struct Window 			*windows[WID_LAST];
+struct ColumnInfo 	*columninfo = NULL;
+struct DrawInfo 		*drInfo;
+
 Object *gadgets[GID_LAST];
 Object *objects[OID_LAST];
 Object *menus[MID_LAST];
 
-static CONST char* screenTitle = APPNAME;
-static CONST char* windowTitle = APPNAME;
+//static CONST char* screenTitle = VSTRING;
+//static CONST char* windowTitle = APPNAME;
 
 CONST_STRPTR genres[] =
 {

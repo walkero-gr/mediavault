@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 08-04-2021 14:40:30
+# Created on: 10-04-2021 20:21:42
 #
 #
 
@@ -24,6 +24,8 @@ MediaVault_OBJ := \
 ##////  Variables and Environment
 ##
 ###################################################################
+
+VER := 2
 
 CC := gcc:bin/gcc
 
