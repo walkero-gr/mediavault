@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 10-04-2021 20:21:42
+# Created on: 11-04-2021 22:06:28
 #
 #
 
@@ -16,7 +16,7 @@
 
 MediaVault_OBJ := \
 	 src/mediavault.o src/libshandler.o src/upnpfuncs.o \
-	 src/gui.o
+	 src/gui.o src/oofuncs.o
 
 
 ###################################################################
@@ -67,7 +67,7 @@ realclean:
 
 MediaVault: $(MediaVault_OBJ)
 	@echo "Linking MediaVault"
-	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) 
+	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) -lauto
 	@echo "Removing stale debug target: MediaVault"
 	@rm -f MediaVault.debug
 
@@ -94,7 +94,8 @@ src/libshandler.o: src/libshandler.c src/libshandler.h src/globals.h \
 src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h src/globals.h \
 	
 
-src/oofuncs.o: src/oofuncs.c
+src/oofuncs.o: src/oofuncs.c src/oofuncs.h src/globals.h \
+	
 
 src/gui.o: src/gui.c src/gui.h src/version.h \
 	

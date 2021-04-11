@@ -20,6 +20,9 @@ static void buildMainWindow(void);
 static void buildAboutWindow(void);
 static void buildMainMenu(void);
 static struct Image *MenuImage(CONST_STRPTR, struct Screen *);
+static void windowBlocking(struct Window *, Object *, BOOL disable);
+
+extern void getRadioStations(void);
 
 void showGUI(void)
 {
@@ -53,8 +56,9 @@ void showGUI(void)
 				    
 				    if ( wait & signal ) {
 		        	uint32 result = WMHI_LASTMSG;
-		
-		          while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE)) != WMHI_LASTMSG) {
+
+							// Main Window events
+		          while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE))) {
 		          	switch (result & WMHI_CLASSMASK) {
 		           		case WMHI_CLOSEWINDOW:
 		              	windows[WID_MAIN] = NULL;
@@ -77,8 +81,7 @@ void showGUI(void)
                         	break;
                         case MID_ABOUT:
 													windows[WID_ABOUT] = (struct Window*)IIntuition->IDoMethod(objects[OID_ABOUT], WM_OPEN, TAG_DONE);
-													IIntuition->SetWindowPointer(windows[WID_MAIN], WA_BusyPointer, TRUE, TAG_DONE);
-													IIntuition->SetAttrs(objects[OID_MAIN], WA_BusyPointer, TRUE, TAG_DONE);
+													windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
                         	break;
                         case MID_QUIT:
                         	done = TRUE;
@@ -87,22 +90,29 @@ void showGUI(void)
                     }
 
 									  break;
+									case WMHI_GADGETUP:
+										switch(result & WMHI_GADGETMASK) {
+											case GID_FILTER_BUTTON:
+											  IDOS->Printf("Search radio stations\n");
+											  getRadioStations();
+											  break;
+										}
+										break;
 								}
 							}
 							
+							// About Window events
 							while ((result = IIntuition->IDoMethod(objects[OID_ABOUT], WM_HANDLEINPUT, &code, TAG_DONE))) {
 								switch(result & WMHI_CLASSMASK) {
 									case WMHI_CLOSEWINDOW:
 										IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE, TAG_DONE);
-										IIntuition->SetAttrs(objects[OID_MAIN], WA_BusyPointer, FALSE, TAG_DONE);
-										IIntuition->SetWindowPointer(windows[WID_MAIN], WA_BusyPointer, FALSE, TAG_DONE);
+										windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
 										break;
 									case WMHI_GADGETUP:
 										switch(result & WMHI_GADGETMASK) {
 											case GID_ABOUT_BUTTON_OK:
 												IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE, TAG_DONE);
-												IIntuition->SetAttrs(objects[OID_MAIN], WA_BusyPointer, FALSE, TAG_DONE);
-												IIntuition->SetWindowPointer(windows[WID_MAIN], WA_BusyPointer, FALSE, TAG_DONE);
+												windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
 												break;		
 										}
 										break;
@@ -241,8 +251,10 @@ static void buildMainWindow(void) {
 								
 							// Filters Button
 							LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
-								GA_ID,		GID_FILTER_BUTTON,
-								GA_Text, 	"Filter Stations",
+								GA_ID,							GID_FILTER_BUTTON,
+								GA_Text, 						"Filter Stations",
+								GA_RelVerify, 			TRUE,
+								//BUTTON_AutoButton, 	0,
 								TAG_DONE),
 						TAG_DONE),
 						CHILD_WeightedHeight, 0,
@@ -273,7 +285,7 @@ static void buildAboutWindow(void) {
   CONST_STRPTR aboutText = VSTRING "\n" \
   	"Copyright (c) 2021 George Sokianos\n\n"
   	"MediaVault is a media frontend for different sources.\n\n" \
-		"My plan for MediaVault is to create an app where people can find and listen on online " \
+		"My plan for MediaVault is to create an app where people can discover and listen online " \
 		"radio stations, podcasts and even to support UPnP servers to listen music or watch movies.\n\n" \
 		"Created by George Sokianos\n" \
 		"Contact email: walkero@gmail.com\n" \
@@ -310,6 +322,21 @@ static void buildAboutWindow(void) {
 				LAYOUT_BevelStyle, 			BVS_NONE,
 				LAYOUT_BevelState, 			IDS_SELECTED,
 				LAYOUT_BackFill, 				LAYERS_NOBACKFILL,
+				
+				LAYOUT_AddImage, gadgets[GID_ABOUT_LOGO] = IIntuition->NewObject(NULL, "bitmap.image",
+					GA_ID,							GID_ABOUT_LOGO,
+					IA_Scalable, FALSE,
+					BITMAP_SourceFile, "PROGDIR:images/logo_128.png",
+					BITMAP_Screen, screen,
+					//BITMAP_Precision, PRECISION_EXACT,
+					BITMAP_Masking, TRUE,
+					//BITMAP_Width, 50,
+					//BITMAP_Height, 50,
+				TAG_END),
+				CHILD_WeightedWidth, 30,     
+				CHILD_MaxHeight, 128,	
+
+				
 				LAYOUT_AddChild, gadgets[GID_ABOUT_TEXT] = IIntuition->NewObject(NULL, "texteditor.gadget",
 					GA_ID,										GID_ABOUT_TEXT,
 					GA_RelVerify, 						TRUE,
@@ -431,4 +458,8 @@ static struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen) {
 
    return (i);
 }
-  
+
+static void windowBlocking(struct Window *winId, Object *objId, BOOL disable) {
+  IIntuition->SetWindowPointer(winId, WA_BusyPointer, disable, TAG_DONE);
+	IIntuition->SetAttrs(objId, WA_BusyPointer, disable, TAG_DONE);
+}

@@ -69,6 +69,7 @@ enum
   GID_ABOUT_TEXT,
   GID_ABOUT_TEXT_SCROLLER,
   GID_ABOUT_BUTTON_OK,
+  GID_ABOUT_LOGO,
   GID_LAST
 };
 
@@ -90,9 +91,6 @@ struct DrawInfo 		*drInfo;
 Object *gadgets[GID_LAST];
 Object *objects[OID_LAST];
 Object *menus[MID_LAST];
-
-//static CONST char* screenTitle = VSTRING;
-//static CONST char* windowTitle = APPNAME;
 
 CONST_STRPTR genres[] =
 {
