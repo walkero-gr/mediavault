@@ -17,10 +17,13 @@
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 
+#include <oo/ooNetwork.h>
+
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/utility.h>
 #include <proto/intuition.h>
+#include <proto/oo.h>
 
 #include <string.h>
 
@@ -35,6 +38,7 @@ struct Library *LabelBase;				struct LabelIFace 			*ILabel;
 struct Library *LayoutBase;				struct LayoutIFace 			*ILayout;
 struct Library *UtilityBase;			struct UtilityIFace 		*IUtility;
 struct Library *ListBrowserBase;	struct ListBrowserIFace *IListBrowser;
+struct Library *OOBase;						struct OOIFace 					*IOO;
 
 Class *LayoutClass;
 Class *LabelClass;

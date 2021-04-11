@@ -54,6 +54,12 @@ void OpenLibs(void)
   }
   else CleanExit("Can't open utility.library version 53");
 
+	if ((OOBase=IExec->OpenLibrary("oo.library",1))) {
+    IOO = (struct OOIFace *)IExec->GetInterface( OOBase, "main", 1, NULL );
+    if(!IOO) CleanExit("Can't open oo.library Interface"); 	  
+ 	}
+ 	else CleanExit("Can't open oo.library version 1");
+
 	if ((LayoutBase = (APTR) IIntuition->OpenClass( "gadgets/layout.gadget", 1, &LayoutClass ))) {
 	  ILayout	= (struct LayoutIFace *)IExec->GetInterface( LayoutBase, "main", 1, NULL );
 	  if(!ILayout) CleanExit("Can't open Layout Gadget Interface");

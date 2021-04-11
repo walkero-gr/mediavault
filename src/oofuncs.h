@@ -14,4 +14,11 @@
 
 */
 
+#ifndef _OOFUNCS_H
+#define _OOFUNCS_H
 
+
+
+#include "globals.h"
+
+#endif
