@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 11-04-2021 22:06:28
+# Created on: 14-04-2021 17:54:21
 #
 #
 
@@ -16,7 +16,8 @@
 
 MediaVault_OBJ := \
 	 src/mediavault.o src/libshandler.o src/upnpfuncs.o \
-	 src/gui.o src/oofuncs.o
+	 src/gui.o src/oofuncs.o src/mainWin.o \
+	
 
 
 ###################################################################
@@ -98,5 +99,8 @@ src/oofuncs.o: src/oofuncs.c src/oofuncs.h src/globals.h \
 	
 
 src/gui.o: src/gui.c src/gui.h src/version.h \
-	
+	 src/globals.h
+
+src/mainWin.o: src/mainWin.c src/mainWin.h src/gui.h \
+	 src/version.h src/globals.h
 

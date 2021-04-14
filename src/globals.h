@@ -19,6 +19,7 @@
 
 #include <oo/ooNetwork.h>
 
+#include <proto/amisslmaster.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/utility.h>
@@ -32,13 +33,16 @@
 extern struct ExecIFace *IExec;
 extern struct DOSIFace *IDOS;
 
-struct Library *ApplicationBase; 	struct ApplicationIFace *IApplication;
-struct Library *IntuitionBase; 		struct IntuitionIFace 	*IIntuition;
-struct Library *LabelBase;				struct LabelIFace 			*ILabel;
-struct Library *LayoutBase;				struct LayoutIFace 			*ILayout;
-struct Library *UtilityBase;			struct UtilityIFace 		*IUtility;
-struct Library *ListBrowserBase;	struct ListBrowserIFace *IListBrowser;
-struct Library *OOBase;						struct OOIFace 					*IOO;
+struct Library *ApplicationBase; 	struct ApplicationIFace 	*IApplication;
+struct Library *IntuitionBase; 		struct IntuitionIFace 		*IIntuition;
+struct Library *LabelBase;				struct LabelIFace 				*ILabel;
+struct Library *LayoutBase;				struct LayoutIFace 				*ILayout;
+struct Library *UtilityBase;			struct UtilityIFace 			*IUtility;
+struct Library *ListBrowserBase;	struct ListBrowserIFace 	*IListBrowser;
+struct Library *OOBase;						struct OOIFace 						*IOO;
+//struct Library *SocketBase; 			struct SocketIFace 				*ISocket;
+//struct Library *AmiSSLMasterBase; struct AmiSSLMasterIFace	*IAmiSSLMaster;
+//struct Library *AmiSSLBase; 			struct AmiSSLIFace				*IAmiSSL;
 
 Class *LayoutClass;
 Class *LabelClass;

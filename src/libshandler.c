@@ -24,6 +24,15 @@ void CleanExit(const char *str)
   if(IIntuition)				IExec->DropInterface((APTR) IIntuition);
   if(IntuitionBase)    	IExec->CloseLibrary(IntuitionBase);
 
+  //if(IAmiSSL)						IExec->DropInterface((APTR) IAmiSSL);
+  //if(AmiSSLBase)  			IExec->CloseLibrary(AmiSSLBase);
+  //
+  //if(IAmiSSLMaster)			IExec->DropInterface((APTR) IAmiSSLMaster);
+  //if(AmiSSLMasterBase)  IExec->CloseLibrary(AmiSSLMasterBase);
+  //
+  //if(ISocket)						IExec->DropInterface((APTR) ISocket);
+  //if(SocketBase)   			IExec->CloseLibrary(SocketBase);
+
   if(IApplication)			IExec->DropInterface((APTR) IApplication);
   if(ApplicationBase)   IExec->CloseLibrary(ApplicationBase);
 
@@ -38,7 +47,25 @@ void OpenLibs(void)
     if(!IApplication) CleanExit("Can't open application.library Interface");
   }
   else CleanExit("Can't open application.library version 53");
-  
+
+	//if ((SocketBase = IExec->OpenLibrary( "bsdsocket.library", 4 ))) {
+	  //ISocket = (struct SocketIFace *)IExec->GetInterface( SocketBase, "main", 1, NULL );
+    //if(!ISocket) CleanExit("Can't open bsdsocket.library Interface");
+	//}
+	//else CleanExit("Can't open bsdsocket.library version 4.");
+	//
+	//if ((AmiSSLMasterBase = IExec->OpenLibrary( "amisslmaster.library", 4 ))) {
+	  //IAmiSSLMaster = (struct AmiSSLMasterIFace *)IExec->GetInterface( AmiSSLMasterBase, "main", 1, NULL );
+    //if(!IAmiSSLMaster) CleanExit("Can't open amisslmaster.library Interface");
+	//}
+	//else CleanExit("Can't open amisslmaster.library version 4.");
+	//
+	//if ((AmiSSLBase = IAmiSSLMaster->OpenAmiSSL())) {
+	  //IAmiSSL = (struct AmiSSLIFace *)IExec->GetInterface( AmiSSLBase, "main", 1, NULL );
+	  //if(!IAmiSSL) CleanExit("Can't open AmiSSL Interface");
+	//}
+	//else CleanExit("Can't open AmiSSL.");
+	
   if ((IntuitionBase = IExec->OpenLibrary( "intuition.library", 54 ))) {
     if (LIB_IS_AT_LEAST(IntuitionBase, 54, 6)) {
     	IIntuition = (struct IntuitionIFace *)IExec->GetInterface( IntuitionBase, "main", 1, NULL );
