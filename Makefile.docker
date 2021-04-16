@@ -71,7 +71,7 @@ LIBFLAGS	= -o
 default: MediaVault
 
 clean:
-	rm MediaVault.* src/*.o
+	rm MediaVault src/*.o
 
 release:
 	# TBD
