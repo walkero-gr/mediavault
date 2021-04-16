@@ -1,9 +1,7 @@
 ##########################################################################
 # Compiler settings
 ##########################################################################
-CC			= ppc-amigaos-gcc
-LINK		= ppc-amigaos-gcc
-INCLUDES	= -I$(AOS4_NLIB_INC) -I$(AOS4_SDK_INC) -I$(AMISSL_INC) -I$(OO_INC)
+
 
 DATEISO = $(shell date --iso=date)
 DATESTR = $(shell date "+%Y%m%d")
@@ -33,64 +31,44 @@ else
 endif
 
 
-# CFLAGS		= -c -dontwarn=-1 -O2 $(VERS_FLAGS)
-CFLAGS		= $(VERS_FLAGS) -Wall -Werror -Wwrite-strings
-
-##########################################################################
-# Builder settings
-##########################################################################
-# LIBFLAGS	= -lamiga -lauto -o
-LIBFLAGS	= -o
-
 ###################################################################
 ##
 ##////  Objects
 ##
 ###################################################################
+
 MediaVault_OBJ := \
-	 src/mediavault.o src/libshandler.o src/upnpfuncs.o \
-	 src/gui.o src/oofuncs.o src/mainWin.o \
+	 src/libshandler.o src/mediavault.o
 
 
-.PHONY: MediaVault
+###################################################################
+##
+##////  Variables and Environment
+##
+###################################################################
+
+CC			:= ppc-amigaos-gcc
+LINK		:= ppc-amigaos-gcc
+INCPATH		:= 	-I$(AOS4_NLIB_INC) \
+				-I$(AOS4_SDK_INC) \
+				-I$(AMISSL_INC) \
+				-I$(OO_INC)
+
+CFLAGS := $(INCPATH) $(VERS_FLAGS) -Wall -Werror -Wwrite-strings
+
+# LIBFLAGS	= -lamiga -lauto -o
+LIBFLAGS	= -o
+
+
+###################################################################
+##
+##////  General rules
+##
+###################################################################
+
+.PHONY: MediaVault clean release clean-release
 
 default: MediaVault
-
-###################################################################
-##
-##////  Targets
-##
-###################################################################
-
-MediaVault: $(MediaVault_OBJ)
-	@echo "Linking MediaVault"
-	$(LINK) $(MediaVault_OBJ) $(LIBFLAGS_OS4) $@
-
-##########################################################################
-# object files
-##########################################################################
-
-src/mediavault.o: src/mediavault.c src/mediavault.h src/globals.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/mediavault.c
-
-src/libshandler.o: src/libshandler.c src/libshandler.h src/globals.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/libshandler.c
-
-src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h src/globals.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/upnpfuncs.c
-
-src/oofuncs.o: src/oofuncs.c src/oofuncs.h src/globals.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/oofuncs.c
-
-src/gui.o: src/gui.c src/gui.h src/version.h src/globals.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/gui.c
-
-src/mainWin.o: src/mainWin.c src/mainWin.h src/gui.h src/version.h src/globals.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/mainWin.c
-
-##########################################################################
-# generic build options
-##########################################################################
 
 clean:
 	rm MediaVault.* src/*.o
@@ -100,3 +78,49 @@ release:
 
 clean-release:
 	# TBD
+
+###################################################################
+##
+##////  Targets
+##
+###################################################################
+
+MediaVault: $(MediaVault_OBJ)
+	@echo "Linking MediaVault"
+	$(LINK) $(MediaVault_OBJ) $(LIBFLAGS) $@
+
+
+###################################################################
+##
+##////  Standard rules
+##
+###################################################################
+
+.c.o:
+	@echo "Compiling $<"
+	@$(CC) -c $< -o $*.o $(CFLAGS)
+
+src/libshandler.o: src/libshandler.c
+
+src/mediavault.o: src/mediavault.c src/mediavault.h src/globals.h \
+	 src/version.h
+
+# src/mediavault.o: src/mediavault.c src/mediavault.h src/globals.h \
+# 	 src/version.h
+# 	$(CC) $(CFLAGS) $(INCPATH) -o $@ src/mediavault.c
+
+# src/libshandler.o: src/libshandler.c
+# 	$(CC) $(CFLAGS) $(INCPATH) -o $@ src/libshandler.c
+
+# src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h src/globals.h
+# 	$(CC) $(CFLAGS) $(INCPATH) -o $@ src/upnpfuncs.c
+
+# src/oofuncs.o: src/oofuncs.c src/oofuncs.h src/globals.h
+# 	$(CC) $(CFLAGS) $(INCPATH) -o $@ src/oofuncs.c
+
+# src/gui.o: src/gui.c src/gui.h src/version.h src/globals.h
+# 	$(CC) $(CFLAGS) $(INCPATH) -o $@ src/gui.c
+
+# src/mainWin.o: src/mainWin.c src/mainWin.h src/gui.h src/version.h src/globals.h
+# 	$(CC) $(CFLAGS) $(INCPATH) -o $@ src/mainWin.c
+
