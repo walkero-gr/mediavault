@@ -11,7 +11,7 @@
 *******
 
 DONE - Open libraries manually
-- Update the Makefile.docker to compile
+DONE - Update the Makefile.docker to compile
 - Setup CI/CD
 DONE - Create first window
 DONE - Create about window
