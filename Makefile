@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 14-04-2021 17:54:21
+# Created on: 16-04-2021 23:55:34
 #
 #
 
@@ -15,9 +15,7 @@
 ###################################################################
 
 MediaVault_OBJ := \
-	 src/mediavault.o src/libshandler.o src/upnpfuncs.o \
-	 src/gui.o src/oofuncs.o src/mainWin.o \
-	
+	 src/libshandler.o src/mediavault.o
 
 
 ###################################################################
@@ -25,8 +23,6 @@ MediaVault_OBJ := \
 ##////  Variables and Environment
 ##
 ###################################################################
-
-VER := 2
 
 CC := gcc:bin/gcc
 
@@ -68,7 +64,7 @@ realclean:
 
 MediaVault: $(MediaVault_OBJ)
 	@echo "Linking MediaVault"
-	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) -lauto
+	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) 
 	@echo "Removing stale debug target: MediaVault"
 	@rm -f MediaVault.debug
 
@@ -86,21 +82,8 @@ MediaVault: $(MediaVault_OBJ)
 	@echo "Compiling $<"
 	@$(CC) -c $< -o $*.o $(CFLAGS)
 
+src/libshandler.o: src/libshandler.c
+
 src/mediavault.o: src/mediavault.c src/mediavault.h src/globals.h \
-	
-
-src/libshandler.o: src/libshandler.c src/libshandler.h src/globals.h \
-	
-
-src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h src/globals.h \
-	
-
-src/oofuncs.o: src/oofuncs.c src/oofuncs.h src/globals.h \
-	
-
-src/gui.o: src/gui.c src/gui.h src/version.h \
-	 src/globals.h
-
-src/mainWin.o: src/mainWin.c src/mainWin.h src/gui.h \
-	 src/version.h src/globals.h
+	 src/version.h
 

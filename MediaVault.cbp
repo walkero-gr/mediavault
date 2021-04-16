@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<CodeBench_Project name="MediaVault" path="SDH3:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1366156316" lastmodified="1366156618">
+	<plugin name="PROGDIR:Plugins&#047;AmigaOS4SDK.CCPlugin" flags="0"/>
+	<target/>
+	<homedir name="SDH3:Programming&#047;workspace&#047;MyProjects&#047;mediavault"/>
+	<includedir name="SDH3:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src"/>
+	<compiler name="gcc:bin&#047;gcc" switches="-Wall -Werror -Wwrite-strings" stack="131072"/>
+	<linker switches="-lauto"/>
+	<debugger name="SDK:c&#047;gdb"/>
+	<builder name="SDK:c&#047;make -f"/>
+	<environment tabsize="2"/>
+	<headers>
+		<file name="SDH3:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;globals.h" open="0"/>
+		<file name="SDH3:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;libshandler.h" open="0"/>
+		<file name="SDH3:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;mediavault.h" open="0"/>
+	</headers>
+	<sources>
+		<file name="src&#047;libshandler.c" open="0"/>
+		<file name="src&#047;mediavault.c" open="0"/>
+	</sources>
+	<flags value="0x0000000000068004"/>
+	<buildscript name="Makefile" depth="3" open="0"/>
+	<projectnotes open="0"/>
+	<buildwindow open="0"/>
+	<targets>
+		<target name="MediaVault" linker="gcc:bin&#047;gcc" flags="0x00000002">
+			<file name="src&#047;libshandler.c"/>
+			<file name="src&#047;mediavault.c"/>
+		</target>
+	</targets>
+	<logfile name="RAM Disk:Build.log"/>
+	<search sensecase="1" replace_state="0"/>
+</CodeBench_Project>

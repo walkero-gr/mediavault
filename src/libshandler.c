@@ -4,7 +4,7 @@
 
 // #include <stdlib.h>
 
-// #include "globals.h"
+#include "globals.h"
 #include "libshandler.h"
 
 
