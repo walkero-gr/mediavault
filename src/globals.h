@@ -19,7 +19,7 @@
 
 #include <oo/ooNetwork.h>
 
-#include <proto/amisslmaster.h>
+// #include <proto/amisslmaster.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/utility.h>

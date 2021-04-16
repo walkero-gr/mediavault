@@ -32,4 +32,6 @@
 
 #include "globals.h"
 
+#include "libshandler.h"
+
 #endif

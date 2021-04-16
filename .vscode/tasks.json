@@ -11,7 +11,7 @@
                 "args": [
                     "-f",
                     "Makefile.docker",
-                    "MediaVault.OS4"
+                    "MediaVault"
                 ]
             },
             "problemMatcher": {

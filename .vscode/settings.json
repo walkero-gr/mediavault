@@ -1,5 +1,6 @@
 {
 	"files.associations": {
+		"libshandler.h": "c"
 	},
 	"vsnotes.defaultNotePath": "/opt/code/mediavault/.vscode/vsnotes"
 }

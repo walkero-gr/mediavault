@@ -1,7 +1,10 @@
 /*
-**  Opening and closing libraries&resources 
+**  Opening and closing libraries&resources
 */
 
+// #include <stdlib.h>
+
+// #include "globals.h"
 #include "libshandler.h"
 
 
@@ -17,10 +20,10 @@ void CleanExit(const char *str)
 
 	if(ILayout)						IExec->DropInterface((APTR) ILayout);
 	if(LayoutBase)			 	IIntuition->CloseClass((APTR) LayoutBase);
-	
+
 	if(IUtility)					IExec->DropInterface((APTR) IUtility);
   if(UtilityBase)      	IExec->CloseLibrary(UtilityBase);
-  
+
   if(IIntuition)				IExec->DropInterface((APTR) IIntuition);
   if(IntuitionBase)    	IExec->CloseLibrary(IntuitionBase);
 
@@ -65,7 +68,7 @@ void OpenLibs(void)
 	  //if(!IAmiSSL) CleanExit("Can't open AmiSSL Interface");
 	//}
 	//else CleanExit("Can't open AmiSSL.");
-	
+
   if ((IntuitionBase = IExec->OpenLibrary( "intuition.library", 54 ))) {
     if (LIB_IS_AT_LEAST(IntuitionBase, 54, 6)) {
     	IIntuition = (struct IntuitionIFace *)IExec->GetInterface( IntuitionBase, "main", 1, NULL );
@@ -83,7 +86,7 @@ void OpenLibs(void)
 
 	if ((OOBase=IExec->OpenLibrary("oo.library",1))) {
     IOO = (struct OOIFace *)IExec->GetInterface( OOBase, "main", 1, NULL );
-    if(!IOO) CleanExit("Can't open oo.library Interface"); 	  
+    if(!IOO) CleanExit("Can't open oo.library Interface");
  	}
  	else CleanExit("Can't open oo.library version 1");
 
@@ -92,7 +95,7 @@ void OpenLibs(void)
 	  if(!ILayout) CleanExit("Can't open Layout Gadget Interface");
 	}
 	else CleanExit("Can't open Layout Gadget");
-	
+
 	if ((LabelBase = (APTR) IIntuition->OpenClass( "images/label.image", 1, &LabelClass ))) {
 	  ILabel = (struct LabelIFace *)IExec->GetInterface( LabelBase, "main", 1, NULL );
 	  if(!ILabel) CleanExit("Can't open Label Image Interface");

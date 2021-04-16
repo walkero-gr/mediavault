@@ -1,11 +1,9 @@
 ##########################################################################
 # Compiler settings
 ##########################################################################
-CC			= vc
-LINK		= vc
-# INCLUDES	= -I$(NDK_INC) -I$(MUI38_INC)
-INCLUDES_OS4= -I$(AOS4_NLIB_INC) -I$(AOS4_SDK_INC) -I$(AOS4_NET_INC) -v
-# INCLUDES_MOS= -I$(NDK_INC) -I$(MUI50_INC)
+CC			= ppc-amigaos-gcc
+LINK		= ppc-amigaos-gcc
+INCLUDES	= -I$(AOS4_NLIB_INC) -I$(AOS4_SDK_INC) -I$(AMISSL_INC) -I$(OO_INC)
 
 DATEISO = $(shell date --iso=date)
 DATESTR = $(shell date "+%Y%m%d")
@@ -24,50 +22,71 @@ ifneq ($(origin DRONE_TAG),undefined)
 		MINOR = $(lastword $(subst ., , $(firstword $(subst b, ,$(DRONE_TAG)))))
 		BETA = $(lastword $(subst b, ,$(DRONE_TAG)))
 
-		VERS_FLAGS = -DMAJOR_VERS=$(MAJOR) -DMINOR_VERS=$(MINOR) -DBETA_VERS=$(BETA) -DRELEASE_DATE=$(DATEISO)
+		VERS_FLAGS = -DVERSION=$(MAJOR) -DREVISION=$(MINOR) -DBETA_VERS=$(BETA) -DRELEASE_DATE=$(DATEISO)
 	else
 		MINOR = $(lastword $(subst ., ,$(DRONE_TAG)))
 
-		VERS_FLAGS = -DMAJOR_VERS=$(MAJOR) -DMINOR_VERS=$(MINOR) -DRELEASE_DATE=$(DATEISO)
+		VERS_FLAGS = -DVERSION=$(MAJOR) -DREVISION=$(MINOR) -DRELEASE_DATE=$(DATEISO)
 	endif
 else
 	VERS_FLAGS = -DRELEASE_DATE=$(DATEISO)
 endif
 
-# CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000 $(VERS_FLAGS)
-# CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -DCPU_VERS=MorphOS $(VERS_FLAGS)
-CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -D__USE_INLINE__ $(VERS_FLAGS)
+
+# CFLAGS		= -c -dontwarn=-1 -O2 $(VERS_FLAGS)
+CFLAGS		= $(VERS_FLAGS) -Wall -Werror -Wwrite-strings
 
 ##########################################################################
 # Builder settings
 ##########################################################################
-#MKLIB			= join
-# LIBFLAGS		= +aos68k -lamiga -lauto -o
-# LIBFLAGS_MOS	= +morphos -lamiga -lauto -o
-LIBFLAGS_OS4	= +aosppc -lamiga -lauto -o
+# LIBFLAGS	= -lamiga -lauto -o
+LIBFLAGS	= -o
+
+###################################################################
+##
+##////  Objects
+##
+###################################################################
+MediaVault_OBJ := \
+	 src/mediavault.o src/libshandler.o src/upnpfuncs.o \
+	 src/gui.o src/oofuncs.o src/mainWin.o \
+
+
+.PHONY: MediaVault
+
+default: MediaVault
+
+###################################################################
+##
+##////  Targets
+##
+###################################################################
+
+MediaVault: $(MediaVault_OBJ)
+	@echo "Linking MediaVault"
+	$(LINK) $(MediaVault_OBJ) $(LIBFLAGS_OS4) $@
 
 ##########################################################################
-# Object files
-##########################################################################
-OBJS_OS4	= src/MediaVault_OS4.o
-
-
-.PHONY: MediaVault.OS4
-
-default: MediaVault.OS4
-
-##########################################################################
-# Rule for building
-##########################################################################
-MediaVault.OS4: $(OBJS_OS4)
-	$(LINK) $(OBJS_OS4) $(LIBFLAGS_OS4) $@
-
-##########################################################################
-# object files (AOS4)
+# object files
 ##########################################################################
 
-src/MediaVault_OS4.o: src/mediavault.c
-	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/mediavault.c
+src/mediavault.o: src/mediavault.c src/mediavault.h src/globals.h
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/mediavault.c
+
+src/libshandler.o: src/libshandler.c src/libshandler.h src/globals.h
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/libshandler.c
+
+src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h src/globals.h
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/upnpfuncs.c
+
+src/oofuncs.o: src/oofuncs.c src/oofuncs.h src/globals.h
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/oofuncs.c
+
+src/gui.o: src/gui.c src/gui.h src/version.h src/globals.h
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/gui.c
+
+src/mainWin.o: src/mainWin.c src/mainWin.h src/gui.h src/version.h src/globals.h
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/mainWin.c
 
 ##########################################################################
 # generic build options
