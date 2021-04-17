@@ -20,5 +20,6 @@
 
 Object *buildMainWindow(struct MsgPort *, Object *);
 Object *buildMainMenu(struct Screen *);
+char getChooserText(int gadgetId, uint16 code);
 
 #endif

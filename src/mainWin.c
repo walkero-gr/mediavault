@@ -227,3 +227,19 @@ Object *buildMainMenu(struct Screen *screen)
 			TAG_END),
 		TAG_END);
 }
+
+char getChooserText(int gadgetId, uint16 code)
+{
+  char returnValue[32];
+  
+  IDOS->Printf("Genres selected new %ld\n", code);
+  switch (gadgetId)
+  {
+    case GID_CHOOSER_GENRES:
+  		IDOS->Printf("Genres selected new neww %ld\n", code);
+  		IUtility->Strlcpy(returnValue, genres[code], sizeof(returnValue));
+  		IDOS->Printf("Selected: %s\n", genres[code]);
+      break;
+  }
+  return *returnValue;
+}

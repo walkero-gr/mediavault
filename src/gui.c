@@ -69,6 +69,7 @@ void showGUI(void)
 				    if ( wait & signal ) 
 				    {
 		        	uint32 result = WMHI_LASTMSG;
+		        	//char *temp;
 
 							// Main Window events
 		          while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE)))
@@ -108,11 +109,17 @@ void showGUI(void)
 
 									  break;
 									case WMHI_GADGETUP:
-										switch(result & WMHI_GADGETMASK) 
+										switch (result & WMHI_GADGETMASK) 
 										{
 											case GID_FILTER_BUTTON:
 											  IDOS->Printf("Search radio stations\n");
 											  getRadioStations();
+											  break;
+											case GID_CHOOSER_GENRES:
+											  IDOS->Printf("Genres selected %ld\n", code);
+											  //IDOS->Printf("%s\n", genres[code]);
+											  //temp = (char *)getChooserText(GID_CHOOSER_GENRES, code);
+											  IDOS->Printf("%c\n", getChooserText(GID_CHOOSER_GENRES, code));
 											  break;
 										}
 										break;
