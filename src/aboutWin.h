@@ -6,19 +6,18 @@
 **
 ** Project: MediaVault
 **
-** File: mainWin.h
+** File: aboutWin.h
 **
-** Date: 14-04-2021 17:12:10
+** Date: 17-04-2021 10:59:22
 **
 ************************************************************
 
 */
 
 
-#ifndef _MAINWIN_H
-#define _MAINWIN_H
+#ifndef _ABOUTWIN_H
+#define _ABOUTWIN_H
 
-Object *buildMainWindow(struct MsgPort *, Object *);
-Object *buildMainMenu(struct Screen *);
+Object *buildAboutWindow(struct MsgPort *, struct Screen *);
 
 #endif

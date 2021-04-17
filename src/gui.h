@@ -18,29 +18,29 @@
 #ifndef _GUI_H
 #define _GUI_H
 
-//#include <classes/window.h>
-//
-//#include <images/bitmap.h>
-//#include <images/label.h>
-//#include <intuition/icclass.h> 
+#include <classes/window.h>
+
+#include <images/bitmap.h>
+#include <images/label.h>
+#include <intuition/icclass.h> 
 #include <intuition/menuclass.h>
-//
+
 //#include <libraries/gadtools.h>
-//
-//#include <proto/listbrowser.h>
-//
-//#include <gadgets/button.h>
-//#include <gadgets/chooser.h>
-//#include <gadgets/layout.h>
-////#include <gadgets/listbrowser.h>
-//#include <gadgets/scroller.h> 
-//#include <gadgets/string.h>
-//#include <gadgets/texteditor.h>
-//
+
+#include <proto/listbrowser.h>
+
+#include <gadgets/button.h>
+#include <gadgets/chooser.h>
+#include <gadgets/layout.h>
+//#include <gadgets/listbrowser.h>
+#include <gadgets/scroller.h> 
+#include <gadgets/string.h>
+#include <gadgets/texteditor.h>
+
 //#include <stdio.h>
-//
+
 //#include "version.h"
-//
+
 enum
 {
   WID_MAIN,
@@ -93,20 +93,8 @@ enum
 //Object *menus[MID_LAST];
 //
 
-//// For the scroller at the About window
-//const uint32 textToScroller[] = {
-    //GA_TEXTEDITOR_Prop_Entries,    SCROLLER_Total,
-    //GA_TEXTEDITOR_Prop_First,	     SCROLLER_Top,
-    //GA_TEXTEDITOR_Prop_Visible,    SCROLLER_Visible,
-    //TAG_END
-//};   
-//const uint32 scrollerToText[] = {
-    //SCROLLER_Total,	  	GA_TEXTEDITOR_Prop_Entries,
-    //SCROLLER_Top,				GA_TEXTEDITOR_Prop_First,
-    //SCROLLER_Visible,		GA_TEXTEDITOR_Prop_Visible,
-    //TAG_END
-//};  
-//
+
+
 //#include "globals.h"
 
 

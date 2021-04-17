@@ -14,17 +14,6 @@
 
 */
 
-//#include <classes/window.h>
-
-#include <images/label.h>
-#include <intuition/menuclass.h>
-
-#include <proto/listbrowser.h>
-
-#include <gadgets/chooser.h>
-#include <gadgets/layout.h>
-#include <gadgets/string.h>
-
 #include "globals.h"
 #include "gui.h"
 #include "mainWin.h"
