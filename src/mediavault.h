@@ -33,5 +33,6 @@
 #include "globals.h"
 
 #include "libshandler.h"
+#include "gui.h"
 
 #endif

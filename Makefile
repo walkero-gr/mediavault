@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 17-04-2021 00:28:01
+# Created on: 17-04-2021 09:53:11
 #
 #
 
@@ -15,7 +15,8 @@
 ###################################################################
 
 MediaVault_OBJ := \
-	 src/mediavault.o src/libshandler.o
+	 src/mediavault.o src/libshandler.o src/gui.o \
+	 src/mainWin.o
 
 
 ###################################################################
@@ -83,7 +84,8 @@ MediaVault: $(MediaVault_OBJ)
 	@$(CC) -c $< -o $*.o $(CFLAGS)
 
 src/mediavault.o: src/mediavault.c src/mediavault.h src/globals.h \
-	 src/version.h
+	 src/version.h src/libshandler.h src/gui.h \
+	
 
 src/libshandler.o: src/libshandler.c src/globals.h src/version.h \
 	
@@ -94,9 +96,9 @@ src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h src/globals.h \
 src/oofuncs.o: src/oofuncs.c src/oofuncs.h src/globals.h \
 	
 
-src/gui.o: src/gui.c src/gui.h src/version.h \
-	 src/globals.h
+src/gui.o: src/gui.c src/globals.h src/version.h \
+	 src/gui.h
 
-src/mainWin.o: src/mainWin.c src/mainWin.h src/gui.h \
-	 src/version.h src/globals.h
+src/mainWin.o: src/mainWin.c src/mainWin.h src/guifuncs.h \
+	 src/gui.h src/globals.h
 

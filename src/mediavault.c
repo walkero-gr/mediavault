@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
 	OpenLibs();
 
-	// showGUI();
+	showGUI();
   //discoverUPnPServers();
   //freeUpnpServers();
   //getMetadata((char *)"dummy");

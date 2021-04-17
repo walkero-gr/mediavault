@@ -18,6 +18,10 @@
 #ifndef _MAINWIN_H
 #define _MAINWIN_H
 
-#include "gui.h"
+#include <classes/window.h>
+
+//#include "gui.h"
+Object *buildMainWindow(struct MsgPort *);
+void buildMainMenu(void);
 
 #endif
