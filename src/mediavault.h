@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "globals.h"
+// #include "globals.h"
 
 #include "libshandler.h"
 #include "gui.h"

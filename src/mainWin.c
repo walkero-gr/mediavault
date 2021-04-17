@@ -85,13 +85,13 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 			LAYOUT_DeferLayout, TRUE,
 				LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
 					LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
-					
+
 					// START - Top Filter Section
 					LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-						LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,		
+						LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
 						LAYOUT_BevelStyle,      BVS_GROUP,
 						LAYOUT_Label,           "Filter stations by",
-					
+
 						// Top filter section with the Name Text Box with Label
 						LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
 							LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
@@ -108,7 +108,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 								STRINGA_MaxChars, 		64,
 								TAG_DONE),
 							TAG_DONE),
-						
+
 						// Top filter section with the select boxes
 						LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
 							// Genres Select Box with Label
@@ -117,7 +117,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 								LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
 									//LABEL_DrawInfo, drInfo,
 									LABEL_Text, "_Genre",
-									TAG_END),							
+									TAG_END),
 								LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
 			          	GA_ID,            		GID_CHOOSER_GENRES,
 			          	GA_RelVerify,        	TRUE,
@@ -128,14 +128,14 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 			          	CHOOSER_Selected,    	0,
 									TAG_DONE),
 								TAG_DONE),
-								
+
 							// Countries Select Box with Label
 							LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
 								LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
 								LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
 									//LABEL_DrawInfo, drInfo,
 									LABEL_Text, "_Country",
-									TAG_END),						
+									TAG_END),
 								LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
 			          	GA_ID,            		GID_CHOOSER_COUNTRIES,
 			          	GA_RelVerify,        	TRUE,
@@ -146,14 +146,14 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 			          	CHOOSER_Selected,    	0,
 									TAG_DONE),
 								TAG_DONE),
-							
+
 							// Languages Select Box with Label
 							LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
 								LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
 								LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
 									//LABEL_DrawInfo, drInfo,
 									LABEL_Text, "_Language",
-									TAG_END),									
+									TAG_END),
 								LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
 			          	GA_ID,            		GID_CHOOSER_LANGUAGES,
 			          	GA_RelVerify,        	TRUE,
@@ -176,10 +176,10 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 						TAG_DONE),
 						CHILD_WeightedHeight, 0,
 					// END - Top Filter Section
-					
-					// START - Bottom List Section											
+
+					// START - Bottom List Section
 					LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-						LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,						
+						LAYOUT_Orientation, 		LAYOUT_ORIENT_VERT,
 						LAYOUT_AddChild, IIntuition->NewObject(NULL, "listbrowser.gadget",
 	            GA_ID,                     GID_RADIO_LISTBROWSER,
 							GA_RelVerify,              TRUE,
@@ -191,14 +191,14 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 	            LISTBROWSER_ShowSelected,  TRUE,
 	            LISTBROWSER_Striping,      LBS_ROWS,
 	            TAG_DONE),
-          	TAG_DONE),    		  
+          	TAG_DONE),
 						CHILD_MinHeight, 	300,
 				TAG_DONE),
 			TAG_DONE),
 		TAG_DONE);
 }
 
-Object *buildMainMenu(struct Screen *screen) 
+Object *buildMainMenu(struct Screen *screen)
 {
   return IIntuition->NewObject(NULL,"menuclass",MA_Type,T_ROOT,
 		MA_AddChild, IIntuition->NewObject(NULL,"menuclass",MA_Type,T_MENU,
@@ -231,14 +231,15 @@ Object *buildMainMenu(struct Screen *screen)
 char getChooserText(int gadgetId, uint16 code)
 {
   char returnValue[32];
-  
+
   IDOS->Printf("Genres selected new %ld\n", code);
   switch (gadgetId)
   {
     case GID_CHOOSER_GENRES:
-  		IDOS->Printf("Genres selected new neww %ld\n", code);
-  		IUtility->Strlcpy(returnValue, genres[code], sizeof(returnValue));
-  		IDOS->Printf("Selected: %s\n", genres[code]);
+      IDOS->Printf("Genres selected new neww %ld\n", code);
+      IUtility->Strlcpy(returnValue, genres[code], sizeof(returnValue));
+      IDOS->Printf("Selected: %s\n", genres[code]);
+      IDOS->Printf("Selected 2: %s\n", returnValue);
       break;
   }
   return *returnValue;

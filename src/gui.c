@@ -60,13 +60,13 @@ void showGUI(void)
 				  while (!done)
 				  {
 				    uint32 wait = IExec->Wait(signal | SIGBREAKF_CTRL_C);
-				    if ( wait & SIGBREAKF_CTRL_C ) 
+				    if ( wait & SIGBREAKF_CTRL_C )
 				    {
 							done = TRUE;
 		          break;
 		        }
 
-				    if ( wait & signal ) 
+				    if ( wait & signal )
 				    {
 		        	uint32 result = WMHI_LASTMSG;
 		        	//char *temp;
@@ -89,9 +89,9 @@ void showGUI(void)
 										break;
 									case WMHI_MENUPICK:
 										selectedMenu = NO_MENU_ID;
-                    while ((selectedMenu = IIntuition->IDoMethod(menus[MID_PROJECT], MM_NEXTSELECT, 0, selectedMenu, TAG_DONE)) != NO_MENU_ID) 
+                    while ((selectedMenu = IIntuition->IDoMethod(menus[MID_PROJECT], MM_NEXTSELECT, 0, selectedMenu, TAG_DONE)) != NO_MENU_ID)
                     {
-                      switch (selectedMenu) 
+                      switch (selectedMenu)
                       {
                         case MID_ICONIFY:
                        		IIntuition->IDoMethod(objects[OID_MAIN], WM_ICONIFY, TAG_DONE);
@@ -104,12 +104,12 @@ void showGUI(void)
                         case MID_QUIT:
                         	done = TRUE;
                         	break;
-                      }  
+                      }
                     }
 
 									  break;
 									case WMHI_GADGETUP:
-										switch (result & WMHI_GADGETMASK) 
+										switch (result & WMHI_GADGETMASK)
 										{
 											case GID_FILTER_BUTTON:
 											  IDOS->Printf("Search radio stations\n");
@@ -119,7 +119,7 @@ void showGUI(void)
 											  IDOS->Printf("Genres selected %ld\n", code);
 											  //IDOS->Printf("%s\n", genres[code]);
 											  //temp = (char *)getChooserText(GID_CHOOSER_GENRES, code);
-											  IDOS->Printf("%c\n", getChooserText(GID_CHOOSER_GENRES, code));
+											  IDOS->Printf("%s\n", getChooserText(GID_CHOOSER_GENRES, code));
 											  break;
 										}
 										break;
@@ -127,25 +127,25 @@ void showGUI(void)
 							}
 
 							//// About Window events
-							while ((result = IIntuition->IDoMethod(objects[OID_ABOUT], WM_HANDLEINPUT, &code, TAG_DONE))) 
+							while ((result = IIntuition->IDoMethod(objects[OID_ABOUT], WM_HANDLEINPUT, &code, TAG_DONE)))
 							{
-								switch(result & WMHI_CLASSMASK) 
+								switch(result & WMHI_CLASSMASK)
 								{
 									case WMHI_CLOSEWINDOW:
 										IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE, TAG_DONE);
 										windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
 										break;
 									case WMHI_GADGETUP:
-										switch(result & WMHI_GADGETMASK) 
+										switch(result & WMHI_GADGETMASK)
 										{
 											case GID_ABOUT_BUTTON_OK:
 												IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE, TAG_DONE);
 												windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
-												break;		
+												break;
 										}
 										break;
 								}
-							} 
+							}
 				    }
 				  }
 
