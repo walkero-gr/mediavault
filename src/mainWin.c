@@ -48,7 +48,8 @@ CONST_STRPTR countries[] =
   NULL
 };
 
-Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu) {
+Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
+{
   struct ColumnInfo 	*columninfo = NULL;
 	//struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
 
@@ -197,7 +198,8 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu) {
 		TAG_DONE);
 }
 
-Object *buildMainMenu(struct Screen *screen) {
+Object *buildMainMenu(struct Screen *screen) 
+{
   return IIntuition->NewObject(NULL,"menuclass",MA_Type,T_ROOT,
 		MA_AddChild, IIntuition->NewObject(NULL,"menuclass",MA_Type,T_MENU,
 			MA_Label, "Project",

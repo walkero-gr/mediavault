@@ -17,8 +17,10 @@
 
 #include "globals.h"
 #include "gui.h"
+#include "guifuncs.h"
 #include "mainWin.h"
 #include "aboutWin.h"
+#include "oofuncs.h"
 
 
 struct Screen 			*screen;
@@ -28,18 +30,6 @@ struct Window 			*windows[WID_LAST];
 Object *gadgets[GID_LAST];
 Object *objects[OID_LAST];
 Object *menus[MID_LAST];
-
-//#include "guifuncs.h"
-//
-//extern void buildMainWindow(void);
-//extern void buildMainMenu(void);
-//
-//static void buildAboutWindow(void);
-//
-//struct Image *MenuImage(CONST_STRPTR, struct Screen *);
-//void windowBlocking(struct Window *, Object *, BOOL disable);
-//
-//extern void getRadioStations(void);
 
 void showGUI(void)
 {
@@ -98,15 +88,17 @@ void showGUI(void)
 										break;
 									case WMHI_MENUPICK:
 										selectedMenu = NO_MENU_ID;
-                    while ((selectedMenu = IIntuition->IDoMethod(menus[MID_PROJECT], MM_NEXTSELECT, 0, selectedMenu, TAG_DONE)) != NO_MENU_ID) {
-                      switch (selectedMenu) {
+                    while ((selectedMenu = IIntuition->IDoMethod(menus[MID_PROJECT], MM_NEXTSELECT, 0, selectedMenu, TAG_DONE)) != NO_MENU_ID) 
+                    {
+                      switch (selectedMenu) 
+                      {
                         case MID_ICONIFY:
                        		IIntuition->IDoMethod(objects[OID_MAIN], WM_ICONIFY, TAG_DONE);
 		                			windows[WID_MAIN] = NULL;
                         	break;
                         case MID_ABOUT:
 													windows[WID_ABOUT] = (struct Window*)IIntuition->IDoMethod(objects[OID_ABOUT], WM_OPEN, TAG_DONE);
-													//windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
+													windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
                         	break;
                         case MID_QUIT:
                         	done = TRUE;
@@ -115,29 +107,33 @@ void showGUI(void)
                     }
 
 									  break;
-									//case WMHI_GADGETUP:
-										//switch(result & WMHI_GADGETMASK) {
-											//case GID_FILTER_BUTTON:
-											  //IDOS->Printf("Search radio stations\n");
-											  //getRadioStations();
-											  //break;
-										//}
-										//break;
+									case WMHI_GADGETUP:
+										switch(result & WMHI_GADGETMASK) 
+										{
+											case GID_FILTER_BUTTON:
+											  IDOS->Printf("Search radio stations\n");
+											  getRadioStations();
+											  break;
+										}
+										break;
 								}
 							}
 
 							//// About Window events
-							while ((result = IIntuition->IDoMethod(objects[OID_ABOUT], WM_HANDLEINPUT, &code, TAG_DONE))) {
-								switch(result & WMHI_CLASSMASK) {
+							while ((result = IIntuition->IDoMethod(objects[OID_ABOUT], WM_HANDLEINPUT, &code, TAG_DONE))) 
+							{
+								switch(result & WMHI_CLASSMASK) 
+								{
 									case WMHI_CLOSEWINDOW:
 										IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE, TAG_DONE);
-										//windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
+										windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
 										break;
 									case WMHI_GADGETUP:
-										switch(result & WMHI_GADGETMASK) {
+										switch(result & WMHI_GADGETMASK) 
+										{
 											case GID_ABOUT_BUTTON_OK:
 												IIntuition->IDoMethod(objects[OID_ABOUT], WM_CLOSE, TAG_DONE);
-												//windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
+												windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
 												break;		
 										}
 										break;
@@ -156,14 +152,3 @@ void showGUI(void)
   }
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
-
-
-
-/*
-void windowBlocking(struct Window *winId, Object *objId, BOOL disable) {
-  IIntuition->SetWindowPointer(winId, WA_BusyPointer, disable, TAG_DONE);
-	IIntuition->SetAttrs(objId, WA_BusyPointer, disable, TAG_DONE);
-}
-*/
-
-

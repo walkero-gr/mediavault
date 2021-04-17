@@ -127,9 +127,4 @@ Object *buildAboutWindow(struct MsgPort *appPort, struct Screen *screen)
 			CHILD_MaxHeight, 40,
 	  TAG_DONE), 
 	TAG_DONE);
-	
-	//IIntuition->SetAttrs(gadgets[GID_ABOUT_TEXT], 
-		//ICA_TARGET, 	gadgets[GID_ABOUT_TEXT_SCROLLER],
-		//ICA_MAP, 			textToScroller,
-		//TAG_END); 
 }

@@ -14,27 +14,31 @@
 
 */
 
+#include "globals.h"
+#include "libshandler.h"
 #include "oofuncs.h"
-
-extern void CleanExit(const char *);
 
 static char url[255];
 static uint32 portNum = 80;
 static STRPTR httpreq=NULL,
 							httpresp=NULL;
 
-void getRadioStations(void) {
+void getRadioStations(void) 
+{
   IDOS->Printf("getRadioStations called\n");
   NETWORKOBJ *net=(NETWORKOBJ *)IOO->NewNetworkObject();
   
-  if (net) {
+  if (net)
+  {
     IDOS->Printf("Network is fine!\n");
     
     strcpy(url, "https://de1.api.radio-browser.info/json/countries");  portNum=443;
-    if (net->CreateConnection(url, portNum, TRUE, TRUE)) {
+    if (net->CreateConnection(url, portNum, TRUE, TRUE))
+    {
       IDOS->Printf("Connection created just fine!\n");
       
-      if (net->GetConnection()) {
+      if (net->GetConnection())
+      {
         IDOS->Printf("Connection done fine!\n");
         
         IDOS->Printf("Trying to load %s\n", url);
@@ -42,7 +46,8 @@ void getRadioStations(void) {
       	net->SendHTTPRequest(httpreq);
       	IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode);
       	httpresp = net->GetHTTPResponse();
-      	if (httpresp) { 
+      	if (httpresp)
+      	{ 
       		IDOS->Printf("%s\n", httpresp); 
       	}
       	else IDOS->Printf("No response\n");
@@ -57,5 +62,4 @@ void getRadioStations(void) {
     IOO->DisposeNetworkObject(net);
   }
   else CleanExit("Network Object creation failed!\n");
-  
 }

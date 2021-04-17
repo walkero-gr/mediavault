@@ -18,7 +18,6 @@
 #define _OOFUNCS_H
 
 
-
-#include "globals.h"
+void getRadioStations(void);
 
 #endif

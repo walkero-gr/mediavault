@@ -18,8 +18,8 @@
 #define _GUIFUNCS_H
 
 
-struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen);
-void windowBlocking(struct Window *winId, Object *objId, BOOL disable);
+struct Image *MenuImage(CONST_STRPTR name, struct Screen *);
+void windowBlocking(struct Window *, Object *, BOOL disable);
 
 
 #endif
