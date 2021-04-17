@@ -40,6 +40,7 @@ endif
 MediaVault_OBJ := \
 	 src/mediavault.o src/libshandler.o src/gui.o \
 	 src/mainWin.o src/guifuncs.o src/aboutWin.o \
+	 src/oofuncs.o
 
 
 ###################################################################
