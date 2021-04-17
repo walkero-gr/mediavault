@@ -14,6 +14,9 @@
 
 */
 
+#include <images/bitmap.h>
+
+#include "globals.h"
 #include "guifuncs.h"
 
 /**

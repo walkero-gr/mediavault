@@ -17,6 +17,7 @@
 
 #include "globals.h"
 #include "gui.h"
+#include "mainWin.h"
 
 
 struct Screen 			*screen;
@@ -24,6 +25,7 @@ struct MsgPort 			*appPort;
 struct Window 			*windows[WID_LAST];
 
 Object *objects[OID_LAST];
+Object *menus[MID_LAST];
 
 //#include "guifuncs.h"
 //
@@ -45,8 +47,8 @@ void showGUI(void)
 		if((screen = IIntuition->LockPubScreen(NULL)))
 		{
 		  //drInfo = IIntuition->GetScreenDrawInfo(screen);
-		  //buildMainMenu();
-		  objects[OID_MAIN] = buildMainWindow(appPort);
+		  menus[MID_PROJECT] = buildMainMenu(screen);
+		  objects[OID_MAIN] = buildMainWindow(appPort, menus[MID_PROJECT]);
 		  //buildAboutWindow();
 
 		  if (objects[OID_MAIN])
@@ -56,8 +58,8 @@ void showGUI(void)
 
 				if (windows[WID_MAIN])
 				{
-				  uint32 	signal = 0;
-				  				//selectedMenu = MID_LAST;
+				  uint32 	signal = 0,
+				  				selectedMenu = MID_LAST;
 				  uint16 code = 0;
           BOOL done = FALSE;
 
@@ -92,25 +94,25 @@ void showGUI(void)
 									case WMHI_UNICONIFY:
 										windows[WID_MAIN] = (struct Window *)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, TAG_DONE);
 										break;
-									//case WMHI_MENUPICK:
-										//selectedMenu = NO_MENU_ID;
-                    //while ((selectedMenu = IIntuition->IDoMethod(menus[MID_PROJECT], MM_NEXTSELECT, 0, selectedMenu, TAG_DONE)) != NO_MENU_ID) {
-                      //switch (selectedMenu) {
-                        //case MID_ICONIFY:
-                       		//IIntuition->IDoMethod(objects[OID_MAIN], WM_ICONIFY, TAG_DONE);
-		                			//windows[WID_MAIN] = NULL;
-                        	//break;
-                        //case MID_ABOUT:
+									case WMHI_MENUPICK:
+										selectedMenu = NO_MENU_ID;
+                    while ((selectedMenu = IIntuition->IDoMethod(menus[MID_PROJECT], MM_NEXTSELECT, 0, selectedMenu, TAG_DONE)) != NO_MENU_ID) {
+                      switch (selectedMenu) {
+                        case MID_ICONIFY:
+                       		IIntuition->IDoMethod(objects[OID_MAIN], WM_ICONIFY, TAG_DONE);
+		                			windows[WID_MAIN] = NULL;
+                        	break;
+                        case MID_ABOUT:
 													//windows[WID_ABOUT] = (struct Window*)IIntuition->IDoMethod(objects[OID_ABOUT], WM_OPEN, TAG_DONE);
 													//windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
-                        	//break;
-                        //case MID_QUIT:
-                        	//done = TRUE;
-                        	//break;
-                      //}  
-                    //}
+                        	break;
+                        case MID_QUIT:
+                        	done = TRUE;
+                        	break;
+                      }  
+                    }
 
-									  //break;
+									  break;
 									//case WMHI_GADGETUP:
 										//switch(result & WMHI_GADGETMASK) {
 											//case GID_FILTER_BUTTON:
@@ -144,7 +146,7 @@ void showGUI(void)
 
 					//IIntuition->DisposeObject(objects[OID_ABOUT]);
 	  			IIntuition->DisposeObject(objects[OID_MAIN]);
-	  			//IIntuition->DisposeObject(menus[MID_PROJECT]);
+	  			IIntuition->DisposeObject(menus[MID_PROJECT]);
 				}
 			}
 			//IIntuition->FreeScreenDrawInfo(screen, drInfo);

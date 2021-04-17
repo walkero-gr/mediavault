@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1366193937">
+<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1366195872">
 	<plugin name="PROGDIR:Plugins&#047;AmigaOS4SDK.CCPlugin" flags="0"/>
 	<target run="MediaVault"/>
 	<homedir name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault"/>
@@ -15,17 +15,19 @@
 		<file name="src&#047;globals.h" open="1" top="0" left="0" line="32" row="0"/>
 		<file name="src&#047;upnpfuncs.h" open="0"/>
 		<file name="src&#047;oofuncs.h" open="0"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;guifuncs.h" open="1" top="0" left="0" line="23" row="0"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;version.h" open="0"/>
-		<file name="src&#047;gui.h" open="1" current="1" top="85" left="0" line="140" row="20"/>
-		<file name="src&#047;mainWin.h" open="1" top="0" left="0" line="23" row="25"/>
+		<file name="src&#047;gui.h" open="1" top="8" left="0" line="26" row="34"/>
+		<file name="src&#047;mainWin.h" open="1" top="0" left="0" line="25" row="8"/>
 	</headers>
 	<sources>
 		<file name="src&#047;mediavault.c" open="1" top="0" left="0" line="25" row="2"/>
 		<file name="src&#047;libshandler.c" open="0"/>
 		<file name="src&#047;upnpfuncs.c" open="0"/>
 		<file name="src&#047;oofuncs.c" open="0"/>
-		<file name="src&#047;gui.c" open="1" top="11" left="0" line="47" row="6"/>
-		<file name="src&#047;mainWin.c" open="1" top="13" left="0" line="24" row="6"/>
+		<file name="src&#047;gui.c" open="1" top="0" left="0" line="23" row="27"/>
+		<file name="src&#047;guifuncs.c" open="1" top="0" left="0" line="1" row="0"/>
+		<file name="src&#047;mainWin.c" open="1" current="1" top="31" left="0" line="31" row="21"/>
 	</sources>
 	<others>
 		<file name="Makefile" open="0"/>
@@ -41,6 +43,7 @@
 			<file name="src&#047;libshandler.c"/>
 			<file name="src&#047;gui.c"/>
 			<file name="src&#047;mainWin.c"/>
+			<file name="src&#047;guifuncs.c"/>
 		</target>
 	</targets>
 	<logfile name="RAM Disk:Build.log"/>

@@ -17,7 +17,7 @@
 #ifndef _GUIFUNCS_H
 #define _GUIFUNCS_H
 
-#include "gui.h"
+//#include "gui.h"
 //#include "globals.h"
 
 struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen);

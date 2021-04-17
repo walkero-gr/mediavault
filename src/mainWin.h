@@ -21,7 +21,7 @@
 #include <classes/window.h>
 
 //#include "gui.h"
-Object *buildMainWindow(struct MsgPort *);
-void buildMainMenu(void);
+Object *buildMainWindow(struct MsgPort *, Object *);
+Object *buildMainMenu(struct Screen *);
 
 #endif

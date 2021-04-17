@@ -23,7 +23,7 @@
 //#include <images/bitmap.h>
 //#include <images/label.h>
 //#include <intuition/icclass.h> 
-//#include <intuition/menuclass.h>
+#include <intuition/menuclass.h>
 //
 //#include <libraries/gadtools.h>
 //
@@ -92,35 +92,7 @@ enum
 //Object *objects[OID_LAST];
 //Object *menus[MID_LAST];
 //
-//CONST_STRPTR genres[] =
-//{
-  //"All Genres",
-  //"Rock",
-  //"Classic Rock",
-  //"Heavy Metal",
-  //NULL
-//};
-//
-//CONST_STRPTR languages[] =
-//{
-  //"All Languages",
-  //"Greek",
-  //"English",
-  //"Irish",
-  //NULL
-//};
-//
-//CONST_STRPTR countries[] =
-//{
-  //"All Countries",
-  //"Britain",
-  //"Greece",
-  //"Ireland",
-  //"Sweden",
-  //"Germany",
-  //NULL
-//};
-//
+
 //// For the scroller at the About window
 //const uint32 textToScroller[] = {
     //GA_TEXTEDITOR_Prop_Entries,    SCROLLER_Total,
@@ -137,7 +109,6 @@ enum
 //
 //#include "globals.h"
 
-#include "mainWin.h"
 
 void showGUI(void);
 
