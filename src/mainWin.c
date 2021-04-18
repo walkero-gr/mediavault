@@ -99,7 +99,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 								//LABEL_DrawInfo, drInfo,
 								LABEL_Text, "_Name",
 								TAG_END),
-							LAYOUT_AddChild, IIntuition->NewObject(NULL, "string.gadget",
+							LAYOUT_AddChild, gadgets[GID_FILTERS_NAME] = IIntuition->NewObject(NULL, "string.gadget",
 								GA_ID, 								GID_FILTERS_NAME,
 								GA_RelVerify, 				TRUE,
 								GA_TabCycle, 					TRUE,
@@ -228,19 +228,19 @@ Object *buildMainMenu(struct Screen *screen)
 		TAG_END);
 }
 
-char getChooserText(int gadgetId, uint16 code)
+CONST_STRPTR getChooserText(int gadgetId, uint16 code)
 {
-  char returnValue[32];
-
-  IDOS->Printf("Genres selected new %ld\n", code);
   switch (gadgetId)
   {
     case GID_CHOOSER_GENRES:
-      IDOS->Printf("Genres selected new neww %ld\n", code);
-      IUtility->Strlcpy(returnValue, genres[code], sizeof(returnValue));
-      IDOS->Printf("Selected: %s\n", genres[code]);
-      IDOS->Printf("Selected 2: %s\n", returnValue);
+      return genres[code];
+      break;
+    case GID_CHOOSER_COUNTRIES:
+      return countries[code];
+      break;
+    case GID_CHOOSER_LANGUAGES:
+      return languages[code];
       break;
   }
-  return *returnValue;
+  return NULL;
 }

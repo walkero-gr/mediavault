@@ -23,13 +23,13 @@
 #include "oofuncs.h"
 
 
-struct Screen 			*screen;
-struct MsgPort 			*appPort;
-struct Window 			*windows[WID_LAST];
+//struct Screen 			*screen;
+//struct MsgPort 			*appPort;
+//struct Window 			*windows[WID_LAST];
 
-Object *gadgets[GID_LAST];
-Object *objects[OID_LAST];
-Object *menus[MID_LAST];
+//Object *gadgets[GID_LAST];
+//Object *objects[OID_LAST];
+//Object *menus[MID_LAST];
 
 void showGUI(void)
 {
@@ -54,6 +54,10 @@ void showGUI(void)
 				  				selectedMenu = MID_LAST;
 				  uint16 code = 0;
           BOOL done = FALSE;
+          char 	selName[32] = "",
+          			selGenre[32] = "",
+          			selCountry[32] = "",
+          			selLanguage[32] = "";
 
 		      IIntuition->GetAttr(WINDOW_SigMask, objects[OID_MAIN], &signal);
 
@@ -69,7 +73,6 @@ void showGUI(void)
 				    if ( wait & signal )
 				    {
 		        	uint32 result = WMHI_LASTMSG;
-		        	//char *temp;
 
 							// Main Window events
 		          while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE)))
@@ -112,14 +115,33 @@ void showGUI(void)
 										switch (result & WMHI_GADGETMASK)
 										{
 											case GID_FILTER_BUTTON:
-											  IDOS->Printf("Search radio stations\n");
-											  getRadioStations();
+											  IUtility->Strlcpy(selName, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(selGenre));
+											  //IDOS->Printf("Search radio stations\n");
+											  //IDOS->Printf( "Name: %s\n", ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer);
+											  //IDOS->Printf( "Name 2: %s\n", selName);
+											  IDOS->Printf("Name: %s\nGenre: %s\nLanguage: %s\nCountry: %s\n", selName, selGenre, selLanguage, selCountry);
+											  getRadioStations(selName, selGenre, selLanguage, selCountry);
 											  break;
 											case GID_CHOOSER_GENRES:
-											  IDOS->Printf("Genres selected %ld\n", code);
-											  //IDOS->Printf("%s\n", genres[code]);
-											  //temp = (char *)getChooserText(GID_CHOOSER_GENRES, code);
-											  IDOS->Printf("%s\n", getChooserText(GID_CHOOSER_GENRES, code));
+											  if (code > 0) 
+											  {
+											  	IUtility->Strlcpy(selGenre, getChooserText(GID_CHOOSER_GENRES, code), sizeof(selGenre));
+											  }
+											  else IUtility->Strlcpy(selGenre, "", sizeof(selGenre));
+											  break;
+											case GID_CHOOSER_COUNTRIES:
+											  if (code > 0) 
+											  {
+											  	IUtility->Strlcpy(selCountry, getChooserText(GID_CHOOSER_COUNTRIES, code), sizeof(selCountry));
+											  }
+											  else IUtility->Strlcpy(selCountry, "", sizeof(selCountry));
+											  break;
+											case GID_CHOOSER_LANGUAGES:
+											  if (code > 0) 
+											  {
+											  	IUtility->Strlcpy(selLanguage, getChooserText(GID_CHOOSER_LANGUAGES, code), sizeof(selLanguage));
+											  }
+											  else IUtility->Strlcpy(selLanguage, "", sizeof(selLanguage));
 											  break;
 										}
 										break;

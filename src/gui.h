@@ -79,12 +79,15 @@ enum
    MID_LAST
 };
 
+struct Screen 			*screen;
+struct MsgPort 			*appPort;
+struct Window 			*windows[WID_LAST];
 //struct ColumnInfo 	*columninfo = NULL;
 //struct DrawInfo 		*drInfo;
 
-//Object *gadgets[GID_LAST];
-//Object *objects[OID_LAST];
-//Object *menus[MID_LAST];
+Object *gadgets[GID_LAST];
+Object *objects[OID_LAST];
+Object *menus[MID_LAST];
 
 
 void showGUI(void);
