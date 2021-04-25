@@ -2,3 +2,4 @@ src/*_cat.*
 src/*.o
 MediaVault
 *.bak
+debug/

@@ -34,6 +34,8 @@ static char 	selName[32] = "",
 
 static void fillRadioList(void);
 
+extern NETWORKOBJ *net;
+
 //struct Screen 			*screen;
 //struct MsgPort 			*appPort;
 //struct Window 			*windows[WID_LAST];
@@ -207,12 +209,29 @@ void showGUI(void)
 static void fillRadioList(void)
 {
 	STRPTR responseJSON = getRadioStations(selName, selGenre, selLanguage, selCountry);
-	getRadioList(responseJSON);
+	if (responseJSON)
+	{
+	  IDOS->Printf("Response JSON is valid\n");
+		getRadioList(responseJSON);
+		
+		// Dispose net here, after the creation of the listbrowser content,
+		// because it trashes the response data, so to free the signals
+		// TODO: communicate with the oo.library dev to find a more elegant way to do it
+		if (net)
+		{
+		  net->DisposeConnection();
+		  IOO->DisposeNetworkObject(net);
+		}
+		
+	} else IDOS->Printf("Response JSON is NOT valid\n");
 	
-	IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], windows[WID_MAIN], NULL,
-			LISTBROWSER_Labels, 				(ULONG)&radioList,
-			LISTBROWSER_SortColumn,			0,
-			LISTBROWSER_Selected,				-1,
-			LISTBROWSER_ColumnInfo,     columnInfo,
-			TAG_DONE);
+	if (radioListItemsCnt)
+	{
+		IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], windows[WID_MAIN], NULL,
+				LISTBROWSER_Labels, 				(ULONG)&radioList,
+				LISTBROWSER_SortColumn,			0,
+				LISTBROWSER_Selected,				-1,
+				LISTBROWSER_ColumnInfo,     columnInfo,
+				TAG_DONE);
+	}
 }  
