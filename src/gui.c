@@ -20,8 +20,19 @@
 #include "guifuncs.h"
 #include "mainWin.h"
 #include "aboutWin.h"
-#include "oofuncs.h"
+#include "radiofuncs.h"
 
+static struct ColumnInfo *columnInfo;
+struct List radioList;
+int32 radioListItemsCnt = 0;
+
+// TODO: Set below to a struct
+static char 	selName[32] = "",
+          		selGenre[32] = "",
+          		selCountry[32] = "",
+          		selLanguage[32] = "";
+
+static void fillRadioList(void);
 
 //struct Screen 			*screen;
 //struct MsgPort 			*appPort;
@@ -54,10 +65,19 @@ void showGUI(void)
 				  				selectedMenu = MID_LAST;
 				  uint16 code = 0;
           BOOL done = FALSE;
-          char 	selName[32] = "",
-          			selGenre[32] = "",
-          			selCountry[32] = "",
-          			selLanguage[32] = "";
+          
+          columnInfo = IListBrowser->AllocLBColumnInfo(2,
+        			LBCIA_Column, 			0,
+	            	LBCIA_Title, 			" Station",
+	            	LBCIA_AutoSort, 	TRUE,
+	            	LBCIA_SortArrow, 	TRUE,
+	            	LBCIA_Width,			0,
+        			LBCIA_Column, 			1,
+	            	LBCIA_Title, 			" Country",
+	            	LBCIA_AutoSort, 	TRUE,
+	            	LBCIA_SortArrow, 	TRUE,
+	            	LBCIA_Width,			0,
+	        		TAG_DONE);
 
 		      IIntuition->GetAttr(WINDOW_SigMask, objects[OID_MAIN], &signal);
 
@@ -115,12 +135,8 @@ void showGUI(void)
 										switch (result & WMHI_GADGETMASK)
 										{
 											case GID_FILTER_BUTTON:
-											  IUtility->Strlcpy(selName, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(selGenre));
-											  //IDOS->Printf("Search radio stations\n");
-											  //IDOS->Printf( "Name: %s\n", ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer);
-											  //IDOS->Printf( "Name 2: %s\n", selName);
-											  IDOS->Printf("Name: %s\nGenre: %s\nLanguage: %s\nCountry: %s\n", selName, selGenre, selLanguage, selCountry);
-											  getRadioStations(selName, selGenre, selLanguage, selCountry);
+											  IUtility->Strlcpy(selName, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(selGenre));											  
+											  fillRadioList();
 											  break;
 											case GID_CHOOSER_GENRES:
 											  if (code > 0) 
@@ -170,7 +186,13 @@ void showGUI(void)
 							}
 				    }
 				  }
-
+				  
+				  IListBrowser->FreeLBColumnInfo(columnInfo);
+				  if(radioListItemsCnt)
+				  {
+				  	IListBrowser->FreeListBrowserList(&radioList);
+					}
+					
 					IIntuition->DisposeObject(objects[OID_ABOUT]);
 	  			IIntuition->DisposeObject(objects[OID_MAIN]);
 	  			IIntuition->DisposeObject(menus[MID_PROJECT]);
@@ -181,3 +203,16 @@ void showGUI(void)
   }
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
+
+static void fillRadioList(void)
+{
+	STRPTR responseJSON = getRadioStations(selName, selGenre, selLanguage, selCountry);
+	getRadioList(responseJSON);
+	
+	IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], windows[WID_MAIN], NULL,
+			LISTBROWSER_Labels, 				(ULONG)&radioList,
+			LISTBROWSER_SortColumn,			0,
+			LISTBROWSER_Selected,				-1,
+			LISTBROWSER_ColumnInfo,     columnInfo,
+			TAG_DONE);
+}  

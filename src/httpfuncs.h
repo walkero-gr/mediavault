@@ -18,6 +18,6 @@
 #define _OOFUNCS_H
 
 
-void getRadioStations(char *selName, char *selGenre, char *selLanguage, char *selCountry);
+STRPTR getResponseBody(char *, int);
 
 #endif

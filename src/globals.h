@@ -19,14 +19,18 @@
 
 #include <oo/ooNetwork.h>
 
+
+#include <proto/amijansson.h>
 // #include <proto/amisslmaster.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/utility.h>
 #include <proto/intuition.h>
 #include <proto/oo.h>
+#include <proto/listbrowser.h>
 
 #include <string.h>
+#include <jansson/jansson.h>
 
 #include "version.h"
 
@@ -43,6 +47,7 @@ struct Library *OOBase;						struct OOIFace 						*IOO;
 //struct Library *SocketBase; 			struct SocketIFace 				*ISocket;
 //struct Library *AmiSSLMasterBase; struct AmiSSLMasterIFace	*IAmiSSLMaster;
 //struct Library *AmiSSLBase; 			struct AmiSSLIFace				*IAmiSSL;
+struct Library *JanssonBase;			struct JanssonIFace 			*IJansson;
 
 Class *LayoutClass;
 Class *LabelClass;

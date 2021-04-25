@@ -25,14 +25,14 @@
 #include <intuition/icclass.h> 
 #include <intuition/menuclass.h>
 
-//#include <libraries/gadtools.h>
+#include <libraries/gadtools.h>
 
-#include <proto/listbrowser.h>
+//#include <proto/listbrowser.h>
 
 #include <gadgets/button.h>
 #include <gadgets/chooser.h>
 #include <gadgets/layout.h>
-//#include <gadgets/listbrowser.h>
+#include <gadgets/listbrowser.h>
 #include <gadgets/scroller.h> 
 #include <gadgets/string.h>
 #include <gadgets/texteditor.h>
@@ -84,6 +84,7 @@ struct MsgPort 			*appPort;
 struct Window 			*windows[WID_LAST];
 //struct ColumnInfo 	*columninfo = NULL;
 //struct DrawInfo 		*drInfo;
+struct List stationsList;
 
 Object *gadgets[GID_LAST];
 Object *objects[OID_LAST];

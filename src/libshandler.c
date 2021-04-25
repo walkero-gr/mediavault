@@ -20,7 +20,13 @@ void CleanExit(const char *str)
 
 	if(ILayout)						IExec->DropInterface((APTR) ILayout);
 	if(LayoutBase)			 	IIntuition->CloseClass((APTR) LayoutBase);
-
+	
+	if(IOO)								IExec->DropInterface((APTR) IOO);
+  if(OOBase)      			IExec->CloseLibrary(OOBase);
+  
+  if(IJansson)					IExec->DropInterface((APTR) IJansson);
+  if(JanssonBase)      	IExec->CloseLibrary(JanssonBase);
+  
 	if(IUtility)					IExec->DropInterface((APTR) IUtility);
   if(UtilityBase)      	IExec->CloseLibrary(UtilityBase);
 
@@ -45,7 +51,8 @@ void CleanExit(const char *str)
 
 void OpenLibs(void)
 {
-  if ((ApplicationBase = IExec->OpenLibrary( "application.library", 53 ))) {
+  if ((ApplicationBase = IExec->OpenLibrary( "application.library", 53 )))
+  {
     IApplication = (struct ApplicationIFace *)IExec->GetInterface( ApplicationBase, "application", 2, NULL );
     if(!IApplication) CleanExit("Can't open application.library Interface");
   }
@@ -69,8 +76,10 @@ void OpenLibs(void)
 	//}
 	//else CleanExit("Can't open AmiSSL.");
 
-  if ((IntuitionBase = IExec->OpenLibrary( "intuition.library", 54 ))) {
-    if (LIB_IS_AT_LEAST(IntuitionBase, 54, 6)) {
+  if ((IntuitionBase = IExec->OpenLibrary( "intuition.library", 54 )))
+  {
+    if (LIB_IS_AT_LEAST(IntuitionBase, 54, 6))
+    {
     	IIntuition = (struct IntuitionIFace *)IExec->GetInterface( IntuitionBase, "main", 1, NULL );
     	if(!IIntuition) CleanExit("Can't open intuition.library Interface");
     }
@@ -78,31 +87,43 @@ void OpenLibs(void)
   }
   else CleanExit("Can't open intuition.library version 54");
 
-  if ((UtilityBase = IExec->OpenLibrary( "utility.library", 53 ))) {
+  if ((UtilityBase = IExec->OpenLibrary( "utility.library", 53 )))
+  {
     IUtility = (struct UtilityIFace *)IExec->GetInterface( UtilityBase, "main", 1, NULL );
     if(!IUtility) CleanExit("Can't open utility.library Interface");
   }
   else CleanExit("Can't open utility.library version 53");
+  
+	if ((JanssonBase = IExec->OpenLibrary( "jansson.library", 2 )))
+	{
+	  IJansson = (struct JanssonIFace *)IExec->GetInterface( JanssonBase, "main", 1, NULL );
+	  if(!IJansson) CleanExit("Can't open jansson.library Interface");
+	}
+	else CleanExit("Can't open jansson.library version 2");
 
-	if ((OOBase=IExec->OpenLibrary("oo.library",1))) {
+	if ((OOBase=IExec->OpenLibrary("oo.library",1)))
+	{
     IOO = (struct OOIFace *)IExec->GetInterface( OOBase, "main", 1, NULL );
     if(!IOO) CleanExit("Can't open oo.library Interface");
  	}
  	else CleanExit("Can't open oo.library version 1");
 
-	if ((LayoutBase = (APTR) IIntuition->OpenClass( "gadgets/layout.gadget", 1, &LayoutClass ))) {
+	if ((LayoutBase = (APTR) IIntuition->OpenClass( "gadgets/layout.gadget", 1, &LayoutClass )))
+	{
 	  ILayout	= (struct LayoutIFace *)IExec->GetInterface( LayoutBase, "main", 1, NULL );
 	  if(!ILayout) CleanExit("Can't open Layout Gadget Interface");
 	}
 	else CleanExit("Can't open Layout Gadget");
 
-	if ((LabelBase = (APTR) IIntuition->OpenClass( "images/label.image", 1, &LabelClass ))) {
+	if ((LabelBase = (APTR) IIntuition->OpenClass( "images/label.image", 1, &LabelClass )))
+	{
 	  ILabel = (struct LabelIFace *)IExec->GetInterface( LabelBase, "main", 1, NULL );
 	  if(!ILabel) CleanExit("Can't open Label Image Interface");
 	}
 	else CleanExit("Can't open Label Image");
 
-	if ((ListBrowserBase = (APTR) IIntuition->OpenClass( "gadgets/listbrowser.gadget", 1, &ListBrowserClass ))) {
+	if ((ListBrowserBase = (APTR) IIntuition->OpenClass( "gadgets/listbrowser.gadget", 1, &ListBrowserClass )))
+	{
 	  IListBrowser = (struct ListBrowserIFace *)IExec->GetInterface( ListBrowserBase, "main", 1, NULL );
 	  if(!IListBrowser) CleanExit("Can't open ListBrowser Gadget Interface");
 	}
