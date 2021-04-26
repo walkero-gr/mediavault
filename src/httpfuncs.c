@@ -62,32 +62,32 @@ static STRPTR doRequest()
   STRPTR 	httpreq = NULL,
 					httpresp = NULL;
 					
-  IDOS->Printf("getRadioStations called\n");
+  //IDOS->Printf("getRadioStations called\n");
   net = (NETWORKOBJ *)IOO->NewNetworkObject();
   
   if (net)
   {
-    IDOS->Printf("Network is fine!\n");
+    //IDOS->Printf("Network is fine!\n");
 		
     if (net->CreateConnection(requestUrl, requestPort, TRUE, TRUE))
     {
-      IDOS->Printf("Connection created just fine!\n");
+      //IDOS->Printf("Connection created just fine!\n");
       
       if (net->GetConnection())
       {
-        IDOS->Printf("Connection done fine!\n");
+        //IDOS->Printf("Connection done fine!\n");
         
-        IDOS->Printf("Trying to load %s\n", requestUrl);
+        //IDOS->Printf("Trying to load %s\n", requestUrl);
       	httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
-      	IDOS->Printf("Create HTTP Request: %s\n", httpreq);
+      	//IDOS->Printf("Create HTTP Request: %s\n", httpreq);
       	net->SendHTTPRequest(httpreq);
-      	IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode);      	
+      	//IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode);      	
       	
       	httpresp = net->GetHTTPResponse();
       	
       	if (httpresp)
       	{ 
-      		IDOS->Printf("Response GOOD\n------------------------\n%s\n", httpresp);
+      		//IDOS->Printf("Response GOOD\n------------------------\n%s\n", httpresp);
       		return httpresp;
         }
       	else IDOS->Printf("No response\n");        

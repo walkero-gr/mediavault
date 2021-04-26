@@ -33,6 +33,7 @@ static char 	selName[32] = "",
           		selLanguage[32] = "";
 
 static void fillRadioList(void);
+static void playRadio(STRPTR);
 
 extern NETWORKOBJ *net;
 
@@ -68,7 +69,7 @@ void showGUI(void)
 				  uint16 code = 0;
           BOOL done = FALSE;
           
-          columnInfo = IListBrowser->AllocLBColumnInfo(2,
+          columnInfo = IListBrowser->AllocLBColumnInfo( 2,
         			LBCIA_Column, 			0,
 	            	LBCIA_Title, 			" Station",
 	            	LBCIA_AutoSort, 	TRUE,
@@ -79,6 +80,11 @@ void showGUI(void)
 	            	LBCIA_AutoSort, 	TRUE,
 	            	LBCIA_SortArrow, 	TRUE,
 	            	LBCIA_Width,			0,
+        			//LBCIA_Column, 			2,
+	            	//LBCIA_Title, 			" URL",
+	            	//LBCIA_AutoSort, 	FALSE,
+	            	//LBCIA_SortArrow, 	FALSE,
+	            	//LBCIA_Width,			0,
 	        		TAG_DONE);
 
 		      IIntuition->GetAttr(WINDOW_SigMask, objects[OID_MAIN], &signal);
@@ -94,7 +100,10 @@ void showGUI(void)
 
 				    if ( wait & signal )
 				    {
-		        	uint32 result = WMHI_LASTMSG;
+		        	uint32 	result = WMHI_LASTMSG,
+		        					res_value,
+		        					res_node;
+		        	STRPTR	selListValue;
 
 							// Main Window events
 		          while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE)))
@@ -161,6 +170,19 @@ void showGUI(void)
 											  }
 											  else IUtility->Strlcpy(selLanguage, "", sizeof(selLanguage));
 											  break;
+											case GID_RADIO_LISTBROWSER:
+												IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_RADIO_LISTBROWSER], &res_value);
+												if (res_value == LBRE_DOUBLECLICK)
+												{
+													IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_LISTBROWSER], (uint32 *)&res_node);
+													IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node, 
+															LBNA_Column, 2, LBNCA_Text, &selListValue,
+															TAG_DONE);
+													playRadio(selListValue);
+												}
+											  
+											  
+											  break;
 										}
 										break;
 								}
@@ -211,7 +233,6 @@ static void fillRadioList(void)
 	STRPTR responseJSON = getRadioStations(selName, selGenre, selLanguage, selCountry);
 	if (responseJSON)
 	{
-	  IDOS->Printf("Response JSON is valid\n");
 		getRadioList(responseJSON);
 		
 		// Dispose net here, after the creation of the listbrowser content,
@@ -235,3 +256,15 @@ static void fillRadioList(void)
 				TAG_DONE);
 	}
 }  
+
+static void playRadio(STRPTR stationUrl)
+{
+  STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", stationUrl);
+  
+	IDOS->SystemTags( cmd, 
+			SYS_Input, 		ZERO,
+			SYS_Output,		NULL,
+			SYS_Error,		ZERO,
+			SYS_Asynch,		TRUE,
+			TAG_DONE);
+}

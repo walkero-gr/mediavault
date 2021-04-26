@@ -5,8 +5,6 @@
 
 
 
-
-
 //// TO DO
 *******
 
@@ -23,6 +21,8 @@ DONE - Create Project menu
 DONE - Make Iconify menu item to work
 DONE - Make About menu item to open the about window
 DONE - Make Quit menu item to quit the app
+- HTTP encode of the request URL (convert spaces to %20 etc)
+- Make fixes on listbrowser column sizes and sorting
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
@@ -31,7 +31,7 @@ DONE - Parse JSON response
 DONE - Break getRadioStations() to smaller methods
 DONE - Load results into a linked list
 DONE - List radio stations
-- Double click on a station to play on player
+DONE - Double click on a station to play on player
 - Use ToolTypes to set the player and the arguments (optional)
 - Click on a station and show it's info at the side, with logo
 - Mark stations as favorites
@@ -47,11 +47,15 @@ DONE - Move UPnP functions to separate source file
 - Create server list
 - Click on window server list and make Browse SOAP request
 
-//// BUGS
-******
-FIXED - When ooNetwork is used I get some unfreed signals on exit
-- ooNetwork truncates the return info, so for now only 5 items return 
 
+//// BUGS
+*********
+FIXED - When ooNetwork is used I get some unfreed signals on exit
+- ooNetwork truncates the return info, so for now only 5 items return
+
+
+//// IDEAS
+**********
 /* V52.7 : Execute <command> asynchronusly
    V52.9 : Simplified launch routine
    V52.12: Uses wb_lib (reads icon tooltypes)
