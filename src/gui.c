@@ -62,16 +62,20 @@ void showGUI(void)
           BOOL done = FALSE;
           
           columnInfo = IListBrowser->AllocLBColumnInfo( 2,
-        			LBCIA_Column, 			0,
-	            	LBCIA_Title, 			" Station",
-	            	LBCIA_AutoSort, 	TRUE,
-	            	LBCIA_SortArrow, 	TRUE,
-	            	LBCIA_Width,			0,
-        			LBCIA_Column, 			1,
-	            	LBCIA_Title, 			" Country",
-	            	LBCIA_AutoSort, 	TRUE,
-	            	LBCIA_SortArrow, 	TRUE,
-	            	LBCIA_Width,			0,
+        			LBCIA_Column, 								0,
+	            	LBCIA_Title, 								" Station",
+	            	LBCIA_AutoSort, 						TRUE,
+	            	LBCIA_DraggableSeparator, 	TRUE,
+                LBCIA_Sortable, 						TRUE,
+	            	LBCIA_SortArrow, 						TRUE,
+	            	LBCIA_Width,								0,
+        			LBCIA_Column, 								1,
+	            	LBCIA_Title, 								" Country",
+	            	LBCIA_AutoSort, 						TRUE,
+	            	LBCIA_DraggableSeparator, 	TRUE,
+                LBCIA_Sortable, 						TRUE,
+	            	LBCIA_SortArrow, 						TRUE,
+	            	LBCIA_Width,								0,
 	        		TAG_DONE);
 
 		      IIntuition->GetAttr(WINDOW_SigMask, objects[OID_MAIN], &signal);

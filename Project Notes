@@ -22,7 +22,7 @@ DONE - Make Iconify menu item to work
 DONE - Make About menu item to open the about window
 DONE - Make Quit menu item to quit the app
 DONE - HTTP encode of the request URL (convert spaces to %20 etc)
-- Make fixes on listbrowser column sizes and sorting
+DONE - Make fixes on listbrowser column sizes and sorting
 - Check and fix unfreed memory
 - Notifications support
 
@@ -38,6 +38,8 @@ DONE - Double click on a station to play on player
 - Click on a station and show it's info at the side, with logo
 - Mark stations as favorites
 - Add more tags, countries and languages
+- Empty list if invalid/empty JSON returns
+- Add station score in the list
 
 ## Podcasts
 

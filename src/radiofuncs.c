@@ -59,7 +59,7 @@ STRPTR getRadioStations(char *selName, char *selGenre, char *selLanguage, char *
 	  IExec->FreeVec(encSelCountry);
 	}
 	
-	IDOS->Printf("%s\n", url);
+	//IDOS->Printf("%s\n", url);
 
 	return getResponseBody(url, NET_PORT_HTTPS);
 }
