@@ -22,17 +22,18 @@
 CONST_STRPTR genres[] =
 {
   "All Genres",
-  "Rock",
+  "Blues",
   "Classic Rock",
   "Heavy Metal",
+  "Rock",
   NULL
 };
 
 CONST_STRPTR languages[] =
 {
   "All Languages",
-  "Greek",
   "English",
+  "Greek",
   "Irish",
   NULL
 };
@@ -41,10 +42,11 @@ CONST_STRPTR countries[] =
 {
   "All Countries",
   "Britain",
+  "Germany",
   "Greece",
   "Ireland",
   "Sweden",
-  "Germany",
+  "The United States Of America",
   NULL
 };
 
@@ -105,7 +107,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 								GA_TabCycle, 					TRUE,
 								GA_ActivateKey,				"n",
 								STRINGA_MinVisible, 	10,
-								STRINGA_MaxChars, 		64,
+								STRINGA_MaxChars, 		31,
 								TAG_DONE),
 							TAG_DONE),
 

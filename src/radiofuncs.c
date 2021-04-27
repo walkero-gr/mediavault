@@ -32,24 +32,34 @@ STRPTR getRadioStations(char *selName, char *selGenre, char *selLanguage, char *
 	IUtility->Strlcat(url, "/stations/search?limit=5", sizeof(url));
 	if (IUtility->Stricmp(selName, ""))
 	{
+	  STRPTR encSelName = urlEncode(selName);
 	  IUtility->Strlcat(url, "&name=", sizeof(url));
-	  IUtility->Strlcat(url, selName, sizeof(url));
+	  IUtility->Strlcat(url, encSelName, sizeof(url));
+	  IExec->FreeVec(encSelName);
 	}
 	if (IUtility->Stricmp(selGenre, ""))
 	{
+	  STRPTR encSelGenre = urlEncode(selGenre);
 	  IUtility->Strlcat(url, "&tag=", sizeof(url));
-	  IUtility->Strlcat(url, selGenre, sizeof(url));
+	  IUtility->Strlcat(url, encSelGenre, sizeof(url));
+	  IExec->FreeVec(encSelGenre);
 	}
 	if (IUtility->Stricmp(selLanguage, ""))
 	{
+	  STRPTR encSelLanguage = urlEncode(selLanguage);
 	  IUtility->Strlcat(url, "&language=", sizeof(url));
-	  IUtility->Strlcat(url, selLanguage, sizeof(url));
+	  IUtility->Strlcat(url, encSelLanguage, sizeof(url));
+	  IExec->FreeVec(encSelLanguage);
 	}
 	if (IUtility->Stricmp(selCountry, ""))
 	{
+	  STRPTR encSelCountry = urlEncode(selCountry);
 	  IUtility->Strlcat(url, "&country=", sizeof(url));
-	  IUtility->Strlcat(url, selCountry, sizeof(url));
+	  IUtility->Strlcat(url, encSelCountry, sizeof(url));
+	  IExec->FreeVec(encSelCountry);
 	}
+	
+	IDOS->Printf("%s\n", url);
 
 	return getResponseBody(url, NET_PORT_HTTPS);
 }

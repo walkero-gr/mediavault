@@ -19,5 +19,6 @@
 
 
 STRPTR getResponseBody(char *, int);
+STRPTR urlEncode(STRPTR);
 
 #endif

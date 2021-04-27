@@ -37,14 +37,6 @@ static void playRadio(STRPTR);
 
 extern NETWORKOBJ *net;
 
-//struct Screen 			*screen;
-//struct MsgPort 			*appPort;
-//struct Window 			*windows[WID_LAST];
-
-//Object *gadgets[GID_LAST];
-//Object *objects[OID_LAST];
-//Object *menus[MID_LAST];
-
 void showGUI(void)
 {
   appPort = (struct MsgPort *)IExec->AllocSysObject(ASOT_PORT, NULL);
@@ -80,11 +72,6 @@ void showGUI(void)
 	            	LBCIA_AutoSort, 	TRUE,
 	            	LBCIA_SortArrow, 	TRUE,
 	            	LBCIA_Width,			0,
-        			//LBCIA_Column, 			2,
-	            	//LBCIA_Title, 			" URL",
-	            	//LBCIA_AutoSort, 	FALSE,
-	            	//LBCIA_SortArrow, 	FALSE,
-	            	//LBCIA_Width,			0,
 	        		TAG_DONE);
 
 		      IIntuition->GetAttr(WINDOW_SigMask, objects[OID_MAIN], &signal);
@@ -235,16 +222,16 @@ static void fillRadioList(void)
 	{
 		getRadioList(responseJSON);
 		
-		// Dispose net here, after the creation of the listbrowser content,
-		// because it trashes the response data, so to free the signals
-		// TODO: communicate with the oo.library dev to find a more elegant way to do it
-		if (net)
-		{
-		  net->DisposeConnection();
-		  IOO->DisposeNetworkObject(net);
-		}
-		
 	} else IDOS->Printf("Response JSON is NOT valid\n");
+
+	// Dispose net here, after the creation of the listbrowser content,
+	// because it trashes the response data, so to free the signals
+	// TODO: communicate with the oo.library dev to find a more elegant way to do it
+	if (net)
+	{
+	  net->DisposeConnection();
+	  IOO->DisposeNetworkObject(net);
+	}
 	
 	if (radioListItemsCnt)
 	{

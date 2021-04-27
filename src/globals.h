@@ -30,6 +30,8 @@
 #include <proto/listbrowser.h>
 
 #include <string.h>
+#include <ctype.h>
+
 #include <jansson/jansson.h>
 
 #include "version.h"
