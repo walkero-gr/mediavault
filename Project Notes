@@ -39,7 +39,7 @@ DONE - Double click on a station to play on player
 - Mark stations as favorites
 - Add more tags, countries and languages
 - Empty list if invalid/empty JSON returns
-- Add station score in the list
+DONE - Add station votes in the list
 
 ## Podcasts
 

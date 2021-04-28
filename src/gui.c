@@ -61,7 +61,7 @@ void showGUI(void)
 				  uint16 code = 0;
           BOOL done = FALSE;
           
-          columnInfo = IListBrowser->AllocLBColumnInfo( 2,
+          columnInfo = IListBrowser->AllocLBColumnInfo( 3,
         			LBCIA_Column, 								0,
 	            	LBCIA_Title, 								" Station",
 	            	LBCIA_AutoSort, 						TRUE,
@@ -71,6 +71,13 @@ void showGUI(void)
 	            	LBCIA_Width,								0,
         			LBCIA_Column, 								1,
 	            	LBCIA_Title, 								" Country",
+	            	LBCIA_AutoSort, 						TRUE,
+	            	LBCIA_DraggableSeparator, 	TRUE,
+                LBCIA_Sortable, 						TRUE,
+	            	LBCIA_SortArrow, 						TRUE,
+	            	LBCIA_Width,								0,
+        			LBCIA_Column, 								2,
+	            	LBCIA_Title, 								" Votes",
 	            	LBCIA_AutoSort, 						TRUE,
 	            	LBCIA_DraggableSeparator, 	TRUE,
                 LBCIA_Sortable, 						TRUE,
@@ -167,7 +174,7 @@ void showGUI(void)
 												{
 													IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_LISTBROWSER], (uint32 *)&res_node);
 													IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node, 
-															LBNA_Column, 2, LBNCA_Text, &selListValue,
+															LBNA_Column, 3, LBNCA_Text, &selListValue,
 															TAG_DONE);
 													playRadio(selListValue);
 												}

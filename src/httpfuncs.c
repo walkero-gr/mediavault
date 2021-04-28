@@ -49,8 +49,8 @@ void rfcTablesInit(void)
 {
   uint16 i;
   for (i = 0; i < 256; i++) {
-		rfc3986[i] = ( isalnum(i)||i == '~'||i == '-'||i == '.'||i == '_' ) ? i : 0;
-		html5[i] = ( isalnum(i)||i == '*'||i == '-'||i == '.'||i == '_' )		? i : (i == ' ') ? '+' : 0;
+		rfc3986[i]	= ( isalnum(i)||i == '~'||i == '-'||i == '.'||i == '_' ) ? i : 0;
+		html5[i] 		= ( isalnum(i)||i == '*'||i == '-'||i == '.'||i == '_' ) ? i : (i == ' ') ? '+' : 0;
 	}
 }
 
@@ -122,7 +122,7 @@ static STRPTR doRequest()
       	
       	if (httpresp)
       	{ 
-      		//IDOS->Printf("Response GOOD\n------------------------\n%s\n", httpresp);
+      		//IDOS->Printf("Response\n------------------------\n%s\n", httpresp);
       		return httpresp;
         }
       	else IDOS->Printf("No response\n");        

@@ -84,14 +84,14 @@ void getRadioList(STRPTR jsonData)
 		IJansson->json_decref(jsonRoot);
 		CleanExit("JSON error: jsonRoot is not an array");
 	}
-   		
+  json_t *data, *stationuuid, *name, *country, *tags, *url_resolved, *votes;
+  ULONG votesNum = 0;
+  
   IExec->NewList(&radioList);
   radioListItemsCnt = 0;
    		
 	for(i = 0; i < IJansson->json_array_size(jsonRoot); i++)
 	{
-		json_t *data, *stationuuid, *name, *country, *tags, *url_resolved;
-		
 		data = IJansson->json_array_get(jsonRoot, i);
 		if(!json_is_object(data))
 		{
@@ -104,6 +104,7 @@ void getRadioList(STRPTR jsonData)
 		if(!json_is_string(stationuuid))
 		{
 			IDOS->Printf("error: commit %d: stationuuid is not a string\n", (int)(i + 1));
+			IJansson->json_decref(jsonRoot);
 			CleanExit("JSON Error");
 		}
 		//IDOS->Printf("stationuuid: %s\n", IJansson->json_string_value(stationuuid));
@@ -112,6 +113,7 @@ void getRadioList(STRPTR jsonData)
 		if(!json_is_string(name))
 		{
 			IDOS->Printf("error: commit %d: name is not a string\n", (int)(i + 1));
+			IJansson->json_decref(jsonRoot);
 			CleanExit("JSON Error");
 		}
 		//IDOS->Printf("Station name: %s\n", IJansson->json_string_value(name));
@@ -120,6 +122,7 @@ void getRadioList(STRPTR jsonData)
 		if(!json_is_string(country))
 		{
 			IDOS->Printf("error: commit %d: country is not a string\n", (int)(i + 1));
+			IJansson->json_decref(jsonRoot);
 			CleanExit("JSON Error");
 		}
 		//IDOS->Printf("Station country: %s\n", IJansson->json_string_value(country));
@@ -128,6 +131,7 @@ void getRadioList(STRPTR jsonData)
 		if(!json_is_string(tags))
 		{
 			IDOS->Printf("error: commit %d: tags is not a string\n", (int)(i + 1));
+			IJansson->json_decref(jsonRoot);
 			CleanExit("JSON Error");
 		}
 		//IDOS->Printf("Station tags: %s\n", IJansson->json_string_value(tags));
@@ -136,11 +140,22 @@ void getRadioList(STRPTR jsonData)
 		if(!json_is_string(url_resolved))
 		{
 			IDOS->Printf("error: commit %d: url_resolved is not a string\n", (int)(i + 1));
+			IJansson->json_decref(jsonRoot);
 			CleanExit("JSON Error");
 		}
 		//IDOS->Printf("Station url_resolved: %s\n", IJansson->json_string_value(url_resolved));
+
+		votes = IJansson->json_object_get(data, "votes");
+		if(!json_is_integer(votes))
+		{
+			IDOS->Printf("error: commit %d: votes is not an integer\n", (int)(i + 1));
+			IJansson->json_decref(jsonRoot);
+			CleanExit("JSON Error");
+		}
+		//IDOS->Printf("votes: %ld\n", (ULONG)IJansson->json_integer_value(votes));
+		votesNum = (ULONG)IJansson->json_integer_value(votes);
 		
-		stationNode = IListBrowser->AllocListBrowserNode( 3,
+		stationNode = IListBrowser->AllocListBrowserNode( 4,
 				LBNA_Column, 0,
 					LBNCA_CopyText, TRUE,
 					LBNCA_Text, IJansson->json_string_value(name),
@@ -148,6 +163,9 @@ void getRadioList(STRPTR jsonData)
 					LBNCA_CopyText, TRUE,
 					LBNCA_Text, IJansson->json_string_value(country),
 				LBNA_Column, 2,
+					LBNCA_CopyInteger, TRUE,
+					LBNCA_Integer, &votesNum,
+				LBNA_Column, 3,
 					LBNCA_CopyText, TRUE,
 					LBNCA_Text, IJansson->json_string_value(url_resolved),
 				TAG_DONE);
