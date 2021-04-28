@@ -21,7 +21,6 @@
 
 
 #include <proto/amijansson.h>
-// #include <proto/amisslmaster.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/utility.h>
@@ -46,9 +45,6 @@ struct Library *LayoutBase;				struct LayoutIFace 				*ILayout;
 struct Library *UtilityBase;			struct UtilityIFace 			*IUtility;
 struct Library *ListBrowserBase;	struct ListBrowserIFace 	*IListBrowser;
 struct Library *OOBase;						struct OOIFace 						*IOO;
-//struct Library *SocketBase; 			struct SocketIFace 				*ISocket;
-//struct Library *AmiSSLMasterBase; struct AmiSSLMasterIFace	*IAmiSSLMaster;
-//struct Library *AmiSSLBase; 			struct AmiSSLIFace				*IAmiSSL;
 struct Library *JanssonBase;			struct JanssonIFace 			*IJansson;
 
 Class *LayoutClass;

@@ -29,7 +29,7 @@ STRPTR getRadioStations(char *selName, char *selGenre, char *selLanguage, char *
   char url[255];
 	
 	IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
-	IUtility->Strlcat(url, "/stations/search?limit=5", sizeof(url));
+	IUtility->Strlcat(url, "/stations/search?limit=20", sizeof(url));
 	if (IUtility->Stricmp(selName, ""))
 	{
 	  STRPTR encSelName = urlEncode(selName);

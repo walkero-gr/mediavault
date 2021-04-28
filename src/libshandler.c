@@ -2,15 +2,13 @@
 **  Opening and closing libraries&resources
 */
 
-// #include <stdlib.h>
-
 #include "globals.h"
 #include "libshandler.h"
 
 
 void CleanExit(const char *str)
 {
-  if(strcmp(str,"JustExit")) IDOS->Printf("Error::%s\n",str);
+  if(strcmp(str, "JustExit")) IDOS->Printf("Error::%s\n",str);
 
 	if(IListBrowser)			IExec->DropInterface((APTR) IListBrowser);
 	if(ListBrowserBase)		IIntuition->CloseClass((APTR) ListBrowserBase);
@@ -33,15 +31,6 @@ void CleanExit(const char *str)
   if(IIntuition)				IExec->DropInterface((APTR) IIntuition);
   if(IntuitionBase)    	IExec->CloseLibrary(IntuitionBase);
 
-  //if(IAmiSSL)						IExec->DropInterface((APTR) IAmiSSL);
-  //if(AmiSSLBase)  			IExec->CloseLibrary(AmiSSLBase);
-  //
-  //if(IAmiSSLMaster)			IExec->DropInterface((APTR) IAmiSSLMaster);
-  //if(AmiSSLMasterBase)  IExec->CloseLibrary(AmiSSLMasterBase);
-  //
-  //if(ISocket)						IExec->DropInterface((APTR) ISocket);
-  //if(SocketBase)   			IExec->CloseLibrary(SocketBase);
-
   if(IApplication)			IExec->DropInterface((APTR) IApplication);
   if(ApplicationBase)   IExec->CloseLibrary(ApplicationBase);
 
@@ -57,24 +46,6 @@ void OpenLibs(void)
     if(!IApplication) CleanExit("Can't open application.library Interface");
   }
   else CleanExit("Can't open application.library version 53");
-
-	//if ((SocketBase = IExec->OpenLibrary( "bsdsocket.library", 4 ))) {
-	  //ISocket = (struct SocketIFace *)IExec->GetInterface( SocketBase, "main", 1, NULL );
-    //if(!ISocket) CleanExit("Can't open bsdsocket.library Interface");
-	//}
-	//else CleanExit("Can't open bsdsocket.library version 4.");
-	//
-	//if ((AmiSSLMasterBase = IExec->OpenLibrary( "amisslmaster.library", 4 ))) {
-	  //IAmiSSLMaster = (struct AmiSSLMasterIFace *)IExec->GetInterface( AmiSSLMasterBase, "main", 1, NULL );
-    //if(!IAmiSSLMaster) CleanExit("Can't open amisslmaster.library Interface");
-	//}
-	//else CleanExit("Can't open amisslmaster.library version 4.");
-	//
-	//if ((AmiSSLBase = IAmiSSLMaster->OpenAmiSSL())) {
-	  //IAmiSSL = (struct AmiSSLIFace *)IExec->GetInterface( AmiSSLBase, "main", 1, NULL );
-	  //if(!IAmiSSL) CleanExit("Can't open AmiSSL Interface");
-	//}
-	//else CleanExit("Can't open AmiSSL.");
 
   if ((IntuitionBase = IExec->OpenLibrary( "intuition.library", 54 )))
   {
@@ -101,12 +72,16 @@ void OpenLibs(void)
 	}
 	else CleanExit("Can't open jansson.library version 2");
 
-	if ((OOBase=IExec->OpenLibrary("oo.library",1)))
+	if ((OOBase=IExec->OpenLibrary("oo.library", 1 )))
 	{
-    IOO = (struct OOIFace *)IExec->GetInterface( OOBase, "main", 1, NULL );
-    if(!IOO) CleanExit("Can't open oo.library Interface");
+		if (LIB_IS_AT_LEAST(OOBase, 1, 11))
+    {
+    	IOO = (struct OOIFace *)IExec->GetInterface( OOBase, "main", 1, NULL );
+    	if(!IOO) CleanExit("Can't open oo.library Interface");
+		}
+		else CleanExit("Can't open oo.library version 1.11 and above");
  	}
- 	else CleanExit("Can't open oo.library version 1");
+ 	else CleanExit("Can't open oo.library version 1.11 and above. Is it installed?");
 
 	if ((LayoutBase = (APTR) IIntuition->OpenClass( "gadgets/layout.gadget", 1, &LayoutClass )))
 	{

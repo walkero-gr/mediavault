@@ -57,28 +57,8 @@ DONE - Move UPnP functions to separate source file
 //// BUGS
 *********
 FIXED - When ooNetwork is used I get some unfreed signals on exit
-- ooNetwork truncates the return info, so for now only 5 items return
+PARTIALLY FIXED - ooNetwork truncates the return info, so for now only 5 items return. Now it shows 20 stations. Maybe I need to some kind of pagination, based on the scrollbar.
 
 
 //// IDEAS
 **********
-/* V52.7 : Execute <command> asynchronusly
-   V52.9 : Simplified launch routine
-   V52.12: Uses wb_lib (reads icon tooltypes)
-*/
-BOOL beginCommand(char *command)
-{
- return IWorkbench->OpenWorkbenchObject(command, TAG_DONE); //V52.12: Uses wb_lib (reads icon tooltypes)
- 
-// return IDOS->SystemTags(command, SYS_Input,NULL, SYS_Output,NULL, /*SYS_Error,NULL,*/
-//                         NP_Priority,0, SYS_Asynch,TRUE, TAG_END); //V52.9 : Simplified launch routine
-}
-
-				unarc_cmd = IUtility->ASPrintf("c:xadUnFile FROM \"%s\" DESTDIR %s NT", ComicPathName, unarc_folder_path);
-				//IDOS->Printf( "Unarc CMD \n%s\n", unarc_cmd );
-				
-				IDOS->SystemTags(unarc_cmd, SYS_Input,ZERO,
-						SYS_Output,NULL,
-						SYS_Error,ZERO,
-						SYS_Asynch,FALSE,
-					TAG_DONE); 
