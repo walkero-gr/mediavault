@@ -144,8 +144,10 @@ void showGUI(void)
 										switch (result & WMHI_GADGETMASK)
 										{
 											case GID_FILTER_BUTTON:
-											  IUtility->Strlcpy(selName, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(selGenre));											  
+											  IUtility->Strlcpy(selName, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(selGenre));
+											  windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);										  
 											  fillRadioList();
+											  windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
 											  break;
 											case GID_CHOOSER_GENRES:
 											  if (code > 0) 
@@ -178,8 +180,6 @@ void showGUI(void)
 															TAG_DONE);
 													playRadio(selListValue);
 												}
-											  
-											  
 											  break;
 										}
 										break;

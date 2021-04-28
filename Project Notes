@@ -40,6 +40,7 @@ DONE - Double click on a station to play on player
 - Add more tags, countries and languages
 - Empty list if invalid/empty JSON returns
 DONE - Add station votes in the list
+DONE - Block main window when user sent a request
 
 ## Podcasts
 

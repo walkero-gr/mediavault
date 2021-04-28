@@ -171,11 +171,11 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 							// Filters Button
 							LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
 								GA_ID,							GID_FILTER_BUTTON,
-								GA_Text, 						"_Filter Stations",
+								GA_Text, 						"_Discover",
 								GA_TabCycle, 				TRUE,
 								GA_RelVerify, 			TRUE,
 								GA_Underscore,		 	0,
-								GA_ActivateKey,			"f",
+								GA_ActivateKey,			"d",
 								//BUTTON_AutoButton, 	0,
 								TAG_DONE),
 						TAG_DONE),
