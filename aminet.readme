@@ -1,6 +1,12 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/634c72a5f74142228ed82c47848ba17d)](https://app.codacy.com/gh/walkero-gr/mediavault?utm_source=github.com&utm_medium=referral&utm_content=walkero-gr/mediavault&utm_campaign=Badge_Grade_Settings)
-
-# mediavault
+Short:        Discover online radio stations
+Uploader:     walkero@gmail.com (George Sokianos)
+Author:       walkero@gmail.com (George Sokianos)
+Type:         util/wb
+Version:      1.0.0
+Architecture: ppc-amigaos
+Distribution: Aminet
+Requires:
+Replaces:     util/wb/mediavault.lha
 
 MediaVault is an open source desktop application, for AmigaOS 4, which can be
 used to discover online radio stations. The selected radio station can be

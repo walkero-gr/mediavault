@@ -1,7 +1,18 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/634c72a5f74142228ed82c47848ba17d)](https://app.codacy.com/gh/walkero-gr/mediavault?utm_source=github.com&utm_medium=referral&utm_content=walkero-gr/mediavault&utm_campaign=Badge_Grade_Settings)
-
-# mediavault
-
+name: mediavault
+description: Discover online radio stations
+version: 1.0.0
+author: George Sokianos
+submitter: George Sokianos
+email: walkero@gmail.com
+url: https://github.com/walkero-gr/mediavault/
+category: utility/workbench
+replaces: utility/workbench/aiostreams.lha
+requirements: oo.library, jansson.library
+license: Freeware
+minosversion: 4.1
+distribute: yes
+passphrase: OS4DEPOT_PASSPHRASE
+hend:
 MediaVault is an open source desktop application, for AmigaOS 4, which can be
 used to discover online radio stations. The selected radio station can be
 streamed using a player, i.e. AmigaAmp 3.
@@ -13,8 +24,6 @@ stations will show up.
 
 To listen a radio station, double click on it's line, and AmigaAmp3 will
 start, playing the radio station. After that, you can close MediaVault.
-
-![preview](img/mediavault_1.0.0_pre.gif)
 
 Vision
 --------------------------
