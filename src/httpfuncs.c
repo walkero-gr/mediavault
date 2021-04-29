@@ -34,12 +34,12 @@ STRPTR getResponseBody(char *url, int portNum)
   requestUrl = url;
   requestPort = portNum;
   STRPTR httpResponse = doRequest();
-	
+
 	if (httpResponse)
 	{
   	return getResponseJSON(httpResponse);
   }
-  
+
   IDOS->Printf("getResponseBody returned NULL\n");
   return NULL;
 }
@@ -69,7 +69,7 @@ STRPTR urlEncode(STRPTR value)
       AVT_Type,            MEMF_SHARED,
       AVT_ClearWithValue,  "\0",
     	TAG_DONE);
-    	
+
   rfcTablesInit();
 	encode((unsigned char*)value, buf, html5);
 
@@ -79,16 +79,16 @@ STRPTR urlEncode(STRPTR value)
 static STRPTR getResponseJSON(STRPTR response)
 {
   STRPTR tmp = strtok(response, "\n");
-  
+
   while (tmp != NULL)
   {
     if (!IUtility->Strnicmp(tmp, "[{", 2))
     {
     	return tmp;
-    } 
+    }
     tmp = strtok(NULL, "\n");
   }
-  
+
   return NULL;
 }
 
@@ -96,36 +96,36 @@ static STRPTR doRequest()
 {
   STRPTR 	httpreq = NULL,
 					httpresp = NULL;
-					
+
   //IDOS->Printf("getRadioStations called\n");
   net = (NETWORKOBJ *)IOO->NewNetworkObject();
-  
-  if (net)
+
+  if (net != NULL)
   {
     //IDOS->Printf("Network is fine!\n");
-		
+
     if (net->CreateConnection(requestUrl, requestPort, TRUE, TRUE))
     {
       //IDOS->Printf("Connection created just fine!\n");
-      
+
       if (net->GetConnection())
       {
         //IDOS->Printf("Connection done fine!\n");
-        
+
         //IDOS->Printf("Trying to load %s\n", requestUrl);
       	httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
       	//IDOS->Printf("Create HTTP Request: %s\n", httpreq);
       	net->SendHTTPRequest(httpreq);
-      	//IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode);      	
-      	
+      	//IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode());
+
       	httpresp = net->GetHTTPResponse();
-      	
+
       	if (httpresp)
-      	{ 
+      	{
       		//IDOS->Printf("Response\n------------------------\n%s\n", httpresp);
       		return httpresp;
         }
-      	else IDOS->Printf("No response\n");        
+      	else IDOS->Printf("No response\n");
       }
       else IDOS->Printf("Connection failed!\n");
 
@@ -135,7 +135,7 @@ static STRPTR doRequest()
 
     IOO->DisposeNetworkObject(net);
   }
-  else IDOS->Printf("Network Object creation failed!\n");  
+  else IDOS->Printf("Network Object creation failed!\n");
 
   return NULL;
 }

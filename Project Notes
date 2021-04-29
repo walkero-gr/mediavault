@@ -25,6 +25,8 @@ DONE - HTTP encode of the request URL (convert spaces to %20 etc)
 DONE - Make fixes on listbrowser column sizes and sorting
 - Check and fix unfreed memory
 - Notifications support
+- Add AmiUpdate
+DONE - Add icon when iconified
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)

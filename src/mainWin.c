@@ -78,6 +78,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
     WA_NewLookMenus,				TRUE,
 		WINDOW_Iconifiable, 		TRUE,
 		WINDOW_IconifyGadget,  	TRUE,
+		WINDOW_Icon, 			      IIcon->GetDiskObject("PROGDIR:MediaVault"),
 		WINDOW_MenuStrip, 			winMenu,
 		WINDOW_AppPort, 				appPort,
 		WINDOW_Position, 				WPOS_CENTERSCREEN,

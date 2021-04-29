@@ -78,5 +78,5 @@ struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen) {
 
 void windowBlocking(struct Window *winId, Object *objId, BOOL disable) {
   IIntuition->SetWindowPointer(winId, WA_BusyPointer, disable, TAG_DONE);
-	IIntuition->SetAttrs(objId, WA_BusyPointer, disable, TAG_DONE);
+  IIntuition->SetAttrs(objId, WA_BusyPointer, disable, TAG_DONE);
 }

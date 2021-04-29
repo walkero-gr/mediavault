@@ -24,6 +24,7 @@
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/utility.h>
+#include <proto/icon.h>
 #include <proto/intuition.h>
 #include <proto/oo.h>
 #include <proto/listbrowser.h>
@@ -46,6 +47,7 @@ struct Library *UtilityBase;			struct UtilityIFace 			*IUtility;
 struct Library *ListBrowserBase;	struct ListBrowserIFace 	*IListBrowser;
 struct Library *OOBase;						struct OOIFace 						*IOO;
 struct Library *JanssonBase;			struct JanssonIFace 			*IJansson;
+struct Library *AmiSSLMasterBase;
 
 Class *LayoutClass;
 Class *LabelClass;
