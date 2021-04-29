@@ -165,6 +165,7 @@ void getRadioList(STRPTR jsonData)
         LBNA_Column, 2,
           LBNCA_CopyInteger, TRUE,
           LBNCA_Integer, &votesNum,
+          LBNCA_Justification, LCJ_RIGHT,
         LBNA_Column, 3,
           LBNCA_CopyText, TRUE,
           LBNCA_Text, IJansson->json_string_value(url_resolved),
