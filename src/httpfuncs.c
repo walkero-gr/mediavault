@@ -18,13 +18,12 @@
 #include "libshandler.h"
 #include "httpfuncs.h"
 
-static STRPTR doRequest();
-static STRPTR getResponseJSON(STRPTR);
+static STRPTR doRequest();            
 
-static 	char *requestUrl;
-static 	int requestPort;
-static 	char rfc3986[256] = {0},
-						 html5[256] = {0};
+static  char *requestUrl;
+static  int requestPort;
+static  char rfc3986[256] = {0},
+             html5[256] = {0};
 
 
 NETWORKOBJ *net;
@@ -35,12 +34,12 @@ STRPTR getResponseBody(char *url, int portNum)
   requestPort = portNum;
   STRPTR httpResponse = doRequest();
 
-	if (httpResponse)
-	{
-  	return getResponseJSON(httpResponse);
+  if (httpResponse)
+  {
+    return httpResponse;
   }
 
-  IDOS->Printf("getResponseBody returned NULL\n");
+  //IDOS->Printf("getResponseBody returned NULL\n");
   return NULL;
 }
 
@@ -49,18 +48,18 @@ void rfcTablesInit(void)
 {
   uint16 i;
   for (i = 0; i < 256; i++) {
-		rfc3986[i]	= ( isalnum(i)||i == '~'||i == '-'||i == '.'||i == '_' ) ? i : 0;
-		html5[i] 		= ( isalnum(i)||i == '*'||i == '-'||i == '.'||i == '_' ) ? i : (i == ' ') ? '+' : 0;
-	}
+    rfc3986[i]  = ( isalnum(i)||i == '~'||i == '-'||i == '.'||i == '_' ) ? i : 0;
+    html5[i]    = ( isalnum(i)||i == '*'||i == '-'||i == '.'||i == '_' ) ? i : (i == ' ') ? '+' : 0;
+  }
 }
 
 void encode(unsigned char *s, char *enc, char *tb)
 {
-	for (; *s; s++) {
-		if (tb[*s]) sprintf(enc, "%c", tb[*s]);
-		else        sprintf(enc, "%%%02X", *s);
-		while (*++enc);
-	}
+  for (; *s; s++) {
+    if (tb[*s]) sprintf(enc, "%c", tb[*s]);
+    else        sprintf(enc, "%%%02X", *s);
+    while (*++enc);
+  }
 }
 
 STRPTR urlEncode(STRPTR value)
@@ -68,34 +67,18 @@ STRPTR urlEncode(STRPTR value)
   STRPTR buf = IExec->AllocVecTags( (strlen(value) * 3) + 1,
       AVT_Type,            MEMF_SHARED,
       AVT_ClearWithValue,  "\0",
-    	TAG_DONE);
+      TAG_DONE);
 
   rfcTablesInit();
-	encode((unsigned char*)value, buf, html5);
+  encode((unsigned char*)value, buf, html5);
 
   return buf;
 }
 
-static STRPTR getResponseJSON(STRPTR response)
-{
-  STRPTR tmp = strtok(response, "\n");
-
-  while (tmp != NULL)
-  {
-    if (!IUtility->Strnicmp(tmp, "[{", 2))
-    {
-    	return tmp;
-    }
-    tmp = strtok(NULL, "\n");
-  }
-
-  return NULL;
-}
-
 static STRPTR doRequest()
 {
-  STRPTR 	httpreq = NULL,
-					httpresp = NULL;
+  STRPTR  httpreq = NULL,
+          httpRespBody = NULL;
 
   //IDOS->Printf("getRadioStations called\n");
   net = (NETWORKOBJ *)IOO->NewNetworkObject();
@@ -113,19 +96,19 @@ static STRPTR doRequest()
         //IDOS->Printf("Connection done fine!\n");
 
         //IDOS->Printf("Trying to load %s\n", requestUrl);
-      	httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
-      	//IDOS->Printf("Create HTTP Request: %s\n", httpreq);
-      	net->SendHTTPRequest(httpreq);
-      	//IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode());
+        httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
+        //IDOS->Printf("Create HTTP Request: %s\n", httpreq);
+        net->SendHTTPRequest(httpreq);
+        //IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode());
 
-      	httpresp = net->GetHTTPResponse();
+        httpRespBody = net->GetResponseBody();
 
-      	if (httpresp)
-      	{
-      		//IDOS->Printf("Response\n------------------------\n%s\n", httpresp);
-      		return httpresp;
+        if (httpRespBody)
+        {
+          //IDOS->Printf("Response\n------------------------\n%s\n", httpRespBody);
+          return httpRespBody;
         }
-      	else IDOS->Printf("No response\n");
+        else IDOS->Printf("No response\n");
       }
       else IDOS->Printf("Connection failed!\n");
 
