@@ -44,6 +44,12 @@ DONE - Double click on a station to play on player
 - Empty list if invalid/empty JSON returns
 DONE - Add station votes in the list
 DONE - Block main window when user sent a request
+- Add Trending list of radio stations at the left sidebar
+- Add Popular list of radio stations at the left sidebar
+- Add a recent search selection at the left sidebar
+- Add a favorites list of radio stations at the left sidebar
+- Let list bring most voted first
+- Set list to hide the broken stations
 
 ## Podcasts
 
