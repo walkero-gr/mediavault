@@ -5,9 +5,9 @@ author: George Sokianos
 submitter: George Sokianos
 email: walkero@gmail.com
 url: https://github.com/walkero-gr/mediavault/
-category: utility/workbench
-replaces: utility/workbench/aiostreams.lha
-requirements: oo.library, jansson.library
+category: network/misc
+replaces: network/misc/aiostreams.lha
+requirements: oo.library, jansson.library, AmigaAmp3
 license: Freeware
 minosversion: 4.1
 distribute: yes
