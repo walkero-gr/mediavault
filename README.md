@@ -61,7 +61,7 @@ https://github.com/walkero-gr/mediavault/issues
 
 Changelog
 --------------------------
-v1.0.0 - 2021-05-01
+v1.0.0 - 2021-04-30
 * Initial release
 * Radio stations discovery is working
 * Station url can be loaded in AmigaAmp3

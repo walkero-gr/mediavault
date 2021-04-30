@@ -27,6 +27,7 @@ DONE - Make fixes on listbrowser column sizes and sorting
 - Notifications support
 - Add AmiUpdate
 DONE - Add icon when iconified
+- Add a message window/requester
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)

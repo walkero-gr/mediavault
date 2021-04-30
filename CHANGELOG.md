@@ -1,11 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.0.0] - 2021-05-01
+## [1.0.0] - 2021-04-30
 ### Added
 - Initial release
 - Radio stations discovery is working
-- Station url can be loaded in AmigaAmp3
+- Station url can be loaded in AmigaAmp3 only (for now)
 
 
 

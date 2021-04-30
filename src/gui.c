@@ -232,8 +232,8 @@ static void fillRadioList(void)
   if (responseJSON)
   {
     getRadioList(responseJSON);
-
-  } else IDOS->Printf("Response JSON is NOT valid\n");
+  } else IDOS->Printf("No Radio Stations found!\n");
+  //} else IDOS->Printf("Response JSON is NOT valid\n");
 
   // Dispose net here, after the creation of the listbrowser content,
   // because it trashes the response data, so to free the signals
