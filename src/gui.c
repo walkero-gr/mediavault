@@ -49,6 +49,12 @@ void showGUI(void)
       objects[OID_MAIN]   = buildMainWindow(appPort, menus[MID_PROJECT]);
       objects[OID_ABOUT]  = buildAboutWindow(appPort, screen);
 
+      gadgets[GID_MSG_REQ] = IIntuition->NewObject(NULL, "requester.class",
+          REQ_Type, REQTYPE_INFO,
+          REQ_StayOnTop, TRUE,
+          REQ_GadgetText, "_Ok",
+          TAG_DONE);
+
       if (objects[OID_MAIN])
       {
         windows[WID_MAIN] = (struct Window*)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, TAG_DONE);
@@ -147,7 +153,7 @@ void showGUI(void)
                         IUtility->Strlcpy(selName, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(selGenre));
                         windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
                         fillRadioList();
-                        windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
+                        windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);              
                         break;
                       case GID_CHOOSER_GENRES:
                         if (code > 0)
@@ -232,8 +238,11 @@ static void fillRadioList(void)
   if (responseJSON)
   {
     getRadioList(responseJSON);
-  } else IDOS->Printf("No Radio Stations found!\n");
-  //} else IDOS->Printf("Response JSON is NOT valid\n");
+    if (radioListItemsCnt == 0)
+    {
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Radio Stations found with these criteria!\nChange them and try again");
+    }
+  } else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", "There was an error with the returned data.\nPlease, try again or check your network.");
 
   // Dispose net here, after the creation of the listbrowser content,
   // because it trashes the response data, so to free the signals

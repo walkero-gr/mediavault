@@ -80,3 +80,16 @@ void windowBlocking(struct Window *winId, Object *objId, BOOL disable) {
   IIntuition->SetWindowPointer(winId, WA_BusyPointer, disable, TAG_DONE);
   IIntuition->SetAttrs(objId, WA_BusyPointer, disable, TAG_DONE);
 }
+
+void showMsgReq(Object *reqGadget, CONST_STRPTR title, CONST_STRPTR message)
+{
+  if(reqGadget)
+  {
+    IIntuition->SetAttrs(reqGadget,
+      REQ_TitleText,  title,
+      REQ_BodyText,   message,
+      TAG_END);
+
+    IIntuition->IDoMethod(reqGadget, RM_OPENREQ, NULL, NULL, NULL);
+  }
+}

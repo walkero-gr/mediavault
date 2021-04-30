@@ -18,7 +18,7 @@
 #ifndef _GUI_H
 #define _GUI_H
 
-#include <classes/window.h>
+#include <classes/window.h>       
 
 #include <images/bitmap.h>
 #include <images/label.h>
@@ -67,6 +67,7 @@ enum
   GID_ABOUT_TEXT_SCROLLER,
   GID_ABOUT_BUTTON_OK,
   GID_ABOUT_LOGO,
+  GID_MSG_REQ,
   GID_LAST
 };
 
@@ -79,11 +80,11 @@ enum
    MID_LAST
 };
 
-struct Screen 			*screen;
-struct MsgPort 			*appPort;
-struct Window 			*windows[WID_LAST];
-//struct ColumnInfo 	*columninfo = NULL;
-//struct DrawInfo 		*drInfo;
+struct Screen       *screen;
+struct MsgPort      *appPort;
+struct Window       *windows[WID_LAST];
+//struct ColumnInfo   *columninfo = NULL;
+//struct DrawInfo     *drInfo;
 struct List stationsList;
 
 Object *gadgets[GID_LAST];

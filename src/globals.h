@@ -22,12 +22,13 @@
 
 #include <proto/amijansson.h>
 #include <proto/dos.h>
-#include <proto/exec.h>
-#include <proto/utility.h>
+#include <proto/exec.h>   
 #include <proto/icon.h>
 #include <proto/intuition.h>
-#include <proto/oo.h>
 #include <proto/listbrowser.h>
+#include <proto/oo.h>          
+#include <proto/requester.h>
+#include <proto/utility.h>
 
 #include <string.h>
 #include <ctype.h>
@@ -39,14 +40,14 @@
 extern struct ExecIFace *IExec;
 extern struct DOSIFace *IDOS;
 
-struct Library *ApplicationBase; 	struct ApplicationIFace 	*IApplication;
-struct Library *IntuitionBase; 		struct IntuitionIFace 		*IIntuition;
-struct Library *LabelBase;				struct LabelIFace 				*ILabel;
-struct Library *LayoutBase;				struct LayoutIFace 				*ILayout;
-struct Library *UtilityBase;			struct UtilityIFace 			*IUtility;
-struct Library *ListBrowserBase;	struct ListBrowserIFace 	*IListBrowser;
-struct Library *OOBase;						struct OOIFace 						*IOO;
-struct Library *JanssonBase;			struct JanssonIFace 			*IJansson;
+struct Library *ApplicationBase;  struct ApplicationIFace   *IApplication;
+struct Library *IntuitionBase;    struct IntuitionIFace     *IIntuition;
+struct Library *LabelBase;        struct LabelIFace         *ILabel;
+struct Library *LayoutBase;       struct LayoutIFace        *ILayout;
+struct Library *UtilityBase;      struct UtilityIFace       *IUtility;
+struct Library *ListBrowserBase;  struct ListBrowserIFace   *IListBrowser;
+struct Library *OOBase;           struct OOIFace            *IOO;
+struct Library *JanssonBase;      struct JanssonIFace       *IJansson;
 struct Library *AmiSSLMasterBase;
 
 Class *LayoutClass;

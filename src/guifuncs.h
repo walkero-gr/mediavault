@@ -17,9 +17,11 @@
 #ifndef _GUIFUNCS_H
 #define _GUIFUNCS_H
 
+#include <classes/requester.h>
+
 
 struct Image *MenuImage(CONST_STRPTR name, struct Screen *);
 void windowBlocking(struct Window *, Object *, BOOL disable);
-
+void showMsgReq(Object *, CONST_STRPTR, CONST_STRPTR);
 
 #endif
