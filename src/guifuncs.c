@@ -76,7 +76,8 @@ struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen) {
    return (i);
 }
 
-void windowBlocking(struct Window *winId, Object *objId, BOOL disable) {
+void windowBlocking(struct Window *winId, Object *objId, BOOL disable)
+{
   IIntuition->SetWindowPointer(winId, WA_BusyPointer, disable, TAG_DONE);
   IIntuition->SetAttrs(objId, WA_BusyPointer, disable, TAG_DONE);
 }
@@ -91,5 +92,15 @@ void showMsgReq(Object *reqGadget, CONST_STRPTR title, CONST_STRPTR message)
       TAG_END);
 
     IIntuition->IDoMethod(reqGadget, RM_OPENREQ, NULL, NULL, NULL);
+  }
+}
+
+void gadgetBlocking(struct Window *winId, Object *gadgetObj, BOOL disable)
+{
+  if(gadgetObj)
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgetObj, winId, NULL,
+        GA_Disabled,  disable,
+        TAG_DONE);
   }
 }

@@ -17,9 +17,6 @@
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 
-#include <oo/ooNetwork.h>
-
-
 #include <proto/amijansson.h>
 #include <proto/dos.h>
 #include <proto/exec.h>   
@@ -32,8 +29,9 @@
 
 #include <string.h>
 #include <ctype.h>
-
+                          
 #include <jansson/jansson.h>
+#include <oo/ooNetwork.h>
 
 #include "version.h"
 
@@ -59,5 +57,12 @@ static CONST_STRPTR version USED = VERSTAG;
 
 void die(const char *s);
 
+struct filters
+{
+  char name[32];
+  char genre[32];
+  char country[32];
+  char language[32];
+};
 
 #endif

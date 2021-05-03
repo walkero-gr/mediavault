@@ -25,9 +25,11 @@ DONE - HTTP encode of the request URL (convert spaces to %20 etc)
 DONE - Make fixes on listbrowser column sizes and sorting
 - Check and fix unfreed memory
 - Notifications support
-- Add AmiUpdate
+- Add AmiUpdate support
 DONE - Add icon when iconified
 DONE - Add a message window/requester
+- Check if player exists and show a message if not
+- Create documentation in amigaguide format
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
@@ -66,7 +68,7 @@ DONE - Move UPnP functions to separate source file
 //// BUGS
 *********
 FIXED - When ooNetwork is used I get some unfreed signals on exit
-PARTIALLY FIXED - ooNetwork truncates the return info, so for now only 5 items return. Now it shows 20 stations. Maybe I need to some kind of pagination, based on the scrollbar.
+FIXED - ooNetwork truncates the return info, so for now only 5 items return. Now it shows 20 stations. Maybe I need to some kind of pagination, based on the scrollbar.
 
 
 //// IDEAS

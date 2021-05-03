@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - future
+### Added
+- Added a message requester for messages to the user
+- Changed "Discover" button to "Discover more" so to load more radio stations results. If the user change a filter, then it returns to previous usage.
+
 ## [1.0.0] - 2021-04-30
 ### Added
 - Initial release

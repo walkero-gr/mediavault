@@ -14,6 +14,5 @@
 
 */
 
-
-STRPTR getRadioStations(char *, char *, char *, char *);
-void getRadioList(STRPTR);
+STRPTR getRadioStations(struct filters, int);
+void getRadioList(STRPTR, int);

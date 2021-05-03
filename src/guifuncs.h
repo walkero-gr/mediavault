@@ -21,7 +21,8 @@
 
 
 struct Image *MenuImage(CONST_STRPTR name, struct Screen *);
-void windowBlocking(struct Window *, Object *, BOOL disable);
+void windowBlocking(struct Window *, Object *, BOOL);
+void gadgetBlocking(struct Window *, Object *, BOOL);
 void showMsgReq(Object *, CONST_STRPTR, CONST_STRPTR);
 
 #endif

@@ -27,13 +27,18 @@ struct List radioList;
 int32 radioListItemsCnt = 0;
 
 // TODO: Set below to a struct
-static char   selName[32] = "",
-              selGenre[32] = "",
-              selCountry[32] = "",
-              selLanguage[32] = "";
+static char   prvSelName[32] = "",
+              prvSelGenre[32] = "",
+              prvSelCountry[32] = "",
+              prvSelLanguage[32] = "";
 
-static void fillRadioList(void);
+
+struct filters lastFilters, prevFilters;
+
+static void fillRadioList(BOOL);
 static void playRadio(STRPTR);
+static BOOL checkFiltersChanged(void);
+static void changeDiscoverButton(BOOL);
 
 extern NETWORKOBJ *net;
 
@@ -150,31 +155,46 @@ void showGUI(void)
                     switch (result & WMHI_GADGETMASK)
                     {
                       case GID_FILTER_BUTTON:
-                        IUtility->Strlcpy(selName, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(selGenre));
+                        IUtility->Strlcpy(lastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastFilters.name));
+
                         windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
-                        fillRadioList();
+                        if(checkFiltersChanged())
+                        {
+                          changeDiscoverButton(FALSE);
+                          fillRadioList(TRUE);
+                        }                                                           
+                        else {
+                          changeDiscoverButton(TRUE);
+                          fillRadioList(FALSE);
+                        }
                         windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);              
                         break;
+                      case GID_FILTERS_NAME:
+                        changeDiscoverButton(FALSE);
+                        break;
                       case GID_CHOOSER_GENRES:
+                        changeDiscoverButton(FALSE);
                         if (code > 0)
                         {
-                          IUtility->Strlcpy(selGenre, getChooserText(GID_CHOOSER_GENRES, code), sizeof(selGenre));
+                          IUtility->Strlcpy(lastFilters.genre, getChooserText(GID_CHOOSER_GENRES, code), sizeof(lastFilters.genre));
                         }
-                        else IUtility->Strlcpy(selGenre, "", sizeof(selGenre));
+                        else IUtility->Strlcpy(lastFilters.genre, "", sizeof(lastFilters.genre));
                         break;
                       case GID_CHOOSER_COUNTRIES:
+                        changeDiscoverButton(FALSE);
                         if (code > 0)
                         {
-                          IUtility->Strlcpy(selCountry, getChooserText(GID_CHOOSER_COUNTRIES, code), sizeof(selCountry));
+                          IUtility->Strlcpy(lastFilters.country, getChooserText(GID_CHOOSER_COUNTRIES, code), sizeof(lastFilters.country));
                         }
-                        else IUtility->Strlcpy(selCountry, "", sizeof(selCountry));
+                        else IUtility->Strlcpy(lastFilters.country, "", sizeof(lastFilters.country));
                         break;
                       case GID_CHOOSER_LANGUAGES:
+                        changeDiscoverButton(FALSE);
                         if (code > 0)
                         {
-                          IUtility->Strlcpy(selLanguage, getChooserText(GID_CHOOSER_LANGUAGES, code), sizeof(selLanguage));
+                          IUtility->Strlcpy(lastFilters.language, getChooserText(GID_CHOOSER_LANGUAGES, code), sizeof(lastFilters.language));
                         }
-                        else IUtility->Strlcpy(selLanguage, "", sizeof(selLanguage));
+                        else IUtility->Strlcpy(lastFilters.language, "", sizeof(lastFilters.language));
                         break;
                       case GID_RADIO_LISTBROWSER:
                         IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_RADIO_LISTBROWSER], &res_value);
@@ -188,7 +208,7 @@ void showGUI(void)
                         }
                         break;
                     }
-                    break;
+                    break; 
                 }
               }
 
@@ -232,21 +252,32 @@ void showGUI(void)
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
 
-static void fillRadioList(void)
+static void fillRadioList(BOOL zeroOffset)
 {
-  STRPTR responseJSON = getRadioStations(selName, selGenre, selLanguage, selCountry);
+  static int offset;
+  if (zeroOffset)
+  {
+    offset = 0;
+  }
+  else offset++;
+
+  STRPTR responseJSON = getRadioStations(lastFilters, offset);
   if (responseJSON)
   {
-    getRadioList(responseJSON);
+    getRadioList(responseJSON, offset);
     if (radioListItemsCnt == 0)
     {
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Radio Stations found with these criteria!\nChange them and try again");
+    }
+    if (radioListItemsCnt == 20)
+    {
+      changeDiscoverButton(TRUE);
     }
   } else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", "There was an error with the returned data.\nPlease, try again or check your network.");
 
   // Dispose net here, after the creation of the listbrowser content,
   // because it trashes the response data, so to free the signals
-  // TODO: communicate with the oo.library dev to find a more elegant way to do it
+  // TODO: adapt it to oo.library v1.11 changes
   if (net)
   {
     net->DisposeConnection();
@@ -275,3 +306,45 @@ static void playRadio(STRPTR stationUrl)
       SYS_Asynch,   TRUE,
       TAG_DONE);
 }
+
+static BOOL checkFiltersChanged(void)
+{
+  BOOL changed = FALSE;
+  if (IUtility->Stricmp(lastFilters.name, prvSelName))
+  {
+    changed = TRUE;
+    IUtility->Strlcpy(prvSelName, lastFilters.name, sizeof(prvSelName));
+  }
+  if (IUtility->Stricmp(lastFilters.genre, prvSelGenre))
+  {
+    changed = TRUE;
+    IUtility->Strlcpy(prvSelGenre, lastFilters.genre, sizeof(prvSelGenre));
+  }
+  if (IUtility->Stricmp(lastFilters.country, prvSelCountry))
+  {
+    changed = TRUE;
+    IUtility->Strlcpy(prvSelCountry, lastFilters.country, sizeof(prvSelCountry));
+  }
+  if (IUtility->Stricmp(lastFilters.language, prvSelLanguage))
+  {
+    changed = TRUE;
+    IUtility->Strlcpy(prvSelLanguage, lastFilters.language, sizeof(prvSelLanguage));
+  }
+
+  return changed;
+}
+
+static void changeDiscoverButton(BOOL isMore)
+{
+  char buttonText[16] = "_Discover";
+  if (isMore)
+  {
+    IUtility->Strlcpy(buttonText, "_Discover more", sizeof(buttonText));
+  }
+
+  IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_FILTER_BUTTON], windows[WID_MAIN], NULL,
+      GA_Text,          buttonText,
+      GA_ActivateKey,   "d",
+      TAG_DONE);
+}
+

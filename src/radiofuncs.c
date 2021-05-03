@@ -19,40 +19,53 @@
 #include "httpfuncs.h"
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";
+static int maxResults = 20;
 
 extern struct List radioList;
 extern int32 radioListItemsCnt;
 
-STRPTR getRadioStations(char *selName, char *selGenre, char *selLanguage, char *selCountry)
+STRPTR getRadioStations(struct filters lastFilters, int offset)
 {
   char url[255];
+  char offsetStr[3];
+  char maxResultsStr[4];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
-  IUtility->Strlcat(url, "/stations/search?limit=20", sizeof(url));
-  if (IUtility->Stricmp(selName, ""))
+  IUtility->Strlcat(url, "/stations/search?limit=", sizeof(url));
+  IUtility->SNPrintf(maxResultsStr, sizeof(maxResultsStr), "%ld", maxResults);
+  IUtility->Strlcat(url, maxResultsStr, sizeof(url));
+
+  if (offset > 0)
   {
-    STRPTR encSelName = urlEncode(selName);
+    IUtility->Strlcat(url, "&offset=", sizeof(url));
+    IUtility->SNPrintf(offsetStr, sizeof(offsetStr), "%ld", offset * maxResults);
+    IUtility->Strlcat(url, offsetStr, sizeof(url));
+  }
+
+  if (IUtility->Stricmp(lastFilters.name, ""))
+  {
+    STRPTR encSelName = urlEncode(lastFilters.name);
     IUtility->Strlcat(url, "&name=", sizeof(url));
     IUtility->Strlcat(url, encSelName, sizeof(url));
     IExec->FreeVec(encSelName);
   }
-  if (IUtility->Stricmp(selGenre, ""))
+  if (IUtility->Stricmp(lastFilters.genre, ""))
   {
-    STRPTR encSelGenre = urlEncode(selGenre);
+    STRPTR encSelGenre = urlEncode(lastFilters.genre);
     IUtility->Strlcat(url, "&tag=", sizeof(url));
     IUtility->Strlcat(url, encSelGenre, sizeof(url));
     IExec->FreeVec(encSelGenre);
   }
-  if (IUtility->Stricmp(selLanguage, ""))
+  if (IUtility->Stricmp(lastFilters.language, ""))
   {
-    STRPTR encSelLanguage = urlEncode(selLanguage);
+    STRPTR encSelLanguage = urlEncode(lastFilters.language);
     IUtility->Strlcat(url, "&language=", sizeof(url));
     IUtility->Strlcat(url, encSelLanguage, sizeof(url));
     IExec->FreeVec(encSelLanguage);
   }
-  if (IUtility->Stricmp(selCountry, ""))
+  if (IUtility->Stricmp(lastFilters.country, ""))
   {
-    STRPTR encSelCountry = urlEncode(selCountry);
+    STRPTR encSelCountry = urlEncode(lastFilters.country);
     IUtility->Strlcat(url, "&country=", sizeof(url));
     IUtility->Strlcat(url, encSelCountry, sizeof(url));
     IExec->FreeVec(encSelCountry);
@@ -63,7 +76,7 @@ STRPTR getRadioStations(char *selName, char *selGenre, char *selLanguage, char *
   return getResponseBody(url, NET_PORT_HTTPS);
 }
 
-void getRadioList(STRPTR jsonData)
+void getRadioList(STRPTR jsonData, int offset)
 {
   struct Node *stationNode;
   json_t *jsonRoot;
@@ -86,7 +99,10 @@ void getRadioList(STRPTR jsonData)
   json_t *data, *stationuuid, *name, *country, *tags, *url_resolved, *votes;
   ULONG votesNum = 0;
 
-  IExec->NewList(&radioList);
+  if (offset == 0)
+  {
+    IExec->NewList(&radioList);
+  }
   radioListItemsCnt = 0;
 
   for(i = 0; i < IJansson->json_array_size(jsonRoot); i++)
@@ -179,3 +195,4 @@ void getRadioList(STRPTR jsonData)
 
   IJansson->json_decref(jsonRoot);
 }
+

@@ -20,11 +20,11 @@
 #define STR(s) STR_HELPER(s)  //indirection to expand argument macros
 
 #ifndef VERSION
-#define VERSION	1
+#define VERSION 1
 #endif
 
 #ifndef REVISION
-#define REVISION 0
+#define REVISION 1
 #endif
 
 #ifndef PATCH
@@ -32,12 +32,12 @@
 #endif
 
 #ifndef RELEASE_DATE
-#define RELEASE_DATE "30.4.2021"
+#define RELEASE_DATE "3.5.2021"
 #endif
 
-#define APPNAME			"MediaVault"
-#define VERS				APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH)
-#define VSTRING			APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH) " (" RELEASE_DATE ")"
-#define VERSTAG			"\0$VER: " STR(VERSION) "." STR(REVISION) "." STR(PATCH) " (" RELEASE_DATE ")"
+#define APPNAME     "MediaVault"
+#define VERS        APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH)
+#define VSTRING     APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH) " (" RELEASE_DATE ")"
+#define VERSTAG     "\0$VER: " STR(VERSION) "." STR(REVISION) "." STR(PATCH) " (" RELEASE_DATE ")"
 
 #endif
