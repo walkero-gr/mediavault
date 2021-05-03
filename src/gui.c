@@ -26,13 +26,6 @@ static struct ColumnInfo *columnInfo;
 struct List radioList;
 int32 radioListItemsCnt = 0;
 
-// TODO: Set below to a struct
-static char   prvSelName[32] = "",
-              prvSelGenre[32] = "",
-              prvSelCountry[32] = "",
-              prvSelLanguage[32] = "";
-
-
 struct filters lastFilters, prevFilters;
 
 static void fillRadioList(BOOL);
@@ -310,26 +303,24 @@ static void playRadio(STRPTR stationUrl)
 static BOOL checkFiltersChanged(void)
 {
   BOOL changed = FALSE;
-  if (IUtility->Stricmp(lastFilters.name, prvSelName))
+  if (IUtility->Stricmp(lastFilters.name, prevFilters.name))
   {
     changed = TRUE;
-    IUtility->Strlcpy(prvSelName, lastFilters.name, sizeof(prvSelName));
   }
-  if (IUtility->Stricmp(lastFilters.genre, prvSelGenre))
+  if (IUtility->Stricmp(lastFilters.genre, prevFilters.genre))
   {
     changed = TRUE;
-    IUtility->Strlcpy(prvSelGenre, lastFilters.genre, sizeof(prvSelGenre));
   }
-  if (IUtility->Stricmp(lastFilters.country, prvSelCountry))
+  if (IUtility->Stricmp(lastFilters.country, prevFilters.country))
   {
     changed = TRUE;
-    IUtility->Strlcpy(prvSelCountry, lastFilters.country, sizeof(prvSelCountry));
   }
-  if (IUtility->Stricmp(lastFilters.language, prvSelLanguage))
+  if (IUtility->Stricmp(lastFilters.language, prevFilters.language))
   {
     changed = TRUE;
-    IUtility->Strlcpy(prvSelLanguage, lastFilters.language, sizeof(prvSelLanguage));
   }
+
+  if (changed)  prevFilters = lastFilters;
 
   return changed;
 }
