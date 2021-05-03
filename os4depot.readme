@@ -1,6 +1,6 @@
 name: mediavault
 description: Discover online radio stations
-version: 1.0.0
+version: 1.1.0
 author: George Sokianos
 submitter: George Sokianos
 email: walkero@gmail.com
@@ -17,7 +17,7 @@ MediaVault is an open source desktop application, for AmigaOS 4, which can be
 used to discover online radio stations. The selected radio station can be
 streamed using a player, i.e. AmigaAmp 3.
 
-When Mediavault is started at the top of the window there are a few fields
+When MediaVault is started at the top of the window there are a few fields
 that can be used to discover radio station based on their name, genre, country
 and spoken language. By clicking on "Discover" button a list of relevant radio
 stations will show up.
