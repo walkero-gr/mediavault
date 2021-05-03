@@ -64,7 +64,7 @@ void encode(unsigned char *s, char *enc, char *tb)
 
 STRPTR urlEncode(STRPTR value)
 {
-  STRPTR buf = IExec->AllocVecTags( (strlen(value) * 3) + 1,
+  STRPTR buf = IExec->AllocVecTags( (IUtility->Strlen(value) * 3) + 1,
       AVT_Type,            MEMF_SHARED,
       AVT_ClearWithValue,  "\0",
       TAG_DONE);

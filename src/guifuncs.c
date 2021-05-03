@@ -31,7 +31,7 @@ struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen) {
    STRPTR name_s, name_g;
    uint32 len;
 
-   len = strlen(name);
+   len = IUtility->Strlen(name);
 
    name_s = IExec->AllocVecTags(len + 3 + len + 3,TAG_END);
 

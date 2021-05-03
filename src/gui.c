@@ -96,7 +96,6 @@ void showGUI(void)
             uint32 wait = IExec->Wait(signal | SIGBREAKF_CTRL_C);
             if ( wait & SIGBREAKF_CTRL_C )
             {
-              done = TRUE;
               break;
             }
 
