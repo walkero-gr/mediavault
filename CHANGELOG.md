@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Added a message requester for messages to the user
 - Changed "Discover" button to "Discover more" so to load more radio stations results. If the user change a filter, then it returns to previous usage.
 - Added more options at the Genre select box
+- Now the retrieved radio stations list doesn't include the marked as broken stations
 
 ## [1.0.0] - 2021-04-30
 ### Added

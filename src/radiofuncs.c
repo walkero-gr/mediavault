@@ -30,7 +30,7 @@ STRPTR getRadioStations(struct filters lastFilters, int offset)
   char maxResultsStr[4];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
-  IUtility->Strlcat(url, "/stations/search?limit=", sizeof(url));
+  IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
   IUtility->SNPrintf(maxResultsStr, sizeof(maxResultsStr), "%ld", maxResults);
   IUtility->Strlcat(url, maxResultsStr, sizeof(url));
 

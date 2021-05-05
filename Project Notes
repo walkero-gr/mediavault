@@ -52,7 +52,7 @@ DONE - Block main window when user sent a request
 - Add a recent search selection at the left sidebar
 - Add a favorites list of radio stations at the left sidebar
 - Let list bring most voted first
-- Set list to hide the broken stations
+DONE - Set list to hide the broken stations
 
 ## Podcasts
 
