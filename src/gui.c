@@ -22,12 +22,14 @@
 #include "aboutWin.h"
 #include "radiofuncs.h"
 
-static struct ColumnInfo *columnInfo;
-struct List radioList;
+static struct ColumnInfo *columnInfo, *leftSidebarCI;
+struct List radioList,
+            leftSidebarList;
 int32 radioListItemsCnt = 0;
 
 struct filters lastFilters, prevFilters;
 
+static void fillLeftSidebar(void);
 static void fillRadioList(BOOL);
 static void playRadio(STRPTR);
 static BOOL checkFiltersChanged(void);
@@ -64,6 +66,8 @@ void showGUI(void)
                   selectedMenu = MID_LAST;
           uint16 code = 0;
           BOOL done = FALSE;
+
+          fillLeftSidebar();
 
           columnInfo = IListBrowser->AllocLBColumnInfo( 3,
               LBCIA_Column,                 0,
@@ -104,7 +108,7 @@ void showGUI(void)
               uint32  result = WMHI_LASTMSG,
                       res_value,
                       res_node;
-              STRPTR  selListValue;
+              STRPTR  selListValue; 
 
               // Main Window events
               while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE)))
@@ -144,6 +148,7 @@ void showGUI(void)
 
                     break;
                   case WMHI_GADGETUP:
+                    IDOS->Printf("WMHI_GADGETUP\n");
                     switch (result & WMHI_GADGETMASK)
                     {
                       case GID_FILTER_BUTTON:
@@ -194,9 +199,39 @@ void showGUI(void)
                         {
                           IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_LISTBROWSER], (uint32 *)&res_node);
                           IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-                              LBNA_Column, 3, LBNCA_Text, &selListValue,
+                              LBNA_Column,  3,
+                              LBNCA_Text,   &selListValue,
                               TAG_DONE);
                           playRadio(selListValue);
+                        }
+                        break;
+                      case GID_LEFT_SIDEBAR:
+                        
+                        IDOS->Printf("GID_LEFT_SIDEBAR\n");
+                        IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_LEFT_SIDEBAR], &res_value);
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          struct Node *lsbNode;
+
+                          IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_LEFT_SIDEBAR], (ULONG*)&lsbNode);
+                          //IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+                          //    LBNA_Column,  0,
+                          //    LBNCA_Text,   &selListValue,
+                          //    TAG_DONE);
+                          IDOS->Printf("Listview: [%ld]\n",lsbNode->ln_Pri);
+                          switch (lsbNode->ln_Pri)
+                          {
+                            case LSB_RADIO:
+                              IDOS->Printf("LSB_RADIO \n");
+                              break;
+                            case LSB_RADIO_POPULAR:
+                              IDOS->Printf("LSB_RADIO_POPULAR \n");
+                              break;
+                            case LSB_RADIO_TREND:
+                              IDOS->Printf("LSB_RADIO_TREND \n");
+                              break;
+                          }
+                          IDOS->Printf("##########################################################\n");
                         }
                         break;
                     }
@@ -232,6 +267,9 @@ void showGUI(void)
           {
             IListBrowser->FreeListBrowserList(&radioList);
           }
+
+          IListBrowser->FreeLBColumnInfo(leftSidebarCI);
+          IListBrowser->FreeListBrowserList(&leftSidebarList);
 
           IIntuition->DisposeObject(objects[OID_ABOUT]);
           IIntuition->DisposeObject(objects[OID_MAIN]);
@@ -338,3 +376,17 @@ static void changeDiscoverButton(BOOL isMore)
       TAG_DONE);
 }
 
+static void fillLeftSidebar(void)
+{
+  getLeftSidebarContent();
+
+  leftSidebarCI = IListBrowser->AllocLBColumnInfo( 1,
+      LBCIA_Column,   0,
+      TAG_DONE);
+
+  IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_LEFT_SIDEBAR], windows[WID_MAIN], NULL,
+      LISTBROWSER_Labels,         (ULONG)&leftSidebarList,
+      LISTBROWSER_Selected,       0,
+      LISTBROWSER_ColumnInfo,     leftSidebarCI,
+      TAG_DONE);
+}

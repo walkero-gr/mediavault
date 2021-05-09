@@ -21,5 +21,6 @@
 Object *buildMainWindow(struct MsgPort *, Object *);
 Object *buildMainMenu(struct Screen *);
 CONST_STRPTR getChooserText(int gadgetId, uint16 code);
+void getLeftSidebarContent(void);
 
 #endif

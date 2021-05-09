@@ -30,6 +30,7 @@ DONE - Add icon when iconified
 DONE - Add a message window/requester
 - Check if player exists and show a message if not
 - Create documentation in amigaguide format
+- Add status bar at the bottom of the window for info
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)

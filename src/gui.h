@@ -68,16 +68,25 @@ enum
   GID_ABOUT_BUTTON_OK,
   GID_ABOUT_LOGO,
   GID_MSG_REQ,
+  GID_LEFT_SIDEBAR,
   GID_LAST
 };
 
 enum
 {
-   MID_PROJECT = 1,  /* Zero is an invalid value for a menu ID */
-   MID_ABOUT,
-   MID_ICONIFY,
-   MID_QUIT,
-   MID_LAST
+  MID_PROJECT = 1,  /* Zero is an invalid value for a menu ID */
+  MID_ABOUT,
+  MID_ICONIFY,
+  MID_QUIT,
+  MID_LAST
+};
+
+enum
+{
+  LSB_RADIO,
+  LSB_RADIO_POPULAR,
+  LSB_RADIO_TREND,
+  LSB_LAST
 };
 
 struct Screen       *screen;
