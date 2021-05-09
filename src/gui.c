@@ -208,6 +208,7 @@ void showGUI(void)
                       case GID_LEFT_SIDEBAR:
                         
                         IDOS->Printf("GID_LEFT_SIDEBAR\n");
+                        /*
                         IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_LEFT_SIDEBAR], &res_value);
                         if (res_value == LBRE_NORMAL)
                         {
@@ -234,6 +235,7 @@ void showGUI(void)
                           IDOS->Printf("##########################################################\n");
                         }
                         break;
+                        */
                     }
                     break; 
                 }

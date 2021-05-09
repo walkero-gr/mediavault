@@ -75,9 +75,23 @@ CONST_STRPTR countries[] =
 
 extern struct List leftSidebarList;
 
+//static Object *buildLeftSidebar(void);
+static Object *buildRadioSearchPage(void);
+static Object *buildRadioPopularPage(void);
+
+static const ULONG listToPage[] = {
+    LISTBROWSER_Selected,    PAGE_Current,
+    TAG_END
+};
+
 Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 {                                           
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
+  Object *radioPages = IIntuition->NewObject(NULL, "page.gadget",
+        LAYOUT_DeferLayout, TRUE,
+        PAGE_Add, gadgets[GID_PAGELAY1] = buildRadioSearchPage(),
+        PAGE_Add, gadgets[GID_PAGELAY2] = buildRadioPopularPage(),
+        TAG_DONE);
 
   return IIntuition->NewObject(NULL, "window.class",
     WA_ScreenTitle,         VSTRING,
@@ -114,125 +128,16 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
               LISTBROWSER_Hierarchical,   TRUE,
               LISTBROWSER_Separators,     FALSE,
               LISTBROWSER_ShowSelected,   TRUE,
+              ICA_TARGET,                 radioPages,
+              ICA_MAP,                    listToPage,
               TAG_DONE),
               CHILD_WeightedWidth, 20,
               CHILD_MinWidth, 150,
               LAYOUT_WeightBar, TRUE,
             // END - Left Sidebar
 
-            LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-              LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+            LAYOUT_AddChild, gadgets[GID_PAGE] = radioPages,
 
-              // START - Top Filter Section
-              LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-                LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-                LAYOUT_BevelStyle,      BVS_GROUP,
-                LAYOUT_Label,           "Filter stations by",
-
-                // Top filter section with the Name Text Box with Label
-                LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-                  LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-                  LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
-                    //LABEL_DrawInfo, drInfo,
-                    LABEL_Text, "_Name",
-                    TAG_END),
-                  LAYOUT_AddChild, gadgets[GID_FILTERS_NAME] = IIntuition->NewObject(NULL, "string.gadget",
-                    GA_ID,                GID_FILTERS_NAME,
-                    GA_RelVerify,         TRUE,
-                    GA_TabCycle,          TRUE,
-                    GA_ActivateKey,       "n",
-                    STRINGA_MinVisible,   10,
-                    STRINGA_MaxChars,     31,
-                    TAG_DONE),
-                  TAG_DONE),
-
-                // Top filter section with the select boxes
-                LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-                  // Genres Select Box with Label
-                  LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-                    LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-                    LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
-                      //LABEL_DrawInfo, drInfo,
-                      LABEL_Text, "_Genre",
-                      TAG_END),
-                    LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
-                      GA_ID,                GID_CHOOSER_GENRES,
-                      GA_RelVerify,         TRUE,
-                      GA_TabCycle,          TRUE,
-                      GA_ActivateKey,       "g",
-                      CHOOSER_LabelArray,   genres,
-                      CHOOSER_MaxLabels,    30,
-                      CHOOSER_Selected,     0,
-                      TAG_DONE),
-                    TAG_DONE),
-
-                  // Countries Select Box with Label
-                  LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-                    LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-                    LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
-                      //LABEL_DrawInfo, drInfo,
-                      LABEL_Text, "_Country",
-                      TAG_END),
-                    LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
-                      GA_ID,                GID_CHOOSER_COUNTRIES,
-                      GA_RelVerify,         TRUE,
-                      GA_TabCycle,          TRUE,
-                      GA_ActivateKey,       "c",
-                      CHOOSER_LabelArray,   countries,
-                      CHOOSER_Selected,     0,
-                      TAG_DONE),
-                    TAG_DONE),
-
-                  // Languages Select Box with Label
-                  LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-                    LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-                    LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
-                      //LABEL_DrawInfo, drInfo,
-                      LABEL_Text, "_Language",
-                      TAG_END),
-                    LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
-                      GA_ID,                GID_CHOOSER_LANGUAGES,
-                      GA_RelVerify,         TRUE,
-                      GA_TabCycle,          TRUE,
-                      GA_ActivateKey,       "l",
-                      CHOOSER_LabelArray,   languages,
-                      CHOOSER_Selected,     0,
-                      TAG_DONE),
-                    TAG_DONE),
-                  TAG_DONE),
-
-                  // Filters Button
-                  LAYOUT_AddChild, gadgets[GID_FILTER_BUTTON] = IIntuition->NewObject(NULL, "button.gadget",
-                    GA_ID,              GID_FILTER_BUTTON,
-                    GA_Text,            "_Discover",
-                    GA_TabCycle,        TRUE,
-                    GA_RelVerify,       TRUE,
-                    GA_ActivateKey,     "d",
-                    TAG_DONE),
-                TAG_DONE),
-                CHILD_WeightedHeight, 0,
-              // END - Top Filter Section
-
-              // START - Bottom List Section
-              LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
-                LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-                LAYOUT_AddChild, gadgets[GID_RADIO_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
-                  GA_ID,                      GID_RADIO_LISTBROWSER,
-                  GA_RelVerify,               TRUE,
-                  GA_TabCycle,                TRUE,
-                  LISTBROWSER_AutoFit,        TRUE,
-                  LISTBROWSER_ColumnTitles,   TRUE,
-                  LISTBROWSER_HorizontalProp, TRUE,
-                  LISTBROWSER_Separators,     TRUE,
-                  LISTBROWSER_ShowSelected,   TRUE,
-                  LISTBROWSER_Striping,       LBS_ROWS,
-                  LISTBROWSER_SortColumn,     0,
-                  LISTBROWSER_TitleClickable, TRUE,
-                  TAG_DONE),
-                TAG_DONE),
-                CHILD_MinHeight,  300,
-                // END - Bottom List Section
-            TAG_DONE),
           TAG_DONE),
       TAG_DONE),
     TAG_DONE);
@@ -285,6 +190,145 @@ CONST_STRPTR getChooserText(int gadgetId, uint16 code)
   return NULL;
 }
 
+static Object *buildRadioSearchPage(void)
+{
+  return IIntuition->NewObject(NULL, "layout.gadget",
+        LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+
+        // START - Top Filter Section
+        LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+          LAYOUT_BevelStyle,      BVS_GROUP,
+          LAYOUT_Label,           "Filter stations by",
+
+          // Top filter section with the Name Text Box with Label
+          LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+            LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+            LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+              //LABEL_DrawInfo, drInfo,
+              LABEL_Text, "_Name",
+              TAG_END),
+            LAYOUT_AddChild, gadgets[GID_FILTERS_NAME] = IIntuition->NewObject(NULL, "string.gadget",
+              GA_ID,                GID_FILTERS_NAME,
+              GA_RelVerify,         TRUE,
+              GA_TabCycle,          TRUE,
+              GA_ActivateKey,       "n",
+              STRINGA_MinVisible,   10,
+              STRINGA_MaxChars,     31,
+              TAG_DONE),
+            TAG_DONE),
+
+          // Top filter section with the select boxes
+          LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+            // Genres Select Box with Label
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+              LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+              LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+                //LABEL_DrawInfo, drInfo,
+                LABEL_Text, "_Genre",
+                TAG_END),
+              LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+                GA_ID,                GID_CHOOSER_GENRES,
+                GA_RelVerify,         TRUE,
+                GA_TabCycle,          TRUE,
+                GA_ActivateKey,       "g",
+                CHOOSER_LabelArray,   genres,
+                CHOOSER_MaxLabels,    30,
+                CHOOSER_Selected,     0,
+                TAG_DONE),
+              TAG_DONE),
+
+            // Countries Select Box with Label
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+              LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+              LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+                //LABEL_DrawInfo, drInfo,
+                LABEL_Text, "_Country",
+                TAG_END),
+              LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+                GA_ID,                GID_CHOOSER_COUNTRIES,
+                GA_RelVerify,         TRUE,
+                GA_TabCycle,          TRUE,
+                GA_ActivateKey,       "c",
+                CHOOSER_LabelArray,   countries,
+                CHOOSER_Selected,     0,
+                TAG_DONE),
+              TAG_DONE),
+
+            // Languages Select Box with Label
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+              LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+              LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+                //LABEL_DrawInfo, drInfo,
+                LABEL_Text, "_Language",
+                TAG_END),
+              LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+                GA_ID,                GID_CHOOSER_LANGUAGES,
+                GA_RelVerify,         TRUE,
+                GA_TabCycle,          TRUE,
+                GA_ActivateKey,       "l",
+                CHOOSER_LabelArray,   languages,
+                CHOOSER_Selected,     0,
+                TAG_DONE),
+              TAG_DONE),
+            TAG_DONE),
+
+            // Filters Button
+            LAYOUT_AddChild, gadgets[GID_FILTER_BUTTON] = IIntuition->NewObject(NULL, "button.gadget",
+              GA_ID,              GID_FILTER_BUTTON,
+              GA_Text,            "_Discover",
+              GA_TabCycle,        TRUE,
+              GA_RelVerify,       TRUE,
+              GA_ActivateKey,     "d",
+              TAG_DONE),
+          TAG_DONE),
+          CHILD_WeightedHeight, 0,
+        // END - Top Filter Section
+
+        // START - Bottom List Section
+        LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+          LAYOUT_AddChild, gadgets[GID_RADIO_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
+            GA_ID,                      GID_RADIO_LISTBROWSER,
+            GA_RelVerify,               TRUE,
+            GA_TabCycle,                TRUE,
+            LISTBROWSER_AutoFit,        TRUE,
+            LISTBROWSER_ColumnTitles,   TRUE,
+            LISTBROWSER_HorizontalProp, TRUE,
+            LISTBROWSER_Separators,     TRUE,
+            LISTBROWSER_ShowSelected,   TRUE,
+            LISTBROWSER_Striping,       LBS_ROWS,
+            LISTBROWSER_SortColumn,     0,
+            LISTBROWSER_TitleClickable, TRUE,
+            TAG_DONE),
+          TAG_DONE),
+          CHILD_MinHeight,  300,
+          // END - Bottom List Section
+        TAG_DONE);
+}
+
+static Object *buildRadioPopularPage(void)
+{
+  return IIntuition->NewObject(NULL, "layout.gadget",
+        LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
+              GA_ID,              GID_RELOAD_BUTTON,
+              GA_Text,            "_Reload",
+              GA_TabCycle,        TRUE,
+              GA_RelVerify,       TRUE,
+              GA_ActivateKey,     "r",
+              TAG_DONE),
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
+              GA_ID,              GID_RELOAD_BUTTON2,
+              GA_Text,            "_Reload2",
+              GA_TabCycle,        TRUE,
+              GA_RelVerify,       TRUE,
+              GA_ActivateKey,     "e",
+              TAG_DONE),
+        TAG_DONE);
+}
+
 void getLeftSidebarContent(void)
 {
 
@@ -301,7 +345,6 @@ void getLeftSidebarContent(void)
     TAG_DONE);
   if (node)
   {
-    node->ln_Pri = LSB_RADIO;
     IExec->AddTail( &leftSidebarList, node );
   }
 
@@ -313,7 +356,6 @@ void getLeftSidebarContent(void)
     TAG_DONE);
   if (node)
   {
-    node->ln_Pri = LSB_RADIO_POPULAR;
     IExec->AddTail( &leftSidebarList, node );
   }
 
@@ -325,7 +367,6 @@ void getLeftSidebarContent(void)
     TAG_DONE);
   if (node)
   {
-    node->ln_Pri = LSB_RADIO_TREND;
     IExec->AddTail( &leftSidebarList, node );
   }
 }

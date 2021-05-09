@@ -69,6 +69,11 @@ enum
   GID_ABOUT_LOGO,
   GID_MSG_REQ,
   GID_LEFT_SIDEBAR,
+  GID_PAGE,
+  GID_PAGELAY1,
+  GID_PAGELAY2,
+  GID_RELOAD_BUTTON,
+  GID_RELOAD_BUTTON2,
   GID_LAST
 };
 
@@ -79,14 +84,6 @@ enum
   MID_ICONIFY,
   MID_QUIT,
   MID_LAST
-};
-
-enum
-{
-  LSB_RADIO,
-  LSB_RADIO_POPULAR,
-  LSB_RADIO_TREND,
-  LSB_LAST
 };
 
 struct Screen       *screen;
