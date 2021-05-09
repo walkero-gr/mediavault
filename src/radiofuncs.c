@@ -76,6 +76,23 @@ STRPTR getRadioStations(struct filters lastFilters, int offset)
   return getResponseBody(url, NET_PORT_HTTPS);
 }
 
+STRPTR getRadioTrendStations(void)
+{
+  char url[255];
+  char maxResultsStr[4];
+
+  IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
+  IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
+  IUtility->SNPrintf(maxResultsStr, sizeof(maxResultsStr), "%ld", maxResults);
+  IUtility->Strlcat(url, maxResultsStr, sizeof(url));
+  IUtility->Strlcat(url, "&order=clicktrend", sizeof(url));
+  IUtility->Strlcat(url, "&reverse=true", sizeof(url));
+
+  IDOS->Printf("%s\n", url);
+
+  return getResponseBody(url, NET_PORT_HTTPS);
+}
+
 void getRadioList(STRPTR jsonData, int offset)
 {                          
   json_t *jsonRoot;
@@ -102,7 +119,6 @@ void getRadioList(STRPTR jsonData, int offset)
     IExec->NewList(&radioList);
   }
   radioListItemsCnt = 0;
-                           
 
   for(i = 0; i < IJansson->json_array_size(jsonRoot); i++)
   {

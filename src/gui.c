@@ -31,6 +31,7 @@ struct filters lastFilters, prevFilters;
 
 static void fillLeftSidebar(void);
 static void fillRadioList(BOOL);
+//static void fillRadioTrendList(void);
 static void playRadio(STRPTR);
 static BOOL checkFiltersChanged(void);
 static void changeDiscoverButton(BOOL);
@@ -107,7 +108,8 @@ void showGUI(void)
             {
               uint32  result = WMHI_LASTMSG,
                       res_value,
-                      res_node;
+                      res_node,
+                      lsbNodeIdx;
               STRPTR  selListValue; 
 
               // Main Window events
@@ -208,6 +210,21 @@ void showGUI(void)
                       case GID_LEFT_SIDEBAR:
                         
                         IDOS->Printf("GID_LEFT_SIDEBAR\n");
+
+                        IIntuition->GetAttr(LISTBROWSER_Selected, gadgets[GID_LEFT_SIDEBAR], &lsbNodeIdx);
+                        IDOS->Printf("Listview: [%ld]\n", lsbNodeIdx);
+                        switch (lsbNodeIdx)
+                        {
+                          case 0:
+                            IDOS->Printf("LSB_RADIO \n");
+                            break;
+                          case 1:
+                            IDOS->Printf("LSB_RADIO_POPULAR \n");
+                            break;
+                          case 2:
+                            IDOS->Printf("LSB_RADIO_TREND \n");
+                            break;
+                        }
                         /*
                         IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_LEFT_SIDEBAR], &res_value);
                         if (res_value == LBRE_NORMAL)
@@ -234,8 +251,8 @@ void showGUI(void)
                           }
                           IDOS->Printf("##########################################################\n");
                         }
-                        break;
                         */
+                        break;
                     }
                     break; 
                 }
@@ -326,6 +343,42 @@ static void fillRadioList(BOOL zeroOffset)
         TAG_DONE);
   }
 }
+
+/*
+static void fillRadioTrendList(void)
+{
+  static int offset = 0;
+
+  STRPTR responseJSON = getRadioTrendStations();
+  if (responseJSON)
+  {
+    getRadioList(responseJSON, offset);
+    if (radioListItemsCnt == 0)
+    {
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Trend Radio Stations found!");
+    }
+  } else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", "There was an error with the returned data.\nPlease, try again or check your network.");
+
+  // Dispose net here, after the creation of the listbrowser content,
+  // because it trashes the response data, so to free the signals
+  // TODO: adapt it to oo.library v1.11 changes
+  if (net)
+  {
+    net->DisposeConnection();
+    IOO->DisposeNetworkObject(net);
+  }
+
+  if (radioListItemsCnt)
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         (ULONG)&radioList,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     columnInfo,
+        TAG_DONE);
+  }
+}
+*/
 
 static void playRadio(STRPTR stationUrl)
 {

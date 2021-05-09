@@ -75,9 +75,9 @@ CONST_STRPTR countries[] =
 
 extern struct List leftSidebarList;
 
-//static Object *buildLeftSidebar(void);
 static Object *buildRadioSearchPage(void);
 static Object *buildRadioPopularPage(void);
+static Object *buildRadioTrendPage(void);
 
 static const ULONG listToPage[] = {
     LISTBROWSER_Selected,    PAGE_Current,
@@ -87,10 +87,12 @@ static const ULONG listToPage[] = {
 Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 {                                           
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
+
   Object *radioPages = IIntuition->NewObject(NULL, "page.gadget",
         LAYOUT_DeferLayout, TRUE,
-        PAGE_Add, gadgets[GID_PAGELAY1] = buildRadioSearchPage(),
-        PAGE_Add, gadgets[GID_PAGELAY2] = buildRadioPopularPage(),
+        PAGE_Add, gadgets[GID_PAGE_1] = buildRadioSearchPage(),
+        PAGE_Add, gadgets[GID_PAGE_2] = buildRadioPopularPage(),
+        PAGE_Add, gadgets[GID_PAGE_3] = buildRadioTrendPage(),
         TAG_DONE);
 
   return IIntuition->NewObject(NULL, "window.class",
@@ -136,7 +138,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
               LAYOUT_WeightBar, TRUE,
             // END - Left Sidebar
 
-            LAYOUT_AddChild, gadgets[GID_PAGE] = radioPages,
+            LAYOUT_AddChild, gadgets[GID_PAGES] = radioPages,
 
           TAG_DONE),
       TAG_DONE),
@@ -327,6 +329,26 @@ static Object *buildRadioPopularPage(void)
               GA_ActivateKey,     "e",
               TAG_DONE),
         TAG_DONE);
+}
+
+static Object *buildRadioTrendPage(void)
+{
+  return IIntuition->NewObject(NULL, "layout.gadget",
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+          LAYOUT_AddChild, gadgets[GID_RADIO_TREND_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
+            GA_ID,                      GID_RADIO_TREND_LISTBROWSER,
+            GA_RelVerify,               TRUE,
+            GA_TabCycle,                TRUE,
+            LISTBROWSER_AutoFit,        TRUE,
+            LISTBROWSER_ColumnTitles,   TRUE,
+            LISTBROWSER_HorizontalProp, TRUE,
+            LISTBROWSER_Separators,     TRUE,
+            LISTBROWSER_ShowSelected,   TRUE,
+            LISTBROWSER_Striping,       LBS_ROWS,
+            LISTBROWSER_SortColumn,     0,
+            LISTBROWSER_TitleClickable, TRUE,
+            TAG_DONE),
+          TAG_DONE);
 }
 
 void getLeftSidebarContent(void)

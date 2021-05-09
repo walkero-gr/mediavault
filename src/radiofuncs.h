@@ -15,4 +15,6 @@
 */
 
 STRPTR getRadioStations(struct filters, int);
+STRPTR getRadioTrendStations(void);
 void getRadioList(STRPTR, int);
+
