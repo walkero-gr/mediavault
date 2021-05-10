@@ -24,14 +24,16 @@
 
 static struct ColumnInfo *columnInfo, *leftSidebarCI;
 struct List radioList,
+            radioTrendList,
             leftSidebarList;
-int32 radioListItemsCnt = 0;
+int32 radioListItemsCnt = 0,
+      radioTrendListItemsCnt = 0;
 
 struct filters lastFilters, prevFilters;
 
 static void fillLeftSidebar(void);
 static void fillRadioList(BOOL);
-//static void fillRadioTrendList(void);
+static void fillRadioTrendList(void);
 static void playRadio(STRPTR);
 static BOOL checkFiltersChanged(void);
 static void changeDiscoverButton(BOOL);
@@ -207,6 +209,18 @@ void showGUI(void)
                           playRadio(selListValue);
                         }
                         break;
+                      case GID_RADIO_TREND_LISTBROWSER:
+                        IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_RADIO_TREND_LISTBROWSER], &res_value);
+                        if (res_value == LBRE_DOUBLECLICK)
+                        {
+                          IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_TREND_LISTBROWSER], (uint32 *)&res_node);
+                          IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+                              LBNA_Column,  3,
+                              LBNCA_Text,   &selListValue,
+                              TAG_DONE);
+                          playRadio(selListValue);
+                        }
+                        break;
                       case GID_LEFT_SIDEBAR:
                         
                         IDOS->Printf("GID_LEFT_SIDEBAR\n");
@@ -223,6 +237,12 @@ void showGUI(void)
                             break;
                           case 2:
                             IDOS->Printf("LSB_RADIO_TREND \n");
+                            if(radioTrendListItemsCnt == 0)
+                            {
+                              windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
+                              fillRadioTrendList();
+                              windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
+                            }
                             break;
                         }
                         /*
@@ -286,6 +306,10 @@ void showGUI(void)
           {
             IListBrowser->FreeListBrowserList(&radioList);
           }
+          if(radioTrendListItemsCnt)
+          {
+            IListBrowser->FreeListBrowserList(&radioTrendList);
+          }
 
           IListBrowser->FreeLBColumnInfo(leftSidebarCI);
           IListBrowser->FreeListBrowserList(&leftSidebarList);
@@ -301,10 +325,10 @@ void showGUI(void)
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
 
-static void fillRadioList(BOOL zeroOffset)
+static void fillRadioList(BOOL newSearch)
 {
   static int offset;
-  if (zeroOffset)
+  if (newSearch)
   {
     offset = 0;
   }
@@ -344,7 +368,7 @@ static void fillRadioList(BOOL zeroOffset)
   }
 }
 
-/*
+
 static void fillRadioTrendList(void)
 {
   static int offset = 0;
@@ -352,8 +376,8 @@ static void fillRadioTrendList(void)
   STRPTR responseJSON = getRadioTrendStations();
   if (responseJSON)
   {
-    getRadioList(responseJSON, offset);
-    if (radioListItemsCnt == 0)
+    getRadioTrendList(responseJSON, offset);
+    if (radioTrendListItemsCnt == 0)
     {
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Trend Radio Stations found!");
     }
@@ -368,17 +392,17 @@ static void fillRadioTrendList(void)
     IOO->DisposeNetworkObject(net);
   }
 
-  if (radioListItemsCnt)
+  if (radioTrendListItemsCnt)
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], windows[WID_MAIN], NULL,
-        LISTBROWSER_Labels,         (ULONG)&radioList,
+        LISTBROWSER_Labels,         (ULONG)&radioTrendList,
         LISTBROWSER_SortColumn,     0,
         LISTBROWSER_Selected,       -1,
         LISTBROWSER_ColumnInfo,     columnInfo,
         TAG_DONE);
   }
 }
-*/
+
 
 static void playRadio(STRPTR stationUrl)
 {
