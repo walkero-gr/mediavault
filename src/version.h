@@ -32,7 +32,7 @@
 #endif
 
 #ifndef RELEASE_DATE
-#define RELEASE_DATE "3.5.2021"
+#define RELEASE_DATE "13.5.2021"
 #endif
 
 #define APPNAME     "MediaVault"
