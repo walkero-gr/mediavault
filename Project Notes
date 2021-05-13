@@ -43,8 +43,8 @@ DONE - Double click on a station to play on player
 - Use ToolTypes to set the player and the arguments (optional)
 - Click on a station and show it's info at the side, with logo
 - Mark stations as favorites
-Done - Add more tags
-- Add more countries and languages
+DONE - Add more tags
+DONE - Add more countries and languages
 - Empty list if invalid/empty JSON returns
 DONE - Add station votes in the list
 DONE - Block main window when user sent a request
