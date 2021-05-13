@@ -105,7 +105,7 @@ STRPTR getRadioPopularStations(void)
   IUtility->Strlcat(url, "&order=clickcount", sizeof(url));
   IUtility->Strlcat(url, "&reverse=true", sizeof(url));
 
-  IDOS->Printf("%s\n", url);
+  //IDOS->Printf("%s\n", url);
 
   return getResponseBody(url, NET_PORT_HTTPS);
 }

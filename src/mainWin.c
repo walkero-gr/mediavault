@@ -294,7 +294,6 @@ static Object *buildRadioSearchPage(void)
             GA_ID,                      GID_RADIO_LISTBROWSER,
             GA_RelVerify,               TRUE,
             GA_TabCycle,                TRUE,
-            LISTBROWSER_AutoFit,        TRUE,
             LISTBROWSER_ColumnTitles,   TRUE,
             LISTBROWSER_HorizontalProp, TRUE,
             LISTBROWSER_Separators,     TRUE,
@@ -312,41 +311,45 @@ static Object *buildRadioSearchPage(void)
 static Object *buildRadioPopularPage(void)
 {
   return IIntuition->NewObject(NULL, "layout.gadget",
-          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-          LAYOUT_AddChild, gadgets[GID_RADIO_POPULAR_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
-            GA_ID,                      GID_RADIO_POPULAR_LISTBROWSER,
-            GA_RelVerify,               TRUE,
-            GA_TabCycle,                TRUE,
-            LISTBROWSER_AutoFit,        TRUE,
-            LISTBROWSER_ColumnTitles,   TRUE,
-            LISTBROWSER_HorizontalProp, TRUE,
-            LISTBROWSER_Separators,     TRUE,
-            LISTBROWSER_ShowSelected,   TRUE,
-            LISTBROWSER_Striping,       LBS_ROWS,
-            LISTBROWSER_SortColumn,     0,
-            LISTBROWSER_TitleClickable, TRUE,
-            TAG_DONE),
-          TAG_DONE);
+      LAYOUT_BevelStyle,      BVS_GROUP,
+      LAYOUT_Label,           "Most-listened over 24 hours",
+
+        LAYOUT_AddChild, gadgets[GID_RADIO_POPULAR_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
+          GA_ID,                      GID_RADIO_POPULAR_LISTBROWSER,
+          GA_RelVerify,               TRUE,
+          GA_TabCycle,                TRUE,
+          LISTBROWSER_ColumnTitles,   TRUE,
+          LISTBROWSER_HorizontalProp, TRUE,
+          LISTBROWSER_Separators,     TRUE,
+          LISTBROWSER_ShowSelected,   TRUE,
+          LISTBROWSER_Striping,       LBS_ROWS,
+          LISTBROWSER_SortColumn,     0,
+          LISTBROWSER_TitleClickable, TRUE,
+          TAG_DONE),
+
+        TAG_DONE);
 }
 
 static Object *buildRadioTrendPage(void)
 {
   return IIntuition->NewObject(NULL, "layout.gadget",
-          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-          LAYOUT_AddChild, gadgets[GID_RADIO_TREND_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
-            GA_ID,                      GID_RADIO_TREND_LISTBROWSER,
-            GA_RelVerify,               TRUE,
-            GA_TabCycle,                TRUE,
-            LISTBROWSER_AutoFit,        TRUE,
-            LISTBROWSER_ColumnTitles,   TRUE,
-            LISTBROWSER_HorizontalProp, TRUE,
-            LISTBROWSER_Separators,     TRUE,
-            LISTBROWSER_ShowSelected,   TRUE,
-            LISTBROWSER_Striping,       LBS_ROWS,
-            LISTBROWSER_SortColumn,     0,
-            LISTBROWSER_TitleClickable, TRUE,
-            TAG_DONE),
-          TAG_DONE);
+      LAYOUT_BevelStyle,      BVS_GROUP,
+      LAYOUT_Label,           "Trending in the last 24 hours",
+      
+        LAYOUT_AddChild, gadgets[GID_RADIO_TREND_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
+          GA_ID,                      GID_RADIO_TREND_LISTBROWSER,
+          GA_RelVerify,               TRUE,
+          GA_TabCycle,                TRUE,
+          LISTBROWSER_ColumnTitles,   TRUE,
+          LISTBROWSER_HorizontalProp, TRUE,
+          LISTBROWSER_Separators,     TRUE,
+          LISTBROWSER_ShowSelected,   TRUE,
+          LISTBROWSER_Striping,       LBS_ROWS,
+          LISTBROWSER_SortColumn,     0,
+          LISTBROWSER_TitleClickable, TRUE,
+          TAG_DONE),
+
+        TAG_DONE);
 }
 
 void getLeftSidebarContent(void)

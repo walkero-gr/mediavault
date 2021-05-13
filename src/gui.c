@@ -82,21 +82,21 @@ void showGUI(void)
                 LBCIA_DraggableSeparator,   TRUE,
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
-                LBCIA_Width,                0,
+                LBCIA_Weight,               60,
               LBCIA_Column,                 1,
                 LBCIA_Title,                " Country",
                 LBCIA_AutoSort,             TRUE,
                 LBCIA_DraggableSeparator,   TRUE,
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
-                LBCIA_Width,                0,
+                LBCIA_Weight,               30,
               LBCIA_Column,                 2,
                 LBCIA_Title,                " Votes",
                 LBCIA_AutoSort,             TRUE,
                 LBCIA_DraggableSeparator,   TRUE,
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
-                LBCIA_Width,                0,
+                LBCIA_Weight,               10,
               TAG_DONE);
 
           IIntuition->GetAttr(WINDOW_SigMask, objects[OID_MAIN], &signal);
@@ -155,7 +155,6 @@ void showGUI(void)
 
                     break;
                   case WMHI_GADGETUP:
-                    IDOS->Printf("WMHI_GADGETUP\n");
                     switch (result & WMHI_GADGETMASK)
                     {
                       case GID_FILTER_BUTTON:
@@ -237,18 +236,13 @@ void showGUI(void)
                         }
                         break;
                       case GID_LEFT_SIDEBAR:
-                        
-                        IDOS->Printf("GID_LEFT_SIDEBAR\n");
-
                         IIntuition->GetAttr(LISTBROWSER_Selected, gadgets[GID_LEFT_SIDEBAR], &lsbNodeIdx);
-                        IDOS->Printf("Listview: [%ld]\n", lsbNodeIdx);
                         switch (lsbNodeIdx)
                         {
                           case 0:
-                            IDOS->Printf("LSB_RADIO \n");
+                            //IDOS->Printf("LSB_RADIO \n");
                             break;
                           case 1:
-                            IDOS->Printf("LSB_RADIO_POPULAR \n");
                             if(radioPopularListItemsCnt == 0)
                             {
                               windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
@@ -257,7 +251,6 @@ void showGUI(void)
                             }                            
                             break;
                           case 2:
-                            IDOS->Printf("LSB_RADIO_TREND \n");
                             if(radioTrendListItemsCnt == 0)
                             {
                               windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
@@ -266,33 +259,6 @@ void showGUI(void)
                             }
                             break;
                         }
-                        /*
-                        IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_LEFT_SIDEBAR], &res_value);
-                        if (res_value == LBRE_NORMAL)
-                        {
-                          struct Node *lsbNode;
-
-                          IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_LEFT_SIDEBAR], (ULONG*)&lsbNode);
-                          //IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-                          //    LBNA_Column,  0,
-                          //    LBNCA_Text,   &selListValue,
-                          //    TAG_DONE);
-                          IDOS->Printf("Listview: [%ld]\n",lsbNode->ln_Pri);
-                          switch (lsbNode->ln_Pri)
-                          {
-                            case LSB_RADIO:
-                              IDOS->Printf("LSB_RADIO \n");
-                              break;
-                            case LSB_RADIO_POPULAR:
-                              IDOS->Printf("LSB_RADIO_POPULAR \n");
-                              break;
-                            case LSB_RADIO_TREND:
-                              IDOS->Printf("LSB_RADIO_TREND \n");
-                              break;
-                          }
-                          IDOS->Printf("##########################################################\n");
-                        }
-                        */
                         break;
                     }
                     break; 
@@ -327,6 +293,10 @@ void showGUI(void)
           {
             IListBrowser->FreeListBrowserList(&radioList);
           }
+          if(radioPopularListItemsCnt)
+          {
+            IListBrowser->FreeListBrowserList(&radioPopularList);
+          }
           if(radioTrendListItemsCnt)
           {
             IListBrowser->FreeListBrowserList(&radioTrendList);
@@ -346,6 +316,7 @@ void showGUI(void)
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
 
+// TODO: Reduce duplicate code
 static void fillRadioList(BOOL newSearch)
 {
   static int offset;
@@ -389,6 +360,7 @@ static void fillRadioList(BOOL newSearch)
   }
 }
 
+// TODO: Reduce duplicate code
 static void fillRadioPopularList(void)
 {
   static int offset = 0;
@@ -423,6 +395,7 @@ static void fillRadioPopularList(void)
   }
 }
 
+// TODO: Reduce duplicate code
 static void fillRadioTrendList(void)
 {
   static int offset = 0;
