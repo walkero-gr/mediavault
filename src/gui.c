@@ -24,15 +24,18 @@
 
 static struct ColumnInfo *columnInfo, *leftSidebarCI;
 struct List radioList,
+            radioPopularList,
             radioTrendList,
             leftSidebarList;
 int32 radioListItemsCnt = 0,
+      radioPopularListItemsCnt = 0,
       radioTrendListItemsCnt = 0;
 
 struct filters lastFilters, prevFilters;
 
 static void fillLeftSidebar(void);
 static void fillRadioList(BOOL);
+static void fillRadioPopularList(void);
 static void fillRadioTrendList(void);
 static void playRadio(STRPTR);
 static BOOL checkFiltersChanged(void);
@@ -209,6 +212,18 @@ void showGUI(void)
                           playRadio(selListValue);
                         }
                         break;
+                      case GID_RADIO_POPULAR_LISTBROWSER:
+                        IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_RADIO_POPULAR_LISTBROWSER], &res_value);
+                        if (res_value == LBRE_DOUBLECLICK)
+                        {
+                          IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_POPULAR_LISTBROWSER], (uint32 *)&res_node);
+                          IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+                              LBNA_Column,  3,
+                              LBNCA_Text,   &selListValue,
+                              TAG_DONE);
+                          playRadio(selListValue);
+                        }
+                        break;
                       case GID_RADIO_TREND_LISTBROWSER:
                         IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_RADIO_TREND_LISTBROWSER], &res_value);
                         if (res_value == LBRE_DOUBLECLICK)
@@ -234,6 +249,12 @@ void showGUI(void)
                             break;
                           case 1:
                             IDOS->Printf("LSB_RADIO_POPULAR \n");
+                            if(radioPopularListItemsCnt == 0)
+                            {
+                              windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
+                              fillRadioPopularList();
+                              windowBlocking(windows[WID_MAIN], objects[OID_MAIN], FALSE);
+                            }                            
                             break;
                           case 2:
                             IDOS->Printf("LSB_RADIO_TREND \n");
@@ -368,6 +389,39 @@ static void fillRadioList(BOOL newSearch)
   }
 }
 
+static void fillRadioPopularList(void)
+{
+  static int offset = 0;
+
+  STRPTR responseJSON = getRadioPopularStations();
+  if (responseJSON)
+  {
+    getRadioPopularList(responseJSON, offset);
+    if (radioPopularListItemsCnt == 0)
+    {
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Popular Radio Stations found!");
+    }
+  } else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", "There was an error with the returned data.\nPlease, try again or check your network.");
+
+  // Dispose net here, after the creation of the listbrowser content,
+  // because it trashes the response data, so to free the signals
+  // TODO: adapt it to oo.library v1.11 changes
+  if (net)
+  {
+    net->DisposeConnection();
+    IOO->DisposeNetworkObject(net);
+  }
+
+  if (radioPopularListItemsCnt)
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER], windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         (ULONG)&radioPopularList,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     columnInfo,
+        TAG_DONE);
+  }
+}
 
 static void fillRadioTrendList(void)
 {

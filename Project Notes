@@ -48,8 +48,8 @@ Done - Add more tags
 - Empty list if invalid/empty JSON returns
 DONE - Add station votes in the list
 DONE - Block main window when user sent a request
-DONE - Added Trending list of radio stations at the left sidebar
-- Add Popular list of radio stations at the left sidebar
+DONE - Add Trending list of radio stations at the left sidebar
+DONE - Add Popular list of radio stations at the left sidebar
 - Add a recent search selection at the left sidebar
 - Add a favorites list of radio stations at the left sidebar
 - Let list bring most voted first

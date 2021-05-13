@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 - Changed "Discover" button to "Discover more" so to load more radio stations results. If the user change a filter, then it returns to previous usage.
 - Added more options at the Genre select box
 - Now the retrieved radio stations list doesn't include the marked as broken stations
+- Added Trending list of radio stations
+- Added Popular list of radio stations
 
 ## [1.0.0] - 2021-04-30
 ### Added

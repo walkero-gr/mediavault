@@ -312,23 +312,21 @@ static Object *buildRadioSearchPage(void)
 static Object *buildRadioPopularPage(void)
 {
   return IIntuition->NewObject(NULL, "layout.gadget",
-        LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-
-            LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
-              GA_ID,              GID_RELOAD_BUTTON,
-              GA_Text,            "_Reload",
-              GA_TabCycle,        TRUE,
-              GA_RelVerify,       TRUE,
-              GA_ActivateKey,     "r",
-              TAG_DONE),
-            LAYOUT_AddChild, IIntuition->NewObject(NULL, "button.gadget",
-              GA_ID,              GID_RELOAD_BUTTON2,
-              GA_Text,            "_Reload2",
-              GA_TabCycle,        TRUE,
-              GA_RelVerify,       TRUE,
-              GA_ActivateKey,     "e",
-              TAG_DONE),
-        TAG_DONE);
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+          LAYOUT_AddChild, gadgets[GID_RADIO_POPULAR_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
+            GA_ID,                      GID_RADIO_POPULAR_LISTBROWSER,
+            GA_RelVerify,               TRUE,
+            GA_TabCycle,                TRUE,
+            LISTBROWSER_AutoFit,        TRUE,
+            LISTBROWSER_ColumnTitles,   TRUE,
+            LISTBROWSER_HorizontalProp, TRUE,
+            LISTBROWSER_Separators,     TRUE,
+            LISTBROWSER_ShowSelected,   TRUE,
+            LISTBROWSER_Striping,       LBS_ROWS,
+            LISTBROWSER_SortColumn,     0,
+            LISTBROWSER_TitleClickable, TRUE,
+            TAG_DONE),
+          TAG_DONE);
 }
 
 static Object *buildRadioTrendPage(void)
