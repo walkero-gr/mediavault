@@ -326,10 +326,15 @@ static void fillRadioList(BOOL newSearch)
   }
   else offset++;
 
+  // Detach list before modify it
+  IIntuition->SetAttrs((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER],
+      LISTBROWSER_Labels, NULL,
+      TAG_DONE);
+
+
   STRPTR responseJSON = getRadioStations(lastFilters, offset);
   if (responseJSON)
   {
-    //IDOS->Printf("responseJSON\n%s\n==============================================\n", responseJSON);
     getRadioList(responseJSON, offset);
     if (radioListItemsCnt == 0)
     {

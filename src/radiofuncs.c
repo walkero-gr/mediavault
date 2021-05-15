@@ -130,13 +130,15 @@ void getRadioList(STRPTR jsonData, int offset)
     IJansson->json_decref(jsonRoot);
     CleanExit("JSON error: jsonRoot is not an array");
   }                                                                         
+
   ULONG votesNum;
+  radioListItemsCnt = 0;
 
   if (offset == 0)
   {
     IExec->NewList(&radioList);
   }
-  radioListItemsCnt = 0;
+  
   
   for(i = 0; i < IJansson->json_array_size(jsonRoot); i++)
   {
