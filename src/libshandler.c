@@ -78,14 +78,14 @@ void OpenLibs(void)
 
   if ((OOBase=IExec->OpenLibrary("oo.library", 1 )))
   {
-    if (LIB_IS_AT_LEAST(OOBase, 1, 9))
+    if (LIB_IS_AT_LEAST(OOBase, 1, 12))
     {
       IOO = (struct OOIFace *)IExec->GetInterface( OOBase, "main", 1, NULL );
       if(!IOO) CleanExit("Can't open oo.library Interface");
     }
-    else CleanExit("Can't open oo.library version 1.11 and above");
+    else CleanExit("Can't open oo.library version 1.12 and above");
   }
-  else CleanExit("Can't open oo.library version 1.11 and above. Is it installed?");
+  else CleanExit("Can't open oo.library version 1.12 and above. Is it installed?");
 
   if ((LayoutBase = (APTR) IIntuition->OpenClass( "gadgets/layout.gadget", 1, &LayoutClass )))
   {

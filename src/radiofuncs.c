@@ -26,7 +26,7 @@ extern int32 radioListItemsCnt, radioTrendListItemsCnt, radioPopularListItemsCnt
 
 STRPTR getRadioStations(struct filters lastFilters, int offset)
 {
-  char url[255];    
+  char url[255];
   char maxResultsStr[4];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
@@ -121,7 +121,7 @@ void getRadioList(STRPTR jsonData, int offset)
 
   if(!jsonRoot)
   {
-    IDOS->Printf("json error: on line %d: %s\n", jsonError.line, jsonError.text);
+    //IDOS->Printf("json error: on line %d: %s\n", jsonError.line, jsonError.text);
     CleanExit("JSON Error");
   }
 
@@ -137,7 +137,7 @@ void getRadioList(STRPTR jsonData, int offset)
     IExec->NewList(&radioList);
   }
   radioListItemsCnt = 0;
-
+  
   for(i = 0; i < IJansson->json_array_size(jsonRoot); i++)
   {
     struct Node *stationNode;
@@ -195,6 +195,7 @@ void getRadioList(STRPTR jsonData, int offset)
       CleanExit("JSON Error");
     }
     //IDOS->Printf("Station url_resolved: %s\n", IJansson->json_string_value(url_resolved));
+    
 
     votes = IJansson->json_object_get(data, "votes");
     if(!json_is_integer(votes))

@@ -329,6 +329,7 @@ static void fillRadioList(BOOL newSearch)
   STRPTR responseJSON = getRadioStations(lastFilters, offset);
   if (responseJSON)
   {
+    //IDOS->Printf("responseJSON\n%s\n==============================================\n", responseJSON);
     getRadioList(responseJSON, offset);
     if (radioListItemsCnt == 0)
     {
@@ -446,6 +447,8 @@ static void playRadio(STRPTR stationUrl)
 static BOOL checkFiltersChanged(void)
 {
   BOOL changed = FALSE;
+  static BOOL firstCheck = TRUE;
+
   if (IUtility->Stricmp(lastFilters.name, prevFilters.name))
   {
     changed = TRUE;
@@ -460,6 +463,12 @@ static BOOL checkFiltersChanged(void)
   }
   if (IUtility->Stricmp(lastFilters.language, prevFilters.language))
   {
+    changed = TRUE;
+  }
+
+  if (firstCheck)
+  {
+    firstCheck = FALSE;
     changed = TRUE;
   }
 

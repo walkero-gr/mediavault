@@ -71,6 +71,9 @@ DONE - Move UPnP functions to separate source file
 *********
 FIXED - When ooNetwork is used I get some unfreed signals on exit
 FIXED - ooNetwork truncates the return info, so for now only 5 items return. Now it shows 20 stations. Maybe I need to some kind of pagination, based on the scrollbar.
+FIXED - A bug on requesting radio stations without using the filters
+        (https://www.amigans.net/modules/xforum/viewtopic.php?post_id=125112#forumpost125112 and
+        https://www.amigans.net/modules/xforum/viewtopic.php?post_id=125171#forumpost125171)
 
 
 //// IDEAS

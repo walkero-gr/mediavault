@@ -31,7 +31,7 @@ My plan for MediaVault is to create an application which users will use to:
 
 Requirements
 --------------------------
-* oo.library v1.11 by Tuomas Hokka
+* oo.library v1.12 by Tuomas Hokka
 * jansson.library v2.12.1 by Simon Tyrrell
 * AmigaAmp3 v3.29 by Thomas Wenzel
 
@@ -61,6 +61,10 @@ https://github.com/walkero-gr/mediavault/issues
 
 Changelog
 --------------------------
+v1.1.1 - 2021-05-15
+* Changed the required oo.library version to 1.12
+* Fixed a bug on requesting radio stations without using the filters
+
 v1.1.0 - 2021-05-13
 * Added a message requester for messages to the user
 * The "Discover" button changes to "Discover more" after the first search,
