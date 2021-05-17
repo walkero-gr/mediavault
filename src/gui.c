@@ -314,137 +314,89 @@ void showGUI(void)
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
 
-// TODO: Reduce duplicate code
+static void listStations(
+  struct Gadget *listbrowser,
+  STRPTR responseJSON,
+  struct List *list,
+  int offset,
+  char *notFoundMsg,
+  void (*maxResultCallback)(BOOL)
+) {
+  size_t stationsCnt = 0;
+  char jsonErrorMsg[] = "There was an error with the returned data.\nPlease, try again or check your network.";
+
+  // Detach list before modify it
+  IIntuition->SetAttrs(listbrowser,
+      LISTBROWSER_Labels, NULL,
+      TAG_DONE);
+
+  if (responseJSON)
+  {
+    stationsCnt = getRadioList(list, responseJSON, offset);
+    
+    if (stationsCnt == 0)
+    {
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg);
+    }
+
+    if (stationsCnt == maxRadioResults)
+    {
+      if (maxResultCallback)
+      {
+        maxResultCallback(TRUE);
+      }
+    }
+
+  } else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg);
+
+  // Dispose net here, after the creation of the listbrowser content,
+  // because it trashes the response data, so to free the signals
+  // TODO: adapt it to oo.library v1.11 changes
+  if (net)
+  {
+    net->DisposeConnection();
+    IOO->DisposeNetworkObject(net);
+  }
+
+  if (stationsCnt)
+  {
+    IIntuition->SetGadgetAttrs(listbrowser, windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         (ULONG)list,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     columnInfo,
+        TAG_DONE);
+
+  }
+}
+
 static void fillRadioList(BOOL newSearch)
 {
-  size_t stationsCnt = 0;
+  char notFoundMsg[] = "No Radio Stations found with these criteria!\nChange them and try again!";
   static int offset;
-  
+
   if (newSearch)
   {
     offset = 0;
   }
   else offset++;
-
-  // Detach list before modify it
-  IIntuition->SetAttrs((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER],
-      LISTBROWSER_Labels, NULL,
-      TAG_DONE);
-
+  
   STRPTR responseJSON = getRadioStations(lastFilters, offset);
-  if (responseJSON)
-  {
-    stationsCnt = getRadioList(&radioList, responseJSON, offset);
-    if (stationsCnt == 0)
-    {
-      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Radio Stations found with these criteria!\nChange them and try again");
-    }
-    if (stationsCnt == maxRadioResults)
-    {
-      changeDiscoverButton(TRUE);
-    }
-  } else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", "There was an error with the returned data.\nPlease, try again or check your network.");
-
-  // Dispose net here, after the creation of the listbrowser content,
-  // because it trashes the response data, so to free the signals
-  // TODO: adapt it to oo.library v1.11 changes
-  if (net)
-  {
-    net->DisposeConnection();
-    IOO->DisposeNetworkObject(net);
-  }
-
-  if (stationsCnt)
-  {
-    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], windows[WID_MAIN], NULL,
-        LISTBROWSER_Labels,         (ULONG)&radioList,
-        LISTBROWSER_SortColumn,     0,
-        LISTBROWSER_Selected,       -1,
-        LISTBROWSER_ColumnInfo,     columnInfo,
-        TAG_DONE);
-  }
+  listStations((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], responseJSON, &radioList, offset, (char *)notFoundMsg, changeDiscoverButton);
 }
 
-// TODO: Reduce duplicate code
 static void fillRadioPopularList(void)
 {
-  size_t stationsCnt = 0;
-  static int offset = 0;
-
-  // Detach list before modify it
-  IIntuition->SetAttrs((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER],
-      LISTBROWSER_Labels, NULL,
-      TAG_DONE);
-
+  char notFoundMsg[] = "No Popular Radio Stations found!";
   STRPTR responseJSON = getRadioPopularStations();
-  if (responseJSON)
-  {
-    stationsCnt = getRadioList(&radioPopularList, responseJSON, offset);
-    if (stationsCnt == 0)
-    {
-      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Popular Radio Stations found!");
-    }
-  } else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", "There was an error with the returned data.\nPlease, try again or check your network.");
-
-  // Dispose net here, after the creation of the listbrowser content,
-  // because it trashes the response data, so to free the signals
-  // TODO: adapt it to oo.library v1.11 changes
-  if (net)
-  {
-    net->DisposeConnection();
-    IOO->DisposeNetworkObject(net);
-  }
-
-  if (stationsCnt)
-  {
-    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER], windows[WID_MAIN], NULL,
-        LISTBROWSER_Labels,         (ULONG)&radioPopularList,
-        LISTBROWSER_SortColumn,     0,
-        LISTBROWSER_Selected,       -1,
-        LISTBROWSER_ColumnInfo,     columnInfo,
-        TAG_DONE);
-  }
+  listStations((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER], responseJSON, &radioPopularList, 0, (char *)notFoundMsg, NULL);
 }
 
-// TODO: Reduce duplicate code
 static void fillRadioTrendList(void)
 {
-  size_t stationsCnt = 0;
-  static int offset = 0;
-
-  // Detach list before modify it
-  IIntuition->SetAttrs((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER],
-      LISTBROWSER_Labels, NULL,
-      TAG_DONE);
-
+  char notFoundMsg[] = "No Trending Radio Stations found!";
   STRPTR responseJSON = getRadioTrendStations();
-  if (responseJSON)
-  {
-    stationsCnt = getRadioList(&radioTrendList, responseJSON, offset);
-    if (stationsCnt == 0)
-    {
-      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Trend Radio Stations found!");
-    }
-  } else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", "There was an error with the returned data.\nPlease, try again or check your network.");
-
-  // Dispose net here, after the creation of the listbrowser content,
-  // because it trashes the response data, so to free the signals
-  // TODO: adapt it to oo.library v1.11 changes
-  if (net)
-  {
-    net->DisposeConnection();
-    IOO->DisposeNetworkObject(net);
-  }
-
-  if (stationsCnt)
-  {
-    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], windows[WID_MAIN], NULL,
-        LISTBROWSER_Labels,         (ULONG)&radioTrendList,
-        LISTBROWSER_SortColumn,     0,
-        LISTBROWSER_Selected,       -1,
-        LISTBROWSER_ColumnInfo,     columnInfo,
-        TAG_DONE);
-  }
+  listStations((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], responseJSON, &radioTrendList, 0, (char *)notFoundMsg, NULL);
 }
 
 static BOOL checkFiltersChanged(void)

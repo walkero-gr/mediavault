@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Added code to detach the listbrowser before change it's data. That's the way it should be done
 - Restructured code to reduce the duplicated code in radiofuncs.c. Now, one method is used instead of three separated that had pretty much the same code. Better code, less problems.
 - Refactoring continues. Added listCount() and removed some global variables.
+- Reduced a lot of duplicated code.
 
 ## [1.1.1] - 2021-05-15
 ### Changed
