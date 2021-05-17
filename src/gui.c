@@ -28,23 +28,17 @@ struct List radioList,
             radioTrendList,
             leftSidebarList;
 
-// TODO: Replace this global variables with a method that counts and
-//       returns lists' items number
-size_t  radioListCnt = 0,
-        radioPopularListCnt = 0,
-        radioTrendListCnt = 0;
-
 struct filters lastFilters, prevFilters;
 
 static void fillLeftSidebar(void);
 static void fillRadioList(BOOL);
 static void fillRadioPopularList(void);
 static void fillRadioTrendList(void);
-static void playRadio(STRPTR);
 static BOOL checkFiltersChanged(void);
 static void changeDiscoverButton(BOOL);
 
 extern NETWORKOBJ *net;
+extern int8 maxRadioResults;
 
 void showGUI(void)
 {
@@ -246,7 +240,8 @@ void showGUI(void)
                             //IDOS->Printf("LSB_RADIO \n");
                             break;
                           case 1:
-                            if(radioPopularListCnt == 0)
+                            //IDOS->Printf("listCount Popular: %ld\n", listCount(&radioPopularList));
+                            if(listCount(&radioPopularList) == 0)
                             {
                               windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
                               fillRadioPopularList();
@@ -254,7 +249,7 @@ void showGUI(void)
                             }                            
                             break;
                           case 2:
-                            if(radioTrendListCnt == 0)
+                            if(listCount(&radioTrendList) == 0)
                             {
                               windowBlocking(windows[WID_MAIN], objects[OID_MAIN], TRUE);
                               fillRadioTrendList();
@@ -292,15 +287,15 @@ void showGUI(void)
           }
 
           IListBrowser->FreeLBColumnInfo(columnInfo);
-          if(radioListCnt)
+          if(listCount(&radioList))
           {
             IListBrowser->FreeListBrowserList(&radioList);
           }
-          if(radioPopularListCnt)
+          if(listCount(&radioPopularList))
           {
             IListBrowser->FreeListBrowserList(&radioPopularList);
           }
-          if(radioTrendListCnt)
+          if(listCount(&radioTrendList))
           {
             IListBrowser->FreeListBrowserList(&radioTrendList);
           }
@@ -322,6 +317,7 @@ void showGUI(void)
 // TODO: Reduce duplicate code
 static void fillRadioList(BOOL newSearch)
 {
+  size_t stationsCnt = 0;
   static int offset;
   
   if (newSearch)
@@ -338,12 +334,12 @@ static void fillRadioList(BOOL newSearch)
   STRPTR responseJSON = getRadioStations(lastFilters, offset);
   if (responseJSON)
   {
-    radioListCnt = getRadioList(&radioList, responseJSON, offset);
-    if (radioListCnt == 0)
+    stationsCnt = getRadioList(&radioList, responseJSON, offset);
+    if (stationsCnt == 0)
     {
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Radio Stations found with these criteria!\nChange them and try again");
     }
-    if (radioListCnt == 20)
+    if (stationsCnt == maxRadioResults)
     {
       changeDiscoverButton(TRUE);
     }
@@ -358,7 +354,7 @@ static void fillRadioList(BOOL newSearch)
     IOO->DisposeNetworkObject(net);
   }
 
-  if (radioListCnt)
+  if (stationsCnt)
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], windows[WID_MAIN], NULL,
         LISTBROWSER_Labels,         (ULONG)&radioList,
@@ -372,6 +368,7 @@ static void fillRadioList(BOOL newSearch)
 // TODO: Reduce duplicate code
 static void fillRadioPopularList(void)
 {
+  size_t stationsCnt = 0;
   static int offset = 0;
 
   // Detach list before modify it
@@ -382,8 +379,8 @@ static void fillRadioPopularList(void)
   STRPTR responseJSON = getRadioPopularStations();
   if (responseJSON)
   {
-    radioPopularListCnt = getRadioList(&radioPopularList, responseJSON, offset);
-    if (radioPopularListCnt == 0)
+    stationsCnt = getRadioList(&radioPopularList, responseJSON, offset);
+    if (stationsCnt == 0)
     {
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Popular Radio Stations found!");
     }
@@ -398,7 +395,7 @@ static void fillRadioPopularList(void)
     IOO->DisposeNetworkObject(net);
   }
 
-  if (radioPopularListCnt)
+  if (stationsCnt)
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER], windows[WID_MAIN], NULL,
         LISTBROWSER_Labels,         (ULONG)&radioPopularList,
@@ -412,7 +409,7 @@ static void fillRadioPopularList(void)
 // TODO: Reduce duplicate code
 static void fillRadioTrendList(void)
 {
-  //size_t stationsCnt = 0;
+  size_t stationsCnt = 0;
   static int offset = 0;
 
   // Detach list before modify it
@@ -423,8 +420,8 @@ static void fillRadioTrendList(void)
   STRPTR responseJSON = getRadioTrendStations();
   if (responseJSON)
   {
-    radioTrendListCnt = getRadioList(&radioTrendList, responseJSON, offset);
-    if (radioTrendListCnt == 0)
+    stationsCnt = getRadioList(&radioTrendList, responseJSON, offset);
+    if (stationsCnt == 0)
     {
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", "No Trend Radio Stations found!");
     }
@@ -439,7 +436,7 @@ static void fillRadioTrendList(void)
     IOO->DisposeNetworkObject(net);
   }
 
-  if (radioTrendListCnt)
+  if (stationsCnt)
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], windows[WID_MAIN], NULL,
         LISTBROWSER_Labels,         (ULONG)&radioTrendList,
@@ -448,19 +445,6 @@ static void fillRadioTrendList(void)
         LISTBROWSER_ColumnInfo,     columnInfo,
         TAG_DONE);
   }
-}
-
-static void playRadio(STRPTR stationUrl)
-{
-  IDOS->Printf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" \n", stationUrl);
-  STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", stationUrl);
-
-  IDOS->SystemTags( cmd,
-      SYS_Input,    ZERO,
-      SYS_Output,   NULL,
-      SYS_Error,    ZERO,
-      SYS_Asynch,   TRUE,
-      TAG_DONE);
 }
 
 static BOOL checkFiltersChanged(void)

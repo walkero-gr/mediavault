@@ -104,3 +104,21 @@ void gadgetBlocking(struct Window *winId, Object *gadgetObj, BOOL disable)
         TAG_DONE);
   }
 }
+
+int listCount(struct List *list)
+{
+  struct Node *node;        
+  int cnt = 0;
+
+  if (list->lh_Head)
+  {
+    for(node = list->lh_Head ;
+          node->ln_Succ != NULL ;
+          node = node->ln_Succ)
+    {
+      cnt++;
+    }
+  }
+
+  return cnt;
+}

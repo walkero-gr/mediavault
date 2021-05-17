@@ -18,24 +18,25 @@
 #include "libshandler.h"
 #include "httpfuncs.h"
 
-static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";
-static int maxResults = 20;
+int8 maxRadioResults = 20;
+
+static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";  
 
 STRPTR getRadioStations(struct filters lastFilters, int offset)
 {
   char url[255];
-  char maxResultsStr[4];
+  char maxRadioResultsStr[4];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
   IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
-  IUtility->SNPrintf(maxResultsStr, sizeof(maxResultsStr), "%ld", maxResults);
-  IUtility->Strlcat(url, maxResultsStr, sizeof(url));
+  IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
+  IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
 
   if (offset > 0)
   {
     char offsetStr[3];
     IUtility->Strlcat(url, "&offset=", sizeof(url));
-    IUtility->SNPrintf(offsetStr, sizeof(offsetStr), "%ld", offset * maxResults);
+    IUtility->SNPrintf(offsetStr, sizeof(offsetStr), "%ld", offset * maxRadioResults);
     IUtility->Strlcat(url, offsetStr, sizeof(url));
   }
 
@@ -76,12 +77,12 @@ STRPTR getRadioStations(struct filters lastFilters, int offset)
 STRPTR getRadioTrendStations(void)
 {
   char url[255];
-  char maxResultsStr[4];
+  char maxRadioResultsStr[4];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
   IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
-  IUtility->SNPrintf(maxResultsStr, sizeof(maxResultsStr), "%ld", maxResults);
-  IUtility->Strlcat(url, maxResultsStr, sizeof(url));
+  IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
+  IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
   IUtility->Strlcat(url, "&order=clicktrend", sizeof(url));
   IUtility->Strlcat(url, "&reverse=true", sizeof(url));
 
@@ -93,12 +94,12 @@ STRPTR getRadioTrendStations(void)
 STRPTR getRadioPopularStations(void)
 {
   char url[255];
-  char maxResultsStr[4];
+  char maxRadioResultsStr[4];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
   IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
-  IUtility->SNPrintf(maxResultsStr, sizeof(maxResultsStr), "%ld", maxResults);
-  IUtility->Strlcat(url, maxResultsStr, sizeof(url));
+  IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
+  IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
   IUtility->Strlcat(url, "&order=clickcount", sizeof(url));
   IUtility->Strlcat(url, "&reverse=true", sizeof(url));
 
@@ -226,5 +227,18 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
 
   IJansson->json_decref(jsonRoot);
   return cnt;
+}
+
+void playRadio(STRPTR stationUrl)
+{
+  //IDOS->Printf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" \n", stationUrl);
+  STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", stationUrl);
+
+  IDOS->SystemTags( cmd,
+      SYS_Input,    ZERO,
+      SYS_Output,   NULL,
+      SYS_Error,    ZERO,
+      SYS_Asynch,   TRUE,
+      TAG_DONE);
 }
 

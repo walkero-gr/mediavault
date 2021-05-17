@@ -18,4 +18,4 @@ STRPTR getRadioStations(struct filters, int);
 STRPTR getRadioTrendStations(void);
 STRPTR getRadioPopularStations(void);
 size_t getRadioList(struct List *, STRPTR, int);
-
+void playRadio(STRPTR);
