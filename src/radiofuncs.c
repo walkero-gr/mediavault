@@ -21,16 +21,21 @@
 int8 maxRadioResults = 20;
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";  
+static char url[255];
 
-STRPTR getRadioStations(struct filters lastFilters, int offset)
-{
-  char url[255];
+static void setBaseSearchUrl(void)
+{                   
   char maxRadioResultsStr[4];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
   IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
   IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
   IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
+}
+
+STRPTR getRadioStations(struct filters lastFilters, int offset)
+{
+  setBaseSearchUrl();
 
   if (offset > 0)
   {
@@ -69,41 +74,23 @@ STRPTR getRadioStations(struct filters lastFilters, int offset)
     IExec->FreeVec(encSelCountry);
   }
 
-  //IDOS->Printf("%s\n", url);
-
   return getResponseBody(url, NET_PORT_HTTPS);
 }
 
 STRPTR getRadioTrendStations(void)
 {
-  char url[255];
-  char maxRadioResultsStr[4];
-
-  IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
-  IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
-  IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
-  IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
+  setBaseSearchUrl();
   IUtility->Strlcat(url, "&order=clicktrend", sizeof(url));
-  IUtility->Strlcat(url, "&reverse=true", sizeof(url));
-
-  //IDOS->Printf("%s\n", url);
+  IUtility->Strlcat(url, "&reverse=true", sizeof(url));   
 
   return getResponseBody(url, NET_PORT_HTTPS);
 }
 
 STRPTR getRadioPopularStations(void)
 {
-  char url[255];
-  char maxRadioResultsStr[4];
-
-  IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
-  IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
-  IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
-  IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
+  setBaseSearchUrl();
   IUtility->Strlcat(url, "&order=clickcount", sizeof(url));
-  IUtility->Strlcat(url, "&reverse=true", sizeof(url));
-
-  //IDOS->Printf("%s\n", url);
+  IUtility->Strlcat(url, "&reverse=true", sizeof(url));  
 
   return getResponseBody(url, NET_PORT_HTTPS);
 }
