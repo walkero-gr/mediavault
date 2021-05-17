@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - future
+### Changed
+- Added code to detach the listbrowser before change it's data. That's the way it should be done
+- Restructured code to reduce the duplicated code in radiofuncs.c. Now, one method is used instead of three separated that had pretty much the same code. Better code, less problems.
+
 ## [1.1.1] - 2021-05-15
 ### Changed
 - Changed the required oo.library version to 1.12
