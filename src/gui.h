@@ -89,8 +89,6 @@ enum
   MID_LAST
 };
 
-struct Screen       *screen;
-struct MsgPort      *appPort;
 struct Window       *windows[WID_LAST];
 //struct ColumnInfo   *columninfo = NULL;
 //struct DrawInfo     *drInfo;

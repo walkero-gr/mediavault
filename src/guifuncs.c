@@ -14,7 +14,10 @@
 
 */
 
+#include <classes/window.h>
 #include <images/bitmap.h>
+
+#include <proto/application.h>
 
 #include "globals.h"
 #include "guifuncs.h"
@@ -76,9 +79,8 @@ struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen) {
    return (i);
 }
 
-void windowBlocking(struct Window *winId, Object *objId, BOOL disable)
+void windowBlocking(Object *objId, BOOL disable)
 {
-  IIntuition->SetWindowPointer(winId, WA_BusyPointer, disable, TAG_DONE);
   IIntuition->SetAttrs(objId, WA_BusyPointer, disable, TAG_DONE);
 }
 
@@ -121,4 +123,63 @@ int listCount(struct List *list)
   }
 
   return cnt;
+}
+
+BOOL appHide(uint32 appID, Object *winObj, uint32 methodID)
+{
+	BOOL retVal = FALSE;
+	
+	if ( IIntuition->IDoMethod(winObj, methodID, NULL) == TRUE )
+	{
+	  IIntuition->SetAttrs(winObj,
+	              WA_PubScreen, NULL,
+	              WINDOW_Window, NULL,
+	              TAG_DONE);
+	  IApplication->SetApplicationAttrs(appID,
+	                APPATTR_Hidden, TRUE,
+	                TAG_DONE);
+	  retVal = TRUE;
+	}
+	
+	return retVal;
+}
+
+
+struct Window *appUnhide(uint32 appID, Object *winObj)
+{
+ 	struct Screen *pubScr = NULL;
+	struct Window *window = NULL;
+	BOOL hidden;
+	
+	IApplication->GetApplicationAttrs(appID,
+	              APPATTR_Hidden, &hidden,
+	              TAG_DONE);
+	
+	if ( hidden == TRUE )
+	{
+	  pubScr = IIntuition->LockPubScreen(NULL);
+	  if ( !pubScr ) return NULL;
+	
+	  IIntuition->SetAttrs(winObj, WA_PubScreen, pubScr, TAG_DONE);
+	
+	  if ( (window = (struct Window *) IIntuition->IDoMethod(winObj, WM_OPEN, NULL)) )
+	  {
+	    IIntuition->ScreenToFront(pubScr);
+	    IApplication->SetApplicationAttrs(appID, APPATTR_Hidden, FALSE, TAG_DONE);
+	  }
+	
+	  IIntuition->UnlockPubScreen(NULL, pubScr);
+	}
+	else {
+	  // The GUI is not hidden = just bring it to front.
+	  IIntuition->GetAttr(WINDOW_Window, winObj, (uint32 *) &window);
+	  if (window)
+	  {
+	    IIntuition->WindowToFront(window);
+	    IIntuition->ScreenToFront(window->WScreen);
+	    IIntuition->ActivateWindow(window);
+	  }
+	}
+	
+	return window;
 }

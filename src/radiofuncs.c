@@ -21,7 +21,7 @@
 #include "httpfuncs.h"
 #include "stringfuncs.h"
 
-int8 maxRadioResults = 50;
+uint8 maxRadioResults = 50;
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";  
 static char url[255];

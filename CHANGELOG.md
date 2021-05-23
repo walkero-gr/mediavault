@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.0] - future
 ### Added
-- Added Unicode conversion to system charset on radio station names
+- Added Unicode conversion to system charset on radio station names - Thanks to Daniel "trixie" Jedlicka
+- Now the application registers properly and can get requests from other app, like Exchanger - Thanks to Daniel "trixie" Jedlicka
 
 ### Changed
 - Added code to detach the listbrowser before change it's data. That's the way it should be done
