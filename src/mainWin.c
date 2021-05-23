@@ -22,12 +22,14 @@
 CONST_STRPTR genres[] =
 {
   "All Genres",
+  (STRPTR) ~0L,
   "Alternative",
   "Blues",
   "Classical",
   "Country",
   "Dance",
   "Disco",
+  "Drum and bass",
   "Electronic",
   "Folk",
   "Jazz",
@@ -55,6 +57,7 @@ CONST_STRPTR genres[] =
 CONST_STRPTR languages[] =
 {
   "All Languages",
+  (STRPTR) ~0L,
   "Arabic",
   "Bulgarian",
   "Chinese",
@@ -92,6 +95,7 @@ CONST_STRPTR languages[] =
 CONST_STRPTR countries[] =
 {
   "All Countries",
+  (STRPTR) ~0L,
   "Argentina",
   "Australia",
   "Austria",
@@ -161,12 +165,15 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
     WA_OverrideOpaqueness,  TRUE,   /* Override global settings? (TRUE|FALSE) */
     WA_FadeTime,            250000, /* Duration of transition in microseconds */
     WA_NewLookMenus,        TRUE,
+    WINDOW_AppPort,         appPort,
     WINDOW_Iconifiable,     TRUE,
     WINDOW_IconifyGadget,   TRUE,
     WINDOW_Icon,            IIcon->GetDiskObject("PROGDIR:MediaVault"),
+    WINDOW_JumpScreensMenu, TRUE,
     WINDOW_MenuStrip,       winMenu,
-    WINDOW_AppPort,         appPort,
+    WINDOW_PopupGadget,     TRUE,
     WINDOW_Position,        WPOS_CENTERSCREEN,
+    WINDOW_UniqueID,        APPNAME,
     WINDOW_Layout, IIntuition->NewObject(NULL, "layout.gadget",
       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
       LAYOUT_SpaceOuter, TRUE,
@@ -294,7 +301,7 @@ static Object *buildRadioSearchPage(void)
               GA_TabCycle,          TRUE,
               GA_ActivateKey,       "n",
               STRINGA_MinVisible,   10,
-              STRINGA_MaxChars,     31,
+              STRINGA_MaxChars,     40,
               TAG_DONE),
             TAG_DONE),
 
@@ -313,7 +320,7 @@ static Object *buildRadioSearchPage(void)
                 GA_TabCycle,          TRUE,
                 GA_ActivateKey,       "g",
                 CHOOSER_LabelArray,   genres,
-                CHOOSER_MaxLabels,    30,
+                CHOOSER_MaxLabels,    40,
                 CHOOSER_Selected,     0,
                 TAG_DONE),
               TAG_DONE),
@@ -331,7 +338,7 @@ static Object *buildRadioSearchPage(void)
                 GA_TabCycle,          TRUE,
                 GA_ActivateKey,       "c",
                 CHOOSER_LabelArray,   countries,
-                CHOOSER_MaxLabels,    33,
+                CHOOSER_MaxLabels,    40,
                 CHOOSER_Selected,     0,
                 TAG_DONE),
               TAG_DONE),

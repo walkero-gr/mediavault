@@ -111,7 +111,6 @@ void showGUI(void)
                   REGAPP_CanCreateNewDocs,  FALSE,
                   REGAPP_CanPrintDocs,      FALSE,
                   REGAPP_Description,       "Online radio station search tool",
-                  REGAPP_FileName,					"MediaVault",
                   REGAPP_HasPrefsWindow,    FALSE,
                   REGAPP_HasIconifyFeature, TRUE,
                   REGAPP_UniqueApplication, FALSE,
@@ -214,6 +213,36 @@ void showGUI(void)
                     }
 
                     break;
+                    
+                  case WMHI_JUMPSCREEN:
+                    {
+	                  	struct Screen *newScr = NULL;
+	       
+											IIntuition->GetAttr(WA_PubScreen, objects[OID_MAIN], (uint32 *) &newScr);
+	 
+											if (newScr)
+	                    {
+												if ( appHide(appID, objects[OID_MAIN], WM_CLOSE) == TRUE )
+	                      {
+	                        windows[WID_MAIN] = NULL;
+	                      }
+	
+	                      // Confirm the screen pointer and re-open the window.
+	                      IIntuition->SetAttrs(objects[OID_MAIN], WA_PubScreen, newScr, TAG_DONE);
+	          
+	                      if ( (windows[WID_MAIN] = (struct Window *) IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, NULL)) )
+	                      {
+	                        IApplication->SetApplicationAttrs(appID,
+	                                      APPATTR_Hidden, FALSE,
+	                                      TAG_DONE);
+	                        IIntuition->ScreenToFront(newScr);
+	                      }
+	
+	                     	if ( windows[WID_MAIN] == NULL ) done = TRUE; // opening on the new screen failed
+	                   	}
+                   	}
+                    break;
+                                        
                   case WMHI_GADGETUP:
                     switch (result & WMHI_GADGETMASK)
                     {

@@ -34,6 +34,8 @@ DONE - Add a message window/requester
 DONE - Added Unicode conversion to system charset on radio station names
 - Find a way to use different codesets and charsets based on station language on Unicode conversion
 DONE - Application registration
+DONE - Window can jump screen 
+DONE - Window size and position can be saved
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
