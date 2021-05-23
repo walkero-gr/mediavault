@@ -25,12 +25,13 @@ static char url[255];
 
 static void setBaseSearchUrl(void)
 {                   
-  char maxRadioResultsStr[4];
+  //char maxRadioResultsStr[4];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
-  IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
-  IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
-  IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
+  IUtility->Strlcat(url, "/stations/search?hidebroken=true", sizeof(url));
+  //IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
+  //IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
+  //IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
 }
 
 STRPTR getRadioStations(struct filters lastFilters, int offset)
@@ -125,6 +126,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
   for(cnt = 0; cnt < IJansson->json_array_size(jsonRoot); cnt++)
   {
     struct Node *stationNode;
+    //struct stationInfo stationData;
     json_t *data, *stationuuid, *name, *country, *tags, *url_resolved, *votes;
 
     data = IJansson->json_array_get(jsonRoot, cnt);
@@ -152,6 +154,8 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
       CleanExit("JSON Error");
     }
     //IDOS->Printf("Station name: %s\n", IJansson->json_string_value(name));
+    //IUtility->Strlcpy(stationData.name, IJansson->json_string_value(name), sizeof(stationData.name));
+    //IDOS->Printf("Station name: %s\n", stationData.name);
 
     country = IJansson->json_object_get(data, "country");
     if(!json_is_string(country))
@@ -190,7 +194,9 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     //IDOS->Printf("votes: %ld\n", (ULONG)IJansson->json_integer_value(votes));
     votesNum = (ULONG)IJansson->json_integer_value(votes);
 
+
     stationNode = IListBrowser->AllocListBrowserNode( 4,
+        //LBNA_UserData, stationData,
         LBNA_Column, 0,
           LBNCA_CopyText, TRUE,
           LBNCA_Text, IJansson->json_string_value(name),

@@ -65,4 +65,12 @@ struct filters
   char language[32];
 };
 
+/*
+struct stationInfo
+{
+  char name[64];
+  char url[255];
+};
+*/
+
 #endif

@@ -14,8 +14,8 @@
 
 */
 
-#ifndef _OOFUNCS_H
-#define _OOFUNCS_H
+#ifndef _HTTPFUNCS_H
+#define _HTTPFUNCS_H
 
 
 STRPTR getResponseBody(char *, int);

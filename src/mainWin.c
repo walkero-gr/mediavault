@@ -192,8 +192,32 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
             // END - Left Sidebar
 
             LAYOUT_AddChild, gadgets[GID_PAGES] = radioPages,
+            LAYOUT_WeightBar, TRUE,
 
-          TAG_DONE),
+            // START - Right Sidebar
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+              LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+              //LAYOUT_BevelStyle,      BVS_GROUP,
+              //LAYOUT_Label,           "Stations info",
+              
+              LAYOUT_AddChild, gadgets[GID_LBL_INFO_NAME] = IIntuition->NewObject(NULL, "button.gadget",
+                GA_ID, GID_LBL_INFO_NAME,
+                GA_RelVerify, TRUE,
+                BUTTON_Justification, BCJ_CENTER,
+                BUTTON_Transparent, TRUE,
+                BUTTON_BevelStyle, BVS_NONE,
+                TAG_DONE),
+                CHILD_WeightedHeight, 0,
+
+              LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+                TAG_DONE),
+              TAG_DONE),
+              CHILD_WeightedWidth, 30,
+              CHILD_MinWidth, 200,
+              
+            // END - Right Sidebar
+         
+         TAG_DONE),
       TAG_DONE),
     TAG_DONE);
 }

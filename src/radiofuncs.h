@@ -14,8 +14,14 @@
 
 */
 
+#ifndef _RADIOFUNCS_H
+#define _RADIOFUNCS_H
+
 STRPTR getRadioStations(struct filters, int);
 STRPTR getRadioTrendStations(void);
 STRPTR getRadioPopularStations(void);
 size_t getRadioList(struct List *, STRPTR, int);
 void playRadio(STRPTR);
+
+
+#endif

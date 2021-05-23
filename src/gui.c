@@ -207,6 +207,21 @@ void showGUI(void)
                               TAG_DONE);
                           playRadio(selListValue);
                         }
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          //struct stationInfo stationData;
+
+                          IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_LISTBROWSER], (uint32 *)&res_node);
+                          IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+                              LBNA_Column,  0,
+                              LBNCA_Text,   &selListValue,
+                              //LBNA_UserData,  &stationData,
+                              TAG_DONE);
+
+                          IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_LBL_INFO_NAME], windows[WID_MAIN], NULL,
+                            GA_Text,   selListValue,
+                            TAG_DONE);
+                        }
                         break;
                       case GID_RADIO_POPULAR_LISTBROWSER:
                         IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_RADIO_POPULAR_LISTBROWSER], &res_value);
@@ -323,7 +338,6 @@ static void listStations(
   void (*maxResultCallback)(BOOL)
 ) {
   size_t stationsCnt = 0;
-  char jsonErrorMsg[] = "There was an error with the returned data.\nPlease, try again or check your network.";
 
   // Detach list before modify it
   IIntuition->SetAttrs(listbrowser,
@@ -347,7 +361,11 @@ static void listStations(
       }
     }
 
-  } else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg);
+  } else {
+    char jsonErrorMsg[] = "There was an error with the returned data.\nPlease, try again or check your network.";
+
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg);
+  }
 
   // Dispose net here, after the creation of the listbrowser content,
   // because it trashes the response data, so to free the signals
