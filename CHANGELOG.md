@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [1.2.0] - future
+### Added
+- Added Unicode conversion to system charset on radio station names
+
 ### Changed
 - Added code to detach the listbrowser before change it's data. That's the way it should be done
 - Restructured code to reduce the duplicated code in radiofuncs.c. Now, one method is used instead of three separated that had pretty much the same code. Better code, less problems.

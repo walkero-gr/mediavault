@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 24-04-2021 10:25:30
+# Created on: 23-05-2021 13:50:07
 #
 #
 
@@ -17,7 +17,8 @@
 MediaVault_OBJ := \
 	 src/mediavault.o src/libshandler.o src/gui.o \
 	 src/mainWin.o src/guifuncs.o src/aboutWin.o \
-	 src/httpfuncs.o src/radiofuncs.o
+	 src/httpfuncs.o src/radiofuncs.o src/stringfuncs.o \
+	
 
 
 ###################################################################
@@ -109,5 +110,8 @@ src/mainWin.o: src/mainWin.c src/globals.h src/version.h \
 src/aboutWin.o: src/aboutWin.c src/globals.h src/version.h \
 	 src/gui.h
 
-src/radiofuncs.o: src/radiofuncs.c
+src/radiofuncs.o: src/radiofuncs.c src/globals.h src/version.h \
+	 src/libshandler.h
+
+src/stringfuncs.o: src/stringfuncs.c
 

@@ -29,6 +29,7 @@
 
 #include <string.h>
 #include <ctype.h>
+//#include <iconv.h>
                           
 #include <jansson/jansson.h>
 #include <oo/ooNetwork.h>

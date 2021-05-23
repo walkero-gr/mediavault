@@ -115,6 +115,7 @@ CONST_STRPTR countries[] =
   "Poland",
   "Portugal",
   "Romania",
+  "Russia",
   "Spain",
   "Switzerland",
   "The Netherlands",

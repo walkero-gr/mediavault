@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1368228227">
+<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1369322710">
 	<plugin name="PROGDIR:Plugins&#047;AmigaOS4SDK.CCPlugin" flags="0"/>
 	<target run="MediaVault"/>
 	<homedir name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault"/>
@@ -12,7 +12,7 @@
 	<headers>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;libshandler.h" open="0"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;mediavault.h" open="0"/>
-		<file name="src&#047;globals.h" open="1" top="10" left="0" line="32" row="0"/>
+		<file name="src&#047;globals.h" open="1" top="5" left="0" line="32" row="20"/>
 		<file name="src&#047;upnpfuncs.h" open="0"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;guifuncs.h" open="0"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;version.h" open="0"/>
@@ -21,26 +21,29 @@
 		<file name="src&#047;mainWin.h" open="0"/>
 		<file name="src&#047;aboutWin.h" open="0"/>
 		<file name="src&#047;radiofuncs.h" open="0"/>
+		<file name="src&#047;stringfuncs.h" open="1" top="0" left="0" line="22" row="28"/>
 	</headers>
 	<sources>
 		<file name="src&#047;mediavault.c" open="0"/>
 		<file name="src&#047;libshandler.c" open="0"/>
 		<file name="src&#047;upnpfuncs.c" open="0"/>
 		<file name="src&#047;gui.c" open="1" top="31" left="0" line="42" row="1"/>
-		<file name="src&#047;httpfuncs.c" open="0"/>
+		<file name="src&#047;httpfuncs.c" open="1" top="20" left="0" line="45" row="14"/>
 		<file name="src&#047;guifuncs.c" open="0"/>
-		<file name="src&#047;mainWin.c" open="1" top="0" left="0" line="18" row="16"/>
+		<file name="src&#047;mainWin.c" open="1" top="77" left="0" line="118" row="11"/>
 		<file name="src&#047;aboutWin.c" open="0"/>
-		<file name="src&#047;radiofuncs.c" open="1" current="1" top="11" left="0" line="22" row="14"/>
+		<file name="src&#047;radiofuncs.c" open="1" top="182" left="0" line="210" row="68"/>
+		<file name="src&#047;stringfuncs.c" open="1" top="7" left="0" line="26" row="84"/>
 	</sources>
 	<others>
+		<file name="CHANGELOG.md" open="0"/>
 		<file name="Makefile" open="0"/>
 		<file name=".gitignore" open="0"/>
 	</others>
 	<flags value="0x0000000000068001"/>
 	<buildscript name="Makefile" depth="3" open="0"/>
-	<projectnotes open="0"/>
-	<buildwindow open="0"/>
+	<projectnotes open="1" current="1" top="11" left="0" line="37" row="8"/>
+	<buildwindow open="1"/>
 	<targets>
 		<target name="MediaVault" linker="gcc:bin&#047;gcc" switches="-lauto" flags="0x00000002">
 			<file name="src&#047;mediavault.c"/>
@@ -51,8 +54,9 @@
 			<file name="src&#047;aboutWin.c"/>
 			<file name="src&#047;httpfuncs.c"/>
 			<file name="src&#047;radiofuncs.c"/>
+			<file name="src&#047;stringfuncs.c"/>
 		</target>
 	</targets>
 	<logfile name="RAM Disk:Build.log"/>
-	<search lastsearch="appPort" sensecase="1" replace_state="0"/>
+	<search lastsearch="unicode" sensecase="1" replace_state="0"/>
 </CodeBench_Project>

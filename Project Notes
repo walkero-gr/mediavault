@@ -31,6 +31,8 @@ DONE - Add a message window/requester
 - Check if player exists and show a message if not
 - Create documentation in amigaguide format
 - Add status bar at the bottom of the window for info
+DONE - Added Unicode conversion to system charset on radio station names
+- Find a way to use different codesets and charsets based on station language on Unicode conversion
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
@@ -41,7 +43,7 @@ DONE - Load results into a linked list
 DONE - List radio stations
 DONE - Double click on a station to play on player
 - Use ToolTypes to set the player and the arguments (optional)
-- Click on a station and show it's info at the side, with logo
+WIP - Click on a station and show it's info at the side, with logo
 - Mark stations as favorites
 DONE - Add more tags
 DONE - Add more countries and languages

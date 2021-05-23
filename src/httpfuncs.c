@@ -34,7 +34,7 @@ STRPTR getResponseBody(char *url, int portNum)
   requestPort = portNum;
   STRPTR httpResponse = doRequest();
 
-  IDOS->Printf("URL: %s\n", url);
+  //IDOS->Printf("URL: %s\n", url);
 
   if (httpResponse)
   {
@@ -107,7 +107,7 @@ static STRPTR doRequest()
 
         if (httpRespBody)
         {
-          IDOS->Printf("Response\n------------------------\n%s\n", httpRespBody);
+          //IDOS->Printf("Response\n------------------------\n%s\n", httpRespBody);
           return httpRespBody;
         }
         else IDOS->Printf("No response\n");

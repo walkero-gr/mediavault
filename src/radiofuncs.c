@@ -14,24 +14,26 @@
 
 */
 
+//#include <iconv.h>
+
 #include "globals.h"
 #include "libshandler.h"
 #include "httpfuncs.h"
+#include "stringfuncs.h"
 
-int8 maxRadioResults = 20;
+int8 maxRadioResults = 50;
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";  
 static char url[255];
 
 static void setBaseSearchUrl(void)
 {                   
-  //char maxRadioResultsStr[4];
+  char maxRadioResultsStr[4];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
-  IUtility->Strlcat(url, "/stations/search?hidebroken=true", sizeof(url));
-  //IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
-  //IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
-  //IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
+  IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
+  IUtility->SNPrintf(maxRadioResultsStr, sizeof(maxRadioResultsStr), "%ld", maxRadioResults);
+  IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
 }
 
 STRPTR getRadioStations(struct filters lastFilters, int offset)
@@ -101,6 +103,8 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
   json_t *jsonRoot;
   json_error_t jsonError;
   size_t cnt;
+  //iconv_t cd = (iconv_t) -1;
+  //char charsetName[128];
 
   jsonRoot = IJansson->json_loads(jsonData, 0, &jsonError);
 
@@ -117,6 +121,8 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
   }                                                                         
 
   ULONG votesNum;
+  //IDOS->GetVar("Charset", charsetName, sizeof(charsetName), GVF_GLOBAL_ONLY);
+  //cd = iconv_open(charsetName, "UTF-8");
 
   if (offset == 0)
   {
@@ -199,7 +205,9 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
         //LBNA_UserData, stationData,
         LBNA_Column, 0,
           LBNCA_CopyText, TRUE,
-          LBNCA_Text, IJansson->json_string_value(name),
+          //LBNCA_Text, IJansson->json_string_value(name),
+          //LBNCA_Text, useIconv(cd, IJansson->json_string_value(name)),
+          LBNCA_Text, 		charConv(IJansson->json_string_value(name)),
         LBNA_Column, 1,
           LBNCA_CopyText, TRUE,
           LBNCA_Text, IJansson->json_string_value(country),
@@ -217,6 +225,8 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
       IExec->AddTail(stationList, stationNode);
     }
   }
+
+	//if (cd != (iconv_t)-1) iconv_close(cd);
 
   IJansson->json_decref(jsonRoot);
   return cnt;
