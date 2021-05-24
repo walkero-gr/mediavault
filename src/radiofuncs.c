@@ -17,6 +17,7 @@
 //#include <iconv.h>
 
 #include "globals.h"
+#include "gui.h"
 #include "libshandler.h"
 #include "httpfuncs.h"
 #include "stringfuncs.h"
@@ -207,7 +208,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
           LBNCA_CopyText, TRUE,
           //LBNCA_Text, IJansson->json_string_value(name),
           //LBNCA_Text, useIconv(cd, IJansson->json_string_value(name)),
-          LBNCA_Text, 		charConv(IJansson->json_string_value(name)),
+          LBNCA_Text,     charConv(IJansson->json_string_value(name)),
         LBNA_Column, 1,
           LBNCA_CopyText, TRUE,
           LBNCA_Text, IJansson->json_string_value(country),
@@ -226,17 +227,22 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     }
   }
 
-	//if (cd != (iconv_t)-1) iconv_close(cd);
+  //if (cd != (iconv_t)-1) iconv_close(cd);
 
   IJansson->json_decref(jsonRoot);
   return cnt;
 }
 
-void playRadio(STRPTR stationUrl)
+void playRadio(struct Node *res_node)
 {
-  //IDOS->Printf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" \n", stationUrl);
-  STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", stationUrl);
+  STRPTR selListValue;
+  
+  IListBrowser->GetListBrowserNodeAttrs(res_node,
+    LBNA_Column,  3,
+    LBNCA_Text,   &selListValue,
+    TAG_DONE);
 
+  STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", selListValue);
   IDOS->SystemTags( cmd,
       SYS_Input,    ZERO,
       SYS_Output,   NULL,
@@ -245,3 +251,15 @@ void playRadio(STRPTR stationUrl)
       TAG_DONE);
 }
 
+void showRadioInfo(struct Node *res_node)
+{
+  STRPTR  selListValue;
+  
+  IListBrowser->GetListBrowserNodeAttrs(res_node,
+      LBNA_Column,  0,
+      LBNCA_Text,   &selListValue,
+      TAG_DONE);
+  IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_LBL_INFO_NAME], windows[WID_MAIN], NULL,
+    GA_Text,   selListValue,
+    TAG_DONE);
+}

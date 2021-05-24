@@ -89,7 +89,7 @@ enum
   MID_LAST
 };
 
-struct Window       *windows[WID_LAST];
+struct Window *windows[WID_LAST];
 //struct ColumnInfo   *columninfo = NULL;
 //struct DrawInfo     *drInfo;
 struct List stationsList;

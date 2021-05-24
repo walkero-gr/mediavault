@@ -43,10 +43,10 @@ extern uint8 maxRadioResults;
 
 void showGUI(void)
 {
-	struct Screen		*screen = NULL;
-	struct MsgPort  *appPort = NULL;  
-	struct MsgPort 	*notifyPort = NULL;
-	uint32 appID = 0L;
+  struct Screen   *screen = NULL;
+  struct MsgPort  *appPort = NULL;  
+  struct MsgPort  *notifyPort = NULL;
+  uint32 appID = 0L;
   
   appPort = (struct MsgPort *)IExec->AllocSysObject(ASOT_PORT, NULL);
   if (appPort)
@@ -106,8 +106,8 @@ void showGUI(void)
                 LBCIA_Weight,               10,
               TAG_DONE);
 
-					// Register MediaVault as an application
-					if ( (appID = IApplication->RegisterApplication(APPNAME,
+          // Register MediaVault as an application
+          if ( (appID = IApplication->RegisterApplication(APPNAME,
                   REGAPP_CanCreateNewDocs,  FALSE,
                   REGAPP_CanPrintDocs,      FALSE,
                   REGAPP_Description,       "Online radio station search tool",
@@ -121,7 +121,7 @@ void showGUI(void)
             if (notifyPort)
             {
               appSignal = (1L << notifyPort->mp_SigBit);
-          	}
+            }
           }
 
 
@@ -170,7 +170,6 @@ void showGUI(void)
                       res_value,
                       res_node,
                       lsbNodeIdx;
-              STRPTR  selListValue; 
 
               // Main Window events
               while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE)))
@@ -197,10 +196,10 @@ void showGUI(void)
                       switch (selectedMenu)
                       {
                         case MID_ICONIFY:
-			                    if (appHide(appID, objects[OID_MAIN], WM_ICONIFY) == TRUE)
-			                    {
-			                      windows[WID_MAIN] = NULL;
-			                    }
+                          if (appHide(appID, objects[OID_MAIN], WM_ICONIFY) == TRUE)
+                          {
+                            windows[WID_MAIN] = NULL;
+                          }
                           break;
                         case MID_ABOUT:
                           windows[WID_ABOUT] = (struct Window*)IIntuition->IDoMethod(objects[OID_ABOUT], WM_OPEN, TAG_DONE);
@@ -216,31 +215,31 @@ void showGUI(void)
                     
                   case WMHI_JUMPSCREEN:
                     {
-	                  	struct Screen *newScr = NULL;
-	       
-											IIntuition->GetAttr(WA_PubScreen, objects[OID_MAIN], (uint32 *) &newScr);
-	 
-											if (newScr)
-	                    {
-												if ( appHide(appID, objects[OID_MAIN], WM_CLOSE) == TRUE )
-	                      {
-	                        windows[WID_MAIN] = NULL;
-	                      }
-	
-	                      // Confirm the screen pointer and re-open the window.
-	                      IIntuition->SetAttrs(objects[OID_MAIN], WA_PubScreen, newScr, TAG_DONE);
-	          
-	                      if ( (windows[WID_MAIN] = (struct Window *) IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, NULL)) )
-	                      {
-	                        IApplication->SetApplicationAttrs(appID,
-	                                      APPATTR_Hidden, FALSE,
-	                                      TAG_DONE);
-	                        IIntuition->ScreenToFront(newScr);
-	                      }
-	
-	                     	if ( windows[WID_MAIN] == NULL ) done = TRUE; // opening on the new screen failed
-	                   	}
-                   	}
+                      struct Screen *newScr = NULL;
+         
+                      IIntuition->GetAttr(WA_PubScreen, objects[OID_MAIN], (uint32 *) &newScr);
+   
+                      if (newScr)
+                      {
+                        if ( appHide(appID, objects[OID_MAIN], WM_CLOSE) == TRUE )
+                        {
+                          windows[WID_MAIN] = NULL;
+                        }
+  
+                        // Confirm the screen pointer and re-open the window.
+                        IIntuition->SetAttrs(objects[OID_MAIN], WA_PubScreen, newScr, TAG_DONE);
+            
+                        if ( (windows[WID_MAIN] = (struct Window *) IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, NULL)) )
+                        {
+                          IApplication->SetApplicationAttrs(appID,
+                                        APPATTR_Hidden, FALSE,
+                                        TAG_DONE);
+                          IIntuition->ScreenToFront(newScr);
+                        }
+  
+                        if ( windows[WID_MAIN] == NULL ) done = TRUE; // opening on the new screen failed
+                      }
+                    }
                     break;
                                         
                   case WMHI_GADGETUP:
@@ -272,6 +271,7 @@ void showGUI(void)
                         }
                         else IUtility->Strlcpy(lastFilters.genre, "", sizeof(lastFilters.genre));
                         break;
+
                       case GID_CHOOSER_COUNTRIES:
                         changeDiscoverButton(FALSE);
                         if (code > 0)
@@ -280,6 +280,7 @@ void showGUI(void)
                         }
                         else IUtility->Strlcpy(lastFilters.country, "", sizeof(lastFilters.country));
                         break;
+
                       case GID_CHOOSER_LANGUAGES:
                         changeDiscoverButton(FALSE);
                         if (code > 0)
@@ -288,66 +289,43 @@ void showGUI(void)
                         }
                         else IUtility->Strlcpy(lastFilters.language, "", sizeof(lastFilters.language));
                         break;
+                      
                       case GID_RADIO_LISTBROWSER:
-                        IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_RADIO_LISTBROWSER], &res_value);
-                        if (res_value == LBRE_DOUBLECLICK)
-                        {
-                          IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_LISTBROWSER], (uint32 *)&res_node);
-                          IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-                              LBNA_Column,  3,
-                              LBNCA_Text,   &selListValue,
-                              TAG_DONE);
-                          playRadio(selListValue);
-                        }
-                        if (res_value == LBRE_NORMAL)
-                        {
-                          //struct stationInfo stationData;
-
-                          IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_LISTBROWSER], (uint32 *)&res_node);
-                          IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-                              LBNA_Column,  0,
-                              LBNCA_Text,   &selListValue,
-                              //LBNA_UserData,  &stationData,
-                              TAG_DONE);
-
-                          IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_LBL_INFO_NAME], windows[WID_MAIN], NULL,
-                            GA_Text,   selListValue,
-                            TAG_DONE);
-                        }
-                        break;
                       case GID_RADIO_POPULAR_LISTBROWSER:
-                        IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_RADIO_POPULAR_LISTBROWSER], &res_value);
-                        if (res_value == LBRE_DOUBLECLICK)
-                        {
-                          IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_POPULAR_LISTBROWSER], (uint32 *)&res_node);
-                          IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-                              LBNA_Column,  3,
-                              LBNCA_Text,   &selListValue,
-                              TAG_DONE);
-                          playRadio(selListValue);
-                        }
-                        break;
                       case GID_RADIO_TREND_LISTBROWSER:
-                        IIntuition->GetAttr(LISTBROWSER_RelEvent, gadgets[GID_RADIO_TREND_LISTBROWSER], &res_value);
-                        if (res_value == LBRE_DOUBLECLICK)
                         {
-                          IIntuition->GetAttr(LISTBROWSER_SelectedNode, gadgets[GID_RADIO_TREND_LISTBROWSER], (uint32 *)&res_node);
-                          IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-                              LBNA_Column,  3,
-                              LBNCA_Text,   &selListValue,
-                              TAG_DONE);
-                          playRadio(selListValue);
+                          Object *lb = NULL;
+
+                          if ((result & WMHI_GADGETMASK) == GID_RADIO_LISTBROWSER) lb = gadgets[GID_RADIO_LISTBROWSER];
+                          else if ((result & WMHI_GADGETMASK) == GID_RADIO_POPULAR_LISTBROWSER) lb = gadgets[GID_RADIO_POPULAR_LISTBROWSER];
+                          else lb = gadgets[GID_RADIO_TREND_LISTBROWSER];
+                            
+
+                          IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+                          if (res_value == LBRE_DOUBLECLICK)
+                          {
+                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+                            /*
+                            IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+                                LBNA_Column,  3,
+                                LBNCA_Text,   &selListValue,
+                                TAG_DONE);
+                            */
+                            playRadio((struct Node *)res_node);
+                          }
+                          if (res_value == LBRE_NORMAL)
+                          {
+                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+                            showRadioInfo((struct Node *)res_node);
+                          }                          
                         }
-                        break;
+                        break;                      
+                      
                       case GID_LEFT_SIDEBAR:
                         IIntuition->GetAttr(LISTBROWSER_Selected, gadgets[GID_LEFT_SIDEBAR], &lsbNodeIdx);
                         switch (lsbNodeIdx)
                         {
-                          case 0:
-                            //IDOS->Printf("LSB_RADIO \n");
-                            break;
                           case 1:
-                            //IDOS->Printf("listCount Popular: %ld\n", listCount(&radioPopularList));
                             if(listCount(&radioPopularList) == 0)
                             {
                               windowBlocking(objects[OID_MAIN], TRUE);
@@ -393,11 +371,11 @@ void showGUI(void)
             }
           }
 
-					if (windows[WID_MAIN])
-					{
-						IIntuition->IDoMethod(objects[OID_MAIN], WM_CLOSE, TAG_DONE);
-						windows[WID_MAIN] = NULL;
-					}
+          if (windows[WID_MAIN])
+          {
+            IIntuition->IDoMethod(objects[OID_MAIN], WM_CLOSE, TAG_DONE);
+            windows[WID_MAIN] = NULL;
+          }
 
           IListBrowser->FreeLBColumnInfo(columnInfo);
           if(listCount(&radioList))
