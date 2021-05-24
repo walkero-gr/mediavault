@@ -6,13 +6,15 @@ All notable changes to this project will be documented in this file.
 - Added Unicode conversion to system charset on radio station names - Thanks to Daniel "trixie" Jedlicka
 - Now the application registers properly and can get requests from other apps, like Exchanger - Thanks to Daniel "trixie" Jedlicka
 - Now the MediaVault can jump to different screens - Thanks to Daniel "trixie" Jedlicka
+- Added better error manipulation when there were API response errors - Thanks to Daniel "trixie" Jedlicka
 - Now the size and the position of the window can be saved by the Popup Gadget - Thanks to Daniel "trixie" Jedlicka
 
 ### Changed
 - Added code to detach the listbrowser before change it's data. That's the way it should be done
 - Restructured code to reduce the duplicated code in radiofuncs.c. Now, one method is used instead of three separated that had pretty much the same code. Better code, less problems.
-- Refactoring continues. Added listCount() and removed some global variables.
-- Reduced a lot of duplicated code.
+- A lot of refactoring, removing global variables.
+- Reduced a lot of duplicated code.                                                  
+- Now the default radio station number increased to 50. The response is also much faster - Thanks to Tuomas Hokka and oo.library 1.13 fixes
 
 ## [1.1.1] - 2021-05-15
 ### Changed

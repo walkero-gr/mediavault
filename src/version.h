@@ -24,18 +24,18 @@
 #endif
 
 #ifndef REVISION
-#define REVISION 1
+#define REVISION 2
 #endif
 
 #ifndef PATCH
-#define PATCH 1
+#define PATCH 0
 #endif
 
 #ifndef RELEASE_DATE
 #define RELEASE_DATE "15.5.2021"
 #endif
 
-#define APPNAME     "MediaVault"
+#define APPNAME     "MediaVault preview"
 #define VERS        APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH)
 #define VSTRING     APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH) " (" RELEASE_DATE ")"
 #define VERSTAG     "\0$VER: " STR(VERSION) "." STR(REVISION) "." STR(PATCH) " (" RELEASE_DATE ")"

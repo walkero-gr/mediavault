@@ -111,14 +111,15 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
 
   if(!jsonRoot)
   {
-    //IDOS->Printf("json error: on line %d: %s\n", jsonError.line, jsonError.text);
-    CleanExit("JSON Error");
+    IDOS->Printf("json error: on line %d: %s\n", jsonError.line, jsonError.text);
+    return ~0UL;
   }
 
   if (!json_is_array(jsonRoot))
   {
     IJansson->json_decref(jsonRoot);
-    CleanExit("JSON error: jsonRoot is not an array");
+    IDOS->Printf("JSON error: jsonRoot is not an array");
+    return ~0UL;
   }                                                                         
 
   ULONG votesNum;
@@ -141,7 +142,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     {
       IDOS->Printf("error: commit data %d is not an object\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
-      CleanExit("JSON Error");
+      return ~0UL;
     }
 
     stationuuid = IJansson->json_object_get(data, "stationuuid");
@@ -149,7 +150,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     {
       IDOS->Printf("error: commit %d: stationuuid is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
-      CleanExit("JSON Error");
+      return ~0UL;
     }
     //IDOS->Printf("stationuuid: %s\n", IJansson->json_string_value(stationuuid));
 
@@ -158,7 +159,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     {
       IDOS->Printf("error: commit %d: name is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
-      CleanExit("JSON Error");
+      return ~0UL;
     }
     //IDOS->Printf("Station name: %s\n", IJansson->json_string_value(name));
     //IUtility->Strlcpy(stationData.name, IJansson->json_string_value(name), sizeof(stationData.name));
@@ -169,7 +170,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     {
       IDOS->Printf("error: commit %d: country is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
-      CleanExit("JSON Error");
+      return ~0UL;
     }
     //IDOS->Printf("Station country: %s\n", IJansson->json_string_value(country));
 
@@ -178,7 +179,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     {
       IDOS->Printf("error: commit %d: tags is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
-      CleanExit("JSON Error");
+      return ~0UL;
     }
     //IDOS->Printf("Station tags: %s\n", IJansson->json_string_value(tags));
 
@@ -187,7 +188,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     {
       IDOS->Printf("error: commit %d: url_resolved is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
-      CleanExit("JSON Error");
+      return ~0UL;
     }
     //IDOS->Printf("Station url_resolved: %s\n", IJansson->json_string_value(url_resolved));
 
@@ -196,7 +197,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     {
       IDOS->Printf("error: commit %d: votes is not an integer\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
-      CleanExit("JSON Error");
+      return ~0UL;
     }
     //IDOS->Printf("votes: %ld\n", (ULONG)IJansson->json_integer_value(votes));
     votesNum = (ULONG)IJansson->json_integer_value(votes);

@@ -425,13 +425,17 @@ static void listStations(
   if (responseJSON)
   {
     stationsCnt = getRadioList(list, responseJSON, offset);
-    
-    if (stationsCnt == 0)
+
+    if (stationsCnt == ~0UL)
+    {
+      char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg);
+    }
+    else if (stationsCnt == 0)
     {
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg);
     }
-
-    if (stationsCnt == maxRadioResults)
+    else if (stationsCnt == maxRadioResults)
     {
       if (maxResultCallback)
       {
