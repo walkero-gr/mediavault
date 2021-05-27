@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.2.0] - future
+## [1.2.0] - 2021-05-27
 ### Added
 - Added Unicode conversion to system charset on radio station names - Thanks to Daniel "trixie" Jedlicka
 - Now the application registers properly and can get requests from other apps, like Exchanger - Thanks to Daniel "trixie" Jedlicka

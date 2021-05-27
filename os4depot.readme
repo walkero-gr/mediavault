@@ -1,6 +1,6 @@
 name: mediavault
 description: Discover online radio stations
-version: 1.1.1
+version: 1.2.0
 author: George Sokianos
 submitter: George Sokianos
 email: walkero@gmail.com
@@ -40,7 +40,7 @@ My plan for MediaVault is to create an application which users will use to:
 
 Requirements
 --------------------------
-* oo.library v1.12 by Tuomas Hokka
+* oo.library v1.13 by Tuomas Hokka
 * jansson.library v2.12.1 by Simon Tyrrell
 * AmigaAmp3 v3.29 by Thomas Wenzel
 
@@ -55,6 +55,9 @@ I would like to thank
 - Simon Archer who develops CodeBench, which helped me a lot during the
   development of this application
 - AmigaOS 4 developers who develop the best OS out there.
+- Daniel "trixie" Jedlicka who worked on a lot of features, fixes and 
+  refactoring of MediaVault, providing proposals, ideas and information
+  to my questions
 
 Without all the above MediaVault would not be possible.
 
@@ -70,6 +73,29 @@ https://github.com/walkero-gr/mediavault/issues
 
 Changelog
 --------------------------
+v1.2.0 - 2021-05-27
+* Added Unicode conversion to system charset on radio station names 
+  - Thanks to Daniel "trixie" Jedlicka
+* Now the application registers properly and can get requests from other 
+  apps, like Exchanger - Thanks to Daniel "trixie" Jedlicka
+* Now the MediaVault can jump to different screens - Thanks to Daniel 
+  "trixie" Jedlicka
+* Added better error manipulation when there were API response errors 
+  - Thanks to Daniel "trixie" Jedlicka
+* Now the size and the position of the window can be saved by the Popup 
+  Gadget - Thanks to Daniel "trixie" Jedlicka
+* Added code to detach the listbrowser before change it's data. That's the 
+  way it should be done
+* Restructured code to reduce the duplicated code in radiofuncs.c. Now, one
+  method is used instead of three separated that had pretty much the same 
+  code. Better code, less problems.
+* A lot of refactoring, removing global variables.
+* Reduced a lot of duplicated code.                                                  
+* Now the default radio station number increased to 50. The response is also 
+  much faster - Thanks to Tuomas Hokka and oo.library 1.13 fixes
+* Changed the way classes and gadgets are initiallized - Thanks to Daniel 
+  "trixie" Jedlicka
+  
 v1.1.1 - 2021-05-15
 * Changed the required oo.library version to 1.12
 * Fixed a bug on requesting radio stations without using the filters

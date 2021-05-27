@@ -172,6 +172,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
     WA_DepthGadget,         TRUE,
     WA_DragBar,             TRUE,
     WA_SizeGadget,          TRUE,
+    //// TODO: Make it configurable at preferences
     //WA_Opaqueness,          255,    /* Initial opaqueness on opening (0..255) */
     //WA_OverrideOpaqueness,  TRUE,   /* Override global settings? (TRUE|FALSE) */
     //WA_FadeTime,            250000, /* Duration of transition in microseconds */
@@ -211,7 +212,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
             // END - Left Sidebar
 
             LAYOUT_AddChild, gadgets[GID_PAGES] = radioPages,
-            LAYOUT_WeightBar, TRUE,
+            //LAYOUT_WeightBar, TRUE,
 
             // START - Right Sidebar
             /*

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1369690646">
+<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1369691602">
 	<plugin name="PROGDIR:Plugins&#047;AmigaOS4SDK.CCPlugin" flags="0"/>
 	<target run="MediaVault"/>
 	<homedir name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault"/>
@@ -12,12 +12,12 @@
 	<headers>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;libshandler.h" open="0"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;mediavault.h" open="0"/>
-		<file name="src&#047;globals.h" open="1" current="1" top="5" left="0" line="36" row="20"/>
+		<file name="src&#047;globals.h" open="1" top="7" left="0" line="24" row="28"/>
 		<file name="src&#047;upnpfuncs.h" open="0"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;guifuncs.h" open="0"/>
-		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;version.h" open="0"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;version.h" open="1" top="0" left="0" line="35" row="24"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;httpfuncs.h" open="0"/>
-		<file name="src&#047;gui.h" open="1" top="18" left="0" line="29" row="0"/>
+		<file name="src&#047;gui.h" open="1" top="17" left="0" line="28" row="31"/>
 		<file name="src&#047;mainWin.h" open="0"/>
 		<file name="src&#047;aboutWin.h" open="0"/>
 		<file name="src&#047;radiofuncs.h" open="0"/>
@@ -27,22 +27,24 @@
 		<file name="src&#047;mediavault.c" open="0"/>
 		<file name="src&#047;libshandler.c" open="0"/>
 		<file name="src&#047;upnpfuncs.c" open="0"/>
-		<file name="src&#047;gui.c" open="1" top="31" left="0" line="42" row="1"/>
-		<file name="src&#047;httpfuncs.c" open="1" top="20" left="0" line="45" row="14"/>
+		<file name="src&#047;gui.c" open="1" top="281" left="0" line="323" row="28"/>
+		<file name="src&#047;httpfuncs.c" open="1" top="43" left="0" line="43" row="0"/>
 		<file name="src&#047;guifuncs.c" open="0"/>
-		<file name="src&#047;mainWin.c" open="1" top="77" left="0" line="118" row="11"/>
+		<file name="src&#047;mainWin.c" open="1" top="139" left="0" line="147" row="26"/>
 		<file name="src&#047;aboutWin.c" open="0"/>
-		<file name="src&#047;radiofuncs.c" open="1" top="182" left="0" line="210" row="68"/>
-		<file name="src&#047;stringfuncs.c" open="1" top="7" left="0" line="26" row="84"/>
+		<file name="src&#047;radiofuncs.c" open="1" top="0" left="0" line="210" row="31"/>
+		<file name="src&#047;stringfuncs.c" open="1" top="10" left="0" line="26" row="84"/>
 	</sources>
 	<others>
-		<file name="CHANGELOG.md" open="0"/>
+		<file name="CHANGELOG.md" open="1" current="1" top="0" left="0" line="19" row="0"/>
+		<file name="README.md" open="1" top="0" left="0" line="34" row="18"/>
+		<file name="os4depot.readme" open="1" top="56" left="0" line="98" row="2"/>
 		<file name="Makefile" open="0"/>
 		<file name=".gitignore" open="0"/>
 	</others>
-	<flags value="0x0000000000068005"/>
+	<flags value="0x0000000000068001"/>
 	<buildscript name="Makefile" depth="3" open="0"/>
-	<projectnotes open="1" current="0" top="0" left="0" line="2" row="0"/>
+	<projectnotes open="1" current="0" top="33" left="0" line="43" row="54"/>
 	<buildwindow open="0"/>
 	<targets>
 		<target name="MediaVault" linker="gcc:bin&#047;gcc" switches="-lauto" flags="0x00000002">
