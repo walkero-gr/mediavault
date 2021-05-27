@@ -172,9 +172,9 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
     WA_DepthGadget,         TRUE,
     WA_DragBar,             TRUE,
     WA_SizeGadget,          TRUE,
-    WA_Opaqueness,          255,    /* Initial opaqueness on opening (0..255) */
-    WA_OverrideOpaqueness,  TRUE,   /* Override global settings? (TRUE|FALSE) */
-    WA_FadeTime,            250000, /* Duration of transition in microseconds */
+    //WA_Opaqueness,          255,    /* Initial opaqueness on opening (0..255) */
+    //WA_OverrideOpaqueness,  TRUE,   /* Override global settings? (TRUE|FALSE) */
+    //WA_FadeTime,            250000, /* Duration of transition in microseconds */
     WA_NewLookMenus,        TRUE,
     WINDOW_AppPort,         appPort,
     WINDOW_Iconifiable,     TRUE,
