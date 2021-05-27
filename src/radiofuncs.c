@@ -15,6 +15,7 @@
 */
 
 //#include <iconv.h>
+#include <proto/listbrowser.h>
 
 #include "globals.h"
 #include "gui.h"

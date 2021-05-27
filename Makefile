@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 23-05-2021 13:50:07
+# Created on: 27-05-2021 21:32:58
 #
 #
 
@@ -31,7 +31,7 @@ CC := gcc:bin/gcc
 
 INCPATH := -I.
 
-CFLAGS := $(INCPATH) -Wall -Werror -Wwrite-strings
+CFLAGS := $(INCPATH) -Wall -Werror -Wwrite-strings  -Wextra -O3
 
 
 ###################################################################
@@ -111,7 +111,9 @@ src/aboutWin.o: src/aboutWin.c src/globals.h src/version.h \
 	 src/gui.h
 
 src/radiofuncs.o: src/radiofuncs.c src/globals.h src/version.h \
-	 src/libshandler.h
+	 src/gui.h src/libshandler.h src/httpfuncs.h \
+	
 
-src/stringfuncs.o: src/stringfuncs.c
+src/stringfuncs.o: src/stringfuncs.c src/globals.h src/version.h \
+	
 

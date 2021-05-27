@@ -7,43 +7,85 @@
 #include "globals.h"
 #include "libshandler.h"
 
+struct Library *ApplicationBase;  struct ApplicationIFace   *IApplication;
+struct Library *IntuitionBase;    struct IntuitionIFace     *IIntuition;
+struct Library *UtilityBase;      struct UtilityIFace       *IUtility;
+struct Library *OOBase;           struct OOIFace            *IOO;
+struct Library *JanssonBase;      struct JanssonIFace       *IJansson;
+struct Library *AmiSSLMasterBase;
 
-void CleanExit(const char *str)
+struct ClassLibrary *BitMapBase;
+struct ClassLibrary *ButtonBase;
+struct ClassLibrary *ChooserBase;
+struct ClassLibrary *LabelBase;
+struct ClassLibrary *LayoutBase;
+struct ClassLibrary *ListBrowserBase;  struct ListBrowserIFace *IListBrowser;
+struct ClassLibrary *RequesterBase;
+struct ClassLibrary *ScrollerBase;
+struct ClassLibrary *StringBase;
+struct ClassLibrary *TextEditorBase;
+struct ClassLibrary *WindowBase;
+
+Class *BitMapClass;
+Class *ButtonClass;
+Class *ChooserClass;
+Class *LabelClass;
+Class *LayoutClass;
+Class *ListBrowserClass;
+Class *RequesterClass;
+Class *ScrollerClass;
+Class *StringClass;
+Class *TextEditorClass;
+Class *WindowClass;
+
+int CleanExit(const char *str)
 {
-  if(strcmp(str, "JustExit")) IDOS->Printf("Error::%s\n",str);
+  //// Close Classes and Gadgets
+  if(RequesterBase)     IIntuition->CloseClass(RequesterBase);
+  if(BitMapBase)        IIntuition->CloseClass(BitMapBase);
+  if(TextEditorBase)    IIntuition->CloseClass(TextEditorBase);
+  if(ScrollerBase)      IIntuition->CloseClass(ScrollerBase);
+  if(StringBase)        IIntuition->CloseClass(StringBase);
+  if(ButtonBase)        IIntuition->CloseClass(ButtonBase);
+  if(ChooserBase)       IIntuition->CloseClass(ChooserBase);
+  if(LabelBase)         IIntuition->CloseClass(LabelBase);
+  if(LayoutBase)        IIntuition->CloseClass(LayoutBase);
+  if(WindowBase)        IIntuition->CloseClass(WindowBase);
 
+  if(IListBrowser)      IExec->DropInterface((struct Interface *) IListBrowser);
+  if(ListBrowserBase)   IIntuition->CloseClass(ListBrowserBase);
+  
+  //// Close Libraries
   if(AmiSSLMasterBase)  IExec->CloseLibrary(AmiSSLMasterBase);
 
-  if(IListBrowser)      IExec->DropInterface((APTR) IListBrowser);
-  if(ListBrowserBase)   IIntuition->CloseClass((APTR) ListBrowserBase);
-
-  if(ILabel)            IExec->DropInterface((APTR) ILabel);
-  if(LabelBase)         IIntuition->CloseClass((APTR) LabelBase);
-
-  if(ILayout)           IExec->DropInterface((APTR) ILayout);
-  if(LayoutBase)        IIntuition->CloseClass((APTR) LayoutBase);
-
-  if(IOO)               IExec->DropInterface((APTR) IOO);
+  if(IOO)               IExec->DropInterface((struct Interface *) IOO);
   if(OOBase)            IExec->CloseLibrary(OOBase);
 
-  if(IJansson)          IExec->DropInterface((APTR) IJansson);
+  if(IJansson)          IExec->DropInterface((struct Interface *) IJansson);
   if(JanssonBase)       IExec->CloseLibrary(JanssonBase);
 
-  if(IUtility)          IExec->DropInterface((APTR) IUtility);
+  if(IUtility)          IExec->DropInterface((struct Interface *) IUtility);
   if(UtilityBase)       IExec->CloseLibrary(UtilityBase);
 
-  if(IIntuition)        IExec->DropInterface((APTR) IIntuition);
+  if(IIntuition)        IExec->DropInterface((struct Interface *) IIntuition);
   if(IntuitionBase)     IExec->CloseLibrary(IntuitionBase);
 
-  if(IApplication)      IExec->DropInterface((APTR) IApplication);
+  if(IApplication)      IExec->DropInterface((struct Interface *) IApplication);
   if(ApplicationBase)   IExec->CloseLibrary(ApplicationBase);
 
-  exit(0);
+  if(strcmp(str, "JustExit")) 
+  {
+    IDOS->Printf("Error::%s\n",str);
+    return RETURN_ERROR;
+  }
+  	
+  return RETURN_OK;
 }
 
 
 void OpenLibs(void)
 {
+  //// Libraries
   if ((ApplicationBase = IExec->OpenLibrary( "application.library", 53 )))
   {
     IApplication = (struct ApplicationIFace *)IExec->GetInterface( ApplicationBase, "application", 2, NULL );
@@ -87,31 +129,48 @@ void OpenLibs(void)
   }
   else CleanExit("Can't open oo.library version 1.13 and above. Is it installed?");
 
-  if ((LayoutBase = (APTR) IIntuition->OpenClass( "gadgets/layout.gadget", 1, &LayoutClass )))
-  {
-    ILayout = (struct LayoutIFace *)IExec->GetInterface( LayoutBase, "main", 1, NULL );
-    if(!ILayout) CleanExit("Can't open Layout Gadget Interface");
-  }
-  else CleanExit("Can't open Layout Gadget");
-
-  if ((LabelBase = (APTR) IIntuition->OpenClass( "images/label.image", 1, &LabelClass )))
-  {
-    ILabel = (struct LabelIFace *)IExec->GetInterface( LabelBase, "main", 1, NULL );
-    if(!ILabel) CleanExit("Can't open Label Image Interface");
-  }
-  else CleanExit("Can't open Label Image");
-
-  if ((ListBrowserBase = (APTR) IIntuition->OpenClass( "gadgets/listbrowser.gadget", 1, &ListBrowserClass )))
-  {
-    IListBrowser = (struct ListBrowserIFace *)IExec->GetInterface( ListBrowserBase, "main", 1, NULL );
-    if(!IListBrowser) CleanExit("Can't open ListBrowser Gadget Interface");
-  }
-  else CleanExit("Can't open ListBrowser");
-
   if ((AmiSSLMasterBase = IExec->OpenLibrary("amisslmaster.library", 4 )))
   {
     if (!LIB_IS_AT_LEAST(AmiSSLMasterBase, 4, 9))
       CleanExit("Can't open amisslmaster.library version 4.9 and above");
   }
   else CleanExit("Can't open amisslmaster.library version 4.9 and above");
+
+  //// Classes and Gadgets opening
+  if ((ListBrowserBase = IIntuition->OpenClass( "gadgets/listbrowser.gadget", 1, &ListBrowserClass )))
+  {
+    IListBrowser = (struct ListBrowserIFace *)IExec->GetInterface( (struct Library *) ListBrowserBase, "main", 1, NULL );
+    if(!IListBrowser) CleanExit("Can't open ListBrowser Gadget Interface");
+  }
+  else CleanExit("Can't open ListBrowser");
+
+  WindowBase = IIntuition->OpenClass( "window.class", 53, &WindowClass );
+  if (!WindowBase) CleanExit("Can't open Window Class");
+
+  LayoutBase = IIntuition->OpenClass( "layout.gadget", 53, &LayoutClass );
+  if (!LayoutBase) CleanExit("Can't open Layout Gadget");
+
+  LabelBase = IIntuition->OpenClass( "label.image", 53, &LabelClass );
+  if (!LabelBase) CleanExit("Can't open Label Image");
+
+  ChooserBase = IIntuition->OpenClass( "chooser.gadget", 53, &ChooserClass );
+  if (!ChooserBase) CleanExit("Can't open Chooser Gadget");
+
+  ButtonBase = IIntuition->OpenClass( "button.gadget", 53, &ButtonClass );
+  if (!ButtonBase) CleanExit("Can't open Button Gadget");
+
+  StringBase = IIntuition->OpenClass( "string.gadget", 53, &StringClass );
+  if (!StringBase) CleanExit("Can't open String Gadget");
+
+  ScrollerBase = IIntuition->OpenClass( "scroller.gadget", 53, &ScrollerClass );
+  if (!ScrollerBase) CleanExit("Can't open Scroller Gadget");
+
+  TextEditorBase = IIntuition->OpenClass( "texteditor.gadget", 53, &TextEditorClass );
+  if (!TextEditorBase) CleanExit("Can't open TextEditor Gadget");
+
+  BitMapBase = IIntuition->OpenClass( "bitmap.image", 53, &BitMapClass );
+  if (!BitMapBase) CleanExit("Can't open BitMap Image");
+
+  RequesterBase = IIntuition->OpenClass( "requester.class", 53, &RequesterClass );
+  if (!RequesterBase) CleanExit("Can't open Requester Class");  
 }

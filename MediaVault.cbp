@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
-<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1369425690">
+<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1369690446">
 	<plugin name="PROGDIR:Plugins&#047;AmigaOS4SDK.CCPlugin" flags="0"/>
 	<target run="MediaVault"/>
 	<homedir name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault"/>
 	<includedir name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src"/>
-	<compiler name="gcc:bin&#047;gcc" switches="-Wall -Werror -Wwrite-strings" stack="131072"/>
+	<compiler name="gcc:bin&#047;gcc" switches="-Wall -Werror -Wwrite-strings  -Wextra -O3" stack="131072"/>
 	<linker switches="-lauto"/>
 	<debugger name="SDK:c&#047;gdb"/>
 	<builder name="SDK:c&#047;make -f"/>
@@ -12,7 +12,7 @@
 	<headers>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;libshandler.h" open="0"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;mediavault.h" open="0"/>
-		<file name="src&#047;globals.h" open="1" top="5" left="0" line="32" row="20"/>
+		<file name="src&#047;globals.h" open="1" current="1" top="5" left="0" line="36" row="20"/>
 		<file name="src&#047;upnpfuncs.h" open="0"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;guifuncs.h" open="0"/>
 		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;version.h" open="0"/>
@@ -40,10 +40,10 @@
 		<file name="Makefile" open="0"/>
 		<file name=".gitignore" open="0"/>
 	</others>
-	<flags value="0x0000000000068001"/>
+	<flags value="0x0000000000068005"/>
 	<buildscript name="Makefile" depth="3" open="0"/>
-	<projectnotes open="1" current="1" top="11" left="0" line="37" row="8"/>
-	<buildwindow open="1"/>
+	<projectnotes open="1" current="0" top="0" left="0" line="2" row="0"/>
+	<buildwindow open="0"/>
 	<targets>
 		<target name="MediaVault" linker="gcc:bin&#047;gcc" switches="-lauto" flags="0x00000002">
 			<file name="src&#047;mediavault.c"/>

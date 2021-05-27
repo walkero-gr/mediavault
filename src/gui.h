@@ -27,8 +27,6 @@
 
 #include <libraries/gadtools.h>
 
-//#include <proto/listbrowser.h>
-
 #include <gadgets/button.h>
 #include <gadgets/chooser.h>
 #include <gadgets/layout.h>

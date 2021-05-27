@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - A lot of refactoring, removing global variables.
 - Reduced a lot of duplicated code.                                                  
 - Now the default radio station number increased to 50. The response is also much faster - Thanks to Tuomas Hokka and oo.library 1.13 fixes
+- Changed the way classes and gadgets are initiallized - Thanks to Daniel "trixie" Jedlicka
 
 ## [1.1.1] - 2021-05-15
 ### Changed

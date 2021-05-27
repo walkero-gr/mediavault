@@ -7,7 +7,7 @@ void die(const char *s)
     exit(EXIT_FAILURE);
 }
 
-int main(int argc, char **argv)
+int main(void)
 {
 
 	OpenLibs();
@@ -17,7 +17,7 @@ int main(int argc, char **argv)
   //freeUpnpServers();
   //getMetadata((char *)"dummy");
 
-  CleanExit("JustExit");
+  return CleanExit("JustExit");
 
-  return 0 ;
+  //return 0;
 }

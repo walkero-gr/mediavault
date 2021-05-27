@@ -15,6 +15,7 @@
 */
 
 #include <proto/application.h>
+#include <proto/listbrowser.h>
 
 #include "globals.h"
 #include "gui.h"
@@ -106,7 +107,7 @@ void showGUI(void)
                 LBCIA_Weight,               10,
               TAG_DONE);
 
-          // Register MediaVault as an application
+          //// Register MediaVault as an application
           if ( (appID = IApplication->RegisterApplication(APPNAME,
                   REGAPP_CanCreateNewDocs,  FALSE,
                   REGAPP_CanPrintDocs,      FALSE,
@@ -451,7 +452,7 @@ static void listStations(
 
   // Dispose net here, after the creation of the listbrowser content,
   // because it trashes the response data, so to free the signals
-  // TODO: adapt it to oo.library v1.11 changes
+  //// TODO: adapt it to oo.library v1.11 changes
   if (net)
   {
     net->DisposeConnection();

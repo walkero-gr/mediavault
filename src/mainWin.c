@@ -14,6 +14,8 @@
 
 */
 
+#include <proto/listbrowser.h>
+
 #include "globals.h"
 #include "gui.h"
 #include "mainWin.h"
@@ -142,6 +144,15 @@ static const ULONG listToPage[] = {
     TAG_END
 };
 
+extern Class *ButtonClass;
+extern Class *ChooserClass;
+extern Class *LabelClass;
+extern Class *LayoutClass;
+extern Class *ListBrowserClass;
+extern Class *StringClass;
+extern Class *WindowClass;
+
+
 Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
 {                                           
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
@@ -153,7 +164,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
         PAGE_Add, gadgets[GID_PAGE_3] = buildRadioTrendPage(),
         TAG_DONE);
 
-  return IIntuition->NewObject(NULL, "window.class",
+  return IIntuition->NewObject(WindowClass, NULL,
     WA_ScreenTitle,         VSTRING,
     WA_Title,               APPNAME,
     WA_Activate,            TRUE,
@@ -174,15 +185,15 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
     WINDOW_PopupGadget,     TRUE,
     WINDOW_Position,        WPOS_CENTERSCREEN,
     WINDOW_UniqueID,        APPNAME,
-    WINDOW_Layout, IIntuition->NewObject(NULL, "layout.gadget",
+    WINDOW_Layout, IIntuition->NewObject(LayoutClass, NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
       LAYOUT_SpaceOuter, TRUE,
       LAYOUT_DeferLayout, TRUE,
-        LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+        LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
           LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
 
             // START - Left Sidebar
-            LAYOUT_AddChild, gadgets[GID_LEFT_SIDEBAR] = IIntuition->NewObject(NULL, "listbrowser.gadget",
+            LAYOUT_AddChild, gadgets[GID_LEFT_SIDEBAR] = IIntuition->NewObject(ListBrowserClass, NULL,
               GA_ID,                      GID_LEFT_SIDEBAR,
               GA_RelVerify,               TRUE,
               GA_TabCycle,                TRUE,
@@ -203,12 +214,10 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
             LAYOUT_WeightBar, TRUE,
 
             // START - Right Sidebar
-            LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+            LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
               LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-              //LAYOUT_BevelStyle,      BVS_GROUP,
-              //LAYOUT_Label,           "Stations info",
               
-              LAYOUT_AddChild, gadgets[GID_LBL_INFO_NAME] = IIntuition->NewObject(NULL, "button.gadget",
+              LAYOUT_AddChild, gadgets[GID_LBL_INFO_NAME] = IIntuition->NewObject(ButtonClass, NULL,
                 GA_ID, GID_LBL_INFO_NAME,
                 GA_RelVerify, TRUE,
                 BUTTON_Justification, BCJ_CENTER,
@@ -279,23 +288,23 @@ CONST_STRPTR getChooserText(int gadgetId, uint16 code)
 
 static Object *buildRadioSearchPage(void)
 {
-  return IIntuition->NewObject(NULL, "layout.gadget",
+  return IIntuition->NewObject(LayoutClass, NULL,
         LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
 
         // START - Top Filter Section
-        LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+        LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
           LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
           LAYOUT_BevelStyle,      BVS_GROUP,
           LAYOUT_Label,           "Filter stations by",
 
           // Top filter section with the Name Text Box with Label
-          LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
             LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-            LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+            LAYOUT_AddImage, IIntuition->NewObject(LabelClass, NULL,
               //LABEL_DrawInfo, drInfo,
               LABEL_Text, "_Name",
               TAG_END),
-            LAYOUT_AddChild, gadgets[GID_FILTERS_NAME] = IIntuition->NewObject(NULL, "string.gadget",
+            LAYOUT_AddChild, gadgets[GID_FILTERS_NAME] = IIntuition->NewObject(StringClass, NULL,
               GA_ID,                GID_FILTERS_NAME,
               GA_RelVerify,         TRUE,
               GA_TabCycle,          TRUE,
@@ -306,15 +315,15 @@ static Object *buildRadioSearchPage(void)
             TAG_DONE),
 
           // Top filter section with the select boxes
-          LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
             // Genres Select Box with Label
-            LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+            LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
               LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-              LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+              LAYOUT_AddImage, IIntuition->NewObject(LabelClass, NULL,
                 //LABEL_DrawInfo, drInfo,
                 LABEL_Text, "_Genre",
                 TAG_END),
-              LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+              LAYOUT_AddChild, IIntuition->NewObject(ChooserClass, NULL,
                 GA_ID,                GID_CHOOSER_GENRES,
                 GA_RelVerify,         TRUE,
                 GA_TabCycle,          TRUE,
@@ -326,13 +335,13 @@ static Object *buildRadioSearchPage(void)
               TAG_DONE),
 
             // Countries Select Box with Label
-            LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+            LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
               LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-              LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+              LAYOUT_AddImage, IIntuition->NewObject(LabelClass, NULL,
                 //LABEL_DrawInfo, drInfo,
                 LABEL_Text, "_Country",
                 TAG_END),
-              LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+              LAYOUT_AddChild, IIntuition->NewObject(ChooserClass, NULL,
                 GA_ID,                GID_CHOOSER_COUNTRIES,
                 GA_RelVerify,         TRUE,
                 GA_TabCycle,          TRUE,
@@ -344,13 +353,13 @@ static Object *buildRadioSearchPage(void)
               TAG_DONE),
 
             // Languages Select Box with Label
-            LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+            LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
               LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-              LAYOUT_AddImage, IIntuition->NewObject(NULL, "label.image",
+              LAYOUT_AddImage, IIntuition->NewObject(LabelClass, NULL,
                 //LABEL_DrawInfo, drInfo,
                 LABEL_Text, "_Language",
                 TAG_END),
-              LAYOUT_AddChild, IIntuition->NewObject(NULL, "chooser.gadget",
+              LAYOUT_AddChild, IIntuition->NewObject(ChooserClass, NULL,
                 GA_ID,                GID_CHOOSER_LANGUAGES,
                 GA_RelVerify,         TRUE,
                 GA_TabCycle,          TRUE,
@@ -363,7 +372,7 @@ static Object *buildRadioSearchPage(void)
             TAG_DONE),
 
             // Filters Button
-            LAYOUT_AddChild, gadgets[GID_FILTER_BUTTON] = IIntuition->NewObject(NULL, "button.gadget",
+            LAYOUT_AddChild, gadgets[GID_FILTER_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
               GA_ID,              GID_FILTER_BUTTON,
               GA_Text,            "_Discover",
               GA_TabCycle,        TRUE,
@@ -375,9 +384,9 @@ static Object *buildRadioSearchPage(void)
         // END - Top Filter Section
 
         // START - Bottom List Section
-        LAYOUT_AddChild, IIntuition->NewObject(NULL, "layout.gadget",
+        LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
           LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-          LAYOUT_AddChild, gadgets[GID_RADIO_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
+          LAYOUT_AddChild, gadgets[GID_RADIO_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
             GA_ID,                      GID_RADIO_LISTBROWSER,
             GA_RelVerify,               TRUE,
             GA_TabCycle,                TRUE,
@@ -397,11 +406,11 @@ static Object *buildRadioSearchPage(void)
 
 static Object *buildRadioPopularPage(void)
 {
-  return IIntuition->NewObject(NULL, "layout.gadget",
+  return IIntuition->NewObject(LayoutClass, NULL,
       LAYOUT_BevelStyle,      BVS_GROUP,
-      LAYOUT_Label,           "Most-listened over 24 hours",
+      LAYOUT_Label,           "Most listened to over 24 hours",
 
-        LAYOUT_AddChild, gadgets[GID_RADIO_POPULAR_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
+        LAYOUT_AddChild, gadgets[GID_RADIO_POPULAR_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
           GA_ID,                      GID_RADIO_POPULAR_LISTBROWSER,
           GA_RelVerify,               TRUE,
           GA_TabCycle,                TRUE,
@@ -419,11 +428,11 @@ static Object *buildRadioPopularPage(void)
 
 static Object *buildRadioTrendPage(void)
 {
-  return IIntuition->NewObject(NULL, "layout.gadget",
+  return IIntuition->NewObject(LayoutClass, NULL,
       LAYOUT_BevelStyle,      BVS_GROUP,
       LAYOUT_Label,           "Trending in the last 24 hours",
       
-        LAYOUT_AddChild, gadgets[GID_RADIO_TREND_LISTBROWSER] = IIntuition->NewObject(NULL, "listbrowser.gadget",
+        LAYOUT_AddChild, gadgets[GID_RADIO_TREND_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
           GA_ID,                      GID_RADIO_TREND_LISTBROWSER,
           GA_RelVerify,               TRUE,
           GA_TabCycle,                TRUE,

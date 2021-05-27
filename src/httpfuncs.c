@@ -41,7 +41,6 @@ STRPTR getResponseBody(char *url, int portNum)
     return httpResponse;
   }
 
-  //IDOS->Printf("getResponseBody returned NULL\n");
   return NULL;
 }
 

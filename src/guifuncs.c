@@ -14,6 +14,7 @@
 
 */
 
+#include <intuition/gadgetclass.h>
 #include <classes/window.h>
 #include <images/bitmap.h>
 

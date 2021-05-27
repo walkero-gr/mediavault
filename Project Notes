@@ -36,6 +36,7 @@ DONE - Added Unicode conversion to system charset on radio station names
 DONE - Application registration
 DONE - Window can jump screen 
 DONE - Window size and position can be saved
+DONE - Changed the way classes and gadgets are initiallized
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
