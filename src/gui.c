@@ -314,11 +314,13 @@ void showGUI(void)
                             */
                             playRadio((struct Node *)res_node);
                           }
+                          /*
                           if (res_value == LBRE_NORMAL)
                           {
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
                             showRadioInfo((struct Node *)res_node);
-                          }                          
+                          } 
+                          */                         
                         }
                         break;                      
                       
