@@ -314,13 +314,24 @@ void showGUI(void)
                             */
                             playRadio((struct Node *)res_node);
                           }
-                          /*
+
                           if (res_value == LBRE_NORMAL)
                           {
+                            
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
-                            showRadioInfo((struct Node *)res_node);
-                          } 
-                          */                         
+                            if (res_node)
+                            {
+                              struct stationInfo *stationData = NULL;
+                              IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+                                    LBNA_UserData, &stationData,
+                                    TAG_DONE);
+                              IDOS->Printf("User Data: name=%s\n", stationData->name);
+                              IDOS->Printf("User Data: url_resolved=%s\n", stationData->url_resolved);
+                            }
+                            
+                            
+                            //showRadioInfo((struct Node *)res_node);
+                          }
                         }
                         break;                      
                       
@@ -383,15 +394,18 @@ void showGUI(void)
           IListBrowser->FreeLBColumnInfo(columnInfo);
           if(listCount(&radioList))
           {
-            IListBrowser->FreeListBrowserList(&radioList);
+            //IListBrowser->FreeListBrowserList(&radioList);
+            FreeList(&radioList, freeStationInfo);
           }
           if(listCount(&radioPopularList))
           {
-            IListBrowser->FreeListBrowserList(&radioPopularList);
+            //IListBrowser->FreeListBrowserList(&radioPopularList);
+            FreeList(&radioPopularList, freeStationInfo);
           }
           if(listCount(&radioTrendList))
           {
-            IListBrowser->FreeListBrowserList(&radioTrendList);
+            //IListBrowser->FreeListBrowserList(&radioTrendList);
+            FreeList(&radioTrendList, freeStationInfo);
           }
 
           IListBrowser->FreeLBColumnInfo(leftSidebarCI);

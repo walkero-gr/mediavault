@@ -23,6 +23,8 @@ STRPTR getRadioPopularStations(void);
 size_t getRadioList(struct List *, STRPTR, int);
 void playRadio(struct Node *);
 void showRadioInfo(struct Node *);
+void freeStationInfo(struct stationInfo *);
+      
 
 
 #endif

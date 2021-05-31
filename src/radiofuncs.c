@@ -14,7 +14,6 @@
 
 */
 
-//#include <iconv.h>
 #include <proto/listbrowser.h>
 
 #include "globals.h"
@@ -134,8 +133,13 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
   for(cnt = 0; cnt < IJansson->json_array_size(jsonRoot); cnt++)
   {
     struct Node *stationNode;
-    //struct stationInfo stationData;
+    struct stationInfo *stationData = NULL;
     json_t *data, *stationuuid, *name, *country, *tags, *url_resolved, *votes;
+
+    stationData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+          AVT_Type,            MEMF_PRIVATE,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
 
     data = IJansson->json_array_get(jsonRoot, cnt);
     if(!json_is_object(data))
@@ -162,7 +166,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
       return ~0UL;
     }
     //IDOS->Printf("Station name: %s\n", IJansson->json_string_value(name));
-    //IUtility->Strlcpy(stationData.name, IJansson->json_string_value(name), sizeof(stationData.name));
+    IUtility->Strlcpy(stationData->name, charConv(IJansson->json_string_value(name)), sizeof(stationData->name));
     //IDOS->Printf("Station name: %s\n", stationData.name);
 
     country = IJansson->json_object_get(data, "country");
@@ -191,6 +195,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
       return ~0UL;
     }
     //IDOS->Printf("Station url_resolved: %s\n", IJansson->json_string_value(url_resolved));
+    IUtility->Strlcpy(stationData->url_resolved, IJansson->json_string_value(url_resolved), sizeof(stationData->url_resolved));
 
     votes = IJansson->json_object_get(data, "votes");
     if(!json_is_integer(votes))
@@ -203,11 +208,9 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     votesNum = (ULONG)IJansson->json_integer_value(votes);
 
     stationNode = IListBrowser->AllocListBrowserNode( 4,
-        //LBNA_UserData, stationData,
+        LBNA_UserData, stationData,
         LBNA_Column, 0,
           LBNCA_CopyText, TRUE,
-          //LBNCA_Text, IJansson->json_string_value(name),
-          //LBNCA_Text, useIconv(cd, IJansson->json_string_value(name)),
           LBNCA_Text,     charConv(IJansson->json_string_value(name)),
         LBNA_Column, 1,
           LBNCA_CopyText, TRUE,
@@ -216,9 +219,6 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
           LBNCA_CopyInteger, TRUE,
           LBNCA_Integer, &votesNum,
           LBNCA_Justification, LCJ_RIGHT,
-        LBNA_Column, 3,
-          LBNCA_CopyText, TRUE,
-          LBNCA_Text, IJansson->json_string_value(url_resolved),
         TAG_DONE);
 
     if(stationNode)
@@ -235,20 +235,26 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
 
 void playRadio(struct Node *res_node)
 {
-  STRPTR selListValue;
-  
-  IListBrowser->GetListBrowserNodeAttrs(res_node,
-    LBNA_Column,  3,
-    LBNCA_Text,   &selListValue,
-    TAG_DONE);
+  if (res_node)
+  {
+    struct stationInfo *stationData = NULL;
+    stationData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+          AVT_Type,            MEMF_PRIVATE,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
 
-  STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", selListValue);
-  IDOS->SystemTags( cmd,
-      SYS_Input,    ZERO,
-      SYS_Output,   NULL,
-      SYS_Error,    ZERO,
-      SYS_Asynch,   TRUE,
-      TAG_DONE);
+    IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+          LBNA_UserData, &stationData,
+          TAG_DONE);
+
+    STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", stationData->url_resolved);
+    IDOS->SystemTags( cmd,
+        SYS_Input,    ZERO,
+        SYS_Output,   NULL,
+        SYS_Error,    ZERO,
+        SYS_Asynch,   TRUE,
+        TAG_DONE);
+  }
 }
 
 void showRadioInfo(struct Node *res_node)
@@ -262,4 +268,12 @@ void showRadioInfo(struct Node *res_node)
   IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_LBL_INFO_NAME], windows[WID_MAIN], NULL,
     GA_Text,   selListValue,
     TAG_DONE);
+}
+
+void freeStationInfo(struct stationInfo *stationData)
+{
+  if(stationData)
+  {
+    IExec->FreeVec(stationData);
+  }
 }

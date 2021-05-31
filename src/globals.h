@@ -47,12 +47,18 @@ struct filters
   char language[32];
 };
 
-/*
 struct stationInfo
 {
+  char uuid[42];
   char name[64];
-  char url[255];
+  char url_resolved[255];
+  char country[64];
+  char language[64];
+  char homepage[255];
+  char favicon[255];
+  char codec[12];
+  char bitrate[6];
 };
-*/
+
 
 #endif

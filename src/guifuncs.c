@@ -19,9 +19,11 @@
 #include <images/bitmap.h>
 
 #include <proto/application.h>
+#include <proto/listbrowser.h>
 
 #include "globals.h"
 #include "guifuncs.h"
+#include "radiofuncs.h"
 
 /**
  * The following code is from MenuClass.c as found at the SDK 53.30 examples
@@ -128,59 +130,122 @@ int listCount(struct List *list)
 
 BOOL appHide(uint32 appID, Object *winObj, uint32 methodID)
 {
-	BOOL retVal = FALSE;
-	
-	if ( IIntuition->IDoMethod(winObj, methodID, NULL) == TRUE )
-	{
-	  IIntuition->SetAttrs(winObj,
-	              WA_PubScreen, NULL,
-	              WINDOW_Window, NULL,
-	              TAG_DONE);
-	  IApplication->SetApplicationAttrs(appID,
-	                APPATTR_Hidden, TRUE,
-	                TAG_DONE);
-	  retVal = TRUE;
-	}
-	
-	return retVal;
+  BOOL retVal = FALSE;
+  
+  if ( IIntuition->IDoMethod(winObj, methodID, NULL) == TRUE )
+  {
+    IIntuition->SetAttrs(winObj,
+                WA_PubScreen, NULL,
+                WINDOW_Window, NULL,
+                TAG_DONE);
+    IApplication->SetApplicationAttrs(appID,
+                  APPATTR_Hidden, TRUE,
+                  TAG_DONE);
+    retVal = TRUE;
+  }
+  
+  return retVal;
 }
 
 
 struct Window *appUnhide(uint32 appID, Object *winObj)
 {
- 	struct Screen *pubScr = NULL;
-	struct Window *window = NULL;
-	BOOL hidden;
-	
-	IApplication->GetApplicationAttrs(appID,
-	              APPATTR_Hidden, &hidden,
-	              TAG_DONE);
-	
-	if ( hidden == TRUE )
-	{
-	  pubScr = IIntuition->LockPubScreen(NULL);
-	  if ( !pubScr ) return NULL;
-	
-	  IIntuition->SetAttrs(winObj, WA_PubScreen, pubScr, TAG_DONE);
-	
-	  if ( (window = (struct Window *) IIntuition->IDoMethod(winObj, WM_OPEN, NULL)) )
-	  {
-	    IIntuition->ScreenToFront(pubScr);
-	    IApplication->SetApplicationAttrs(appID, APPATTR_Hidden, FALSE, TAG_DONE);
-	  }
-	
-	  IIntuition->UnlockPubScreen(NULL, pubScr);
-	}
-	else {
-	  // The GUI is not hidden = just bring it to front.
-	  IIntuition->GetAttr(WINDOW_Window, winObj, (uint32 *) &window);
-	  if (window)
-	  {
-	    IIntuition->WindowToFront(window);
-	    IIntuition->ScreenToFront(window->WScreen);
-	    IIntuition->ActivateWindow(window);
-	  }
-	}
-	
-	return window;
+  struct Screen *pubScr = NULL;
+  struct Window *window = NULL;
+  BOOL hidden;
+  
+  IApplication->GetApplicationAttrs(appID,
+                APPATTR_Hidden, &hidden,
+                TAG_DONE);
+  
+  if ( hidden == TRUE )
+  {
+    pubScr = IIntuition->LockPubScreen(NULL);
+    if ( !pubScr ) return NULL;
+  
+    IIntuition->SetAttrs(winObj, WA_PubScreen, pubScr, TAG_DONE);
+  
+    if ( (window = (struct Window *) IIntuition->IDoMethod(winObj, WM_OPEN, NULL)) )
+    {
+      IIntuition->ScreenToFront(pubScr);
+      IApplication->SetApplicationAttrs(appID, APPATTR_Hidden, FALSE, TAG_DONE);
+    }
+  
+    IIntuition->UnlockPubScreen(NULL, pubScr);
+  }
+  else {
+    // The GUI is not hidden = just bring it to front.
+    IIntuition->GetAttr(WINDOW_Window, winObj, (uint32 *) &window);
+    if (window)
+    {
+      IIntuition->WindowToFront(window);
+      IIntuition->ScreenToFront(window->WScreen);
+      IIntuition->ActivateWindow(window);
+    }
+  }
+  
+  return window;
 }
+
+void FreeList(
+  struct List *listBrowser,
+  void (*freeUserDataCallback)(struct stationInfo *)
+)
+{
+  struct Node *node;
+
+  while((node = IExec->RemHead( listBrowser )))
+  {
+    struct stationInfo *stationData = NULL;
+
+    IListBrowser->GetListBrowserNodeAttrs( node,
+          LBNA_UserData, &stationData,
+          TAG_DONE);
+
+    freeUserDataCallback(stationData);
+
+    IListBrowser->FreeListBrowserNode(node);
+  }
+
+  IExec->FreeSysObject(ASOT_LIST, listBrowser);
+}
+/*
+void myFreeListBrowserList(struct List *list)
+{
+ struct Node *node = NULL;
+ struct Node *nextNode = NULL;
+ struct MyDataStructure *myData = NULL;
+ if (list)
+  {
+   node = IExec->GetHead(list);
+   while (node)
+    {
+     nextNode = IExec->GetSucc(node);
+     
+
+     // Unlink the node from the list.
+     IExec->Remove(node);
+
+
+
+     // Obtain and free the user data.
+
+     IListBrowser->GetListBrowserNodeAttrs(node, LBNA_UserData, &myData, TAG_END);
+
+     if (myData) IExec->FreeVec(myData);
+
+
+
+     // Dispose of the node.
+
+     IListBrowser->FreeListBrowserNode(node);
+
+     node = nextNode;
+    }
+
+   // Finally, dispose of the listbrowser list.
+   IExec->FreeSysObject(ASOT_LIST, list);
+  }
+
+}
+*/

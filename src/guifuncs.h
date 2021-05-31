@@ -26,5 +26,9 @@ void showMsgReq(Object *, CONST_STRPTR, CONST_STRPTR);
 int listCount(struct List *);
 BOOL appHide(uint32, Object *, uint32);
 struct Window *appUnhide(uint32, Object *);
+void FreeList(
+  struct List *,
+  void (*freeUserDataCallback)(struct stationInfo *)
+);
 
 #endif
