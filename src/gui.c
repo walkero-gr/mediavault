@@ -172,7 +172,7 @@ void showGUI(void)
                       res_node,
                       lsbNodeIdx;
 
-              // Main Window events
+              //// Main Window events
               while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE)))
               {
                 switch (result & WMHI_CLASSMASK)
@@ -462,7 +462,7 @@ static void listStations(
     net = NULL;
   }
 
-  if (stationsCnt > 0)
+  if ((stationsCnt != ~0UL) && (stationsCnt > 0))
   {
     IIntuition->SetGadgetAttrs(listbrowser, windows[WID_MAIN], NULL,
         LISTBROWSER_Labels,         list,
@@ -470,7 +470,6 @@ static void listStations(
         LISTBROWSER_Selected,       -1,
         LISTBROWSER_ColumnInfo,     columnInfo,
         TAG_DONE);
-
   }
 }
 

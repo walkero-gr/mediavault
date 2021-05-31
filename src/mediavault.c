@@ -9,10 +9,15 @@ void die(const char *s)
 
 int main(void)
 {
+  int libsOpened;
+  libsOpened = OpenLibs();
 
-	OpenLibs();
+  if (libsOpened)
+  {
+    return libsOpened;
+  }
 
-	showGUI();
+  showGUI();
   //discoverUPnPServers();
   //freeUpnpServers();
   //getMetadata((char *)"dummy");

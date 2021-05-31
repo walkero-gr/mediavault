@@ -212,10 +212,10 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
             // END - Left Sidebar
 
             LAYOUT_AddChild, gadgets[GID_PAGES] = radioPages,
-            //LAYOUT_WeightBar, TRUE,
+            /*
+            LAYOUT_WeightBar, TRUE,
 
             // START - Right Sidebar
-            /*
             LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
               LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
               
@@ -233,9 +233,8 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
               TAG_DONE),
               CHILD_WeightedWidth, 30,
               CHILD_MinWidth, 200,
-            */  
             // END - Right Sidebar
-         
+           */
          TAG_DONE),
       TAG_DONE),
     TAG_DONE);

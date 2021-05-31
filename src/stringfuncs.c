@@ -29,33 +29,33 @@ STRPTR charConv(CONST_STRPTR value)
   iconv_t cd = (iconv_t) -1;
   char charsetName[128];
   STRPTR convertedValue;
-  
+
   IDOS->GetVar("Charset", charsetName, sizeof(charsetName), GVF_GLOBAL_ONLY);
   cd = iconv_open(charsetName, "UTF-8");  
   convertedValue = useIconv(cd, value);
- 	
- 	if (cd != (iconv_t)-1) iconv_close(cd);
- 	
- 	return convertedValue;
+
+  if (cd != (iconv_t)-1) iconv_close(cd);
+
+  return convertedValue;
 }
 
 static STRPTR useIconv(iconv_t cd, CONST_STRPTR string)
 {
-	static char buffer[ICONV_BUFFER];
-	size_t inleft, outleft = ICONV_BUFFER - 1;
-	CONST_STRPTR inbuf = string;
-	STRPTR outbuf = buffer;
+  static char buffer[ICONV_BUFFER];
+  size_t inleft, outleft = ICONV_BUFFER - 1;
+  CONST_STRPTR inbuf = string;
+  STRPTR outbuf = buffer;
 
-	if (string == NULL) return NULL;
+  if (string == NULL) return NULL;
 
-	inleft = strlen(string);
+  inleft = strlen(string);
 
-	if (cd == (iconv_t)-1) return (STRPTR) string;
+  if (cd == (iconv_t)-1) return (STRPTR) string;
 
-	memset(buffer, 0, ICONV_BUFFER);
+  memset(buffer, 0, ICONV_BUFFER);
 
-	if (iconv(cd, &inbuf, &inleft, &outbuf, &outleft) == (size_t)-1)
-		return (STRPTR) string;
-	else
-		return buffer;
+  if (iconv(cd, &inbuf, &inleft, &outbuf, &outleft) == (size_t)-1)
+    return (STRPTR) string;
+  else
+    return buffer;
 }

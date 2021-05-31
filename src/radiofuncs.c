@@ -23,7 +23,7 @@
 #include "httpfuncs.h"
 #include "stringfuncs.h"
 
-uint8 maxRadioResults = 50;
+uint8 maxRadioResults = 20;
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";  
 static char url[255];
@@ -44,7 +44,7 @@ STRPTR getRadioStations(struct filters lastFilters, int offset)
 
   if (offset > 0)
   {
-    char offsetStr[3];
+    char offsetStr[5];
     IUtility->Strlcat(url, "&offset=", sizeof(url));
     IUtility->SNPrintf(offsetStr, sizeof(offsetStr), "%ld", offset * maxRadioResults);
     IUtility->Strlcat(url, offsetStr, sizeof(url));
@@ -109,17 +109,16 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
   //char charsetName[128];
 
   jsonRoot = IJansson->json_loads(jsonData, 0, &jsonError);
-
   if(!jsonRoot)
   {
-    IDOS->Printf("json error: on line %d: %s\n", jsonError.line, jsonError.text);
+    //IDOS->Printf("json error: on line %d: %s\n", jsonError.line, jsonError.text);
     return ~0UL;
   }
 
   if (!json_is_array(jsonRoot))
   {
     IJansson->json_decref(jsonRoot);
-    IDOS->Printf("JSON error: jsonRoot is not an array");
+    //IDOS->Printf("JSON error: jsonRoot is not an array");
     return ~0UL;
   }                                                                         
 
@@ -131,7 +130,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
   {
     IExec->NewList(stationList);
   }
-  
+
   for(cnt = 0; cnt < IJansson->json_array_size(jsonRoot); cnt++)
   {
     struct Node *stationNode;
@@ -202,7 +201,6 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     }
     //IDOS->Printf("votes: %ld\n", (ULONG)IJansson->json_integer_value(votes));
     votesNum = (ULONG)IJansson->json_integer_value(votes);
-
 
     stationNode = IListBrowser->AllocListBrowserNode( 4,
         //LBNA_UserData, stationData,

@@ -1,6 +1,6 @@
 name: mediavault
 description: Discover online radio stations
-version: 1.2.0
+version: 1.2.1
 author: George Sokianos
 submitter: George Sokianos
 email: walkero@gmail.com
@@ -43,6 +43,7 @@ Requirements
 * oo.library v1.13 by Tuomas Hokka
 * jansson.library v2.12.1 by Simon Tyrrell
 * AmigaAmp3 v3.29 by Thomas Wenzel
+* AmiSSL 4.9 by the AmiSSL Open Source Team
 
 I would like to thank
 --------------------------
@@ -73,6 +74,17 @@ https://github.com/walkero-gr/mediavault/issues
 
 Changelog
 --------------------------
+
+v1.2.1 - 2021-05-31
+* Reduced results to 20 as a temporary workaround of a bug that occurs with the 
+  default discovery of radio stations. Found where the problem is and it will 
+  be fixed on a later release.
+* Disabled the load of the window when AmiSSL 4.9 is missing
+* Fixed the exit of MediaVault when a library is not available
+* Fixed the issue with duplicate results when "discover more" was clicked
+* Fixed a crash that had to do with a broken API response. Now an info requester
+  appears.
+
 v1.2.0 - 2021-05-27
 * Added Unicode conversion to system charset on radio station names 
   - Thanks to Daniel "trixie" Jedlicka

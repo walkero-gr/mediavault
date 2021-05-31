@@ -4,6 +4,6 @@
 #define _LIBSHANDLER_H
 
 int CleanExit(const char *);
-void OpenLibs(void);
+int OpenLibs(void);
 
 #endif

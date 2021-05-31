@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2021-05-31
+### Fixed
+- Reduced results to 20 as a temporary workaround of a bug that occurs with the default discovery of radio stations. Found where the problem is and it will be fixed on a later release.
+- Disabled the load of the window when AmiSSL 4.9 is missing
+- Fixed the exit of MediaVault when a library is not available
+- Fixed the issue with duplicate results when "discover more" was clicked
+- Fixed a crash that had to do with a broken API response. Now an info requester appears.
+
 ## [1.2.0] - 2021-05-27
 ### Added
 - Added Unicode conversion to system charset on radio station names - Thanks to Daniel "trixie" Jedlicka

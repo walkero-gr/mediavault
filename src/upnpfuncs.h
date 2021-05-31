@@ -48,6 +48,8 @@ const char DISCOVERMSG[105] = "M-SEARCH * HTTP/1.1\r\n"\
                               "MAN:\"ssdp:discover\"\r\n"\
                               "\r\n";
 
-#include "globals.h"
+//#include "globals.h"
+
+void discoverUPnPServers(void);
 
 #endif

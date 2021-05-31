@@ -78,99 +78,101 @@ int CleanExit(const char *str)
     IDOS->Printf("Error::%s\n",str);
     return RETURN_ERROR;
   }
-  	
+    
   return RETURN_OK;
 }
 
 
-void OpenLibs(void)
+int OpenLibs(void)
 {
   //// Libraries
   if ((ApplicationBase = IExec->OpenLibrary( "application.library", 53 )))
   {
     IApplication = (struct ApplicationIFace *)IExec->GetInterface( ApplicationBase, "application", 2, NULL );
-    if(!IApplication) CleanExit("Can't open application.library Interface");
+    if(!IApplication) return CleanExit("Can't open application.library Interface");
   }
-  else CleanExit("Can't open application.library version 53");
+  else return CleanExit("Can't open application.library version 53");
 
   if ((IntuitionBase = IExec->OpenLibrary( "intuition.library", 54 )))
   {
     if (LIB_IS_AT_LEAST(IntuitionBase, 54, 6))
     {
       IIntuition = (struct IntuitionIFace *)IExec->GetInterface( IntuitionBase, "main", 1, NULL );
-      if(!IIntuition) CleanExit("Can't open intuition.library Interface");
+      if(!IIntuition) return CleanExit("Can't open intuition.library Interface");
     }
-    else CleanExit("Can't open intuition.library version 54.6 and above");
+    else return CleanExit("Can't open intuition.library version 54.6 and above");
   }
-  else CleanExit("Can't open intuition.library version 54");
+  else return CleanExit("Can't open intuition.library version 54");
 
   if ((UtilityBase = IExec->OpenLibrary( "utility.library", 53 )))
   {
     IUtility = (struct UtilityIFace *)IExec->GetInterface( UtilityBase, "main", 1, NULL );
-    if(!IUtility) CleanExit("Can't open utility.library Interface");
+    if(!IUtility) return CleanExit("Can't open utility.library Interface");
   }
-  else CleanExit("Can't open utility.library version 53");
+  else return CleanExit("Can't open utility.library version 53");
 
   if ((JanssonBase = IExec->OpenLibrary( "jansson.library", 2 )))
   {
     IJansson = (struct JanssonIFace *)IExec->GetInterface( JanssonBase, "main", 1, NULL );
-    if(!IJansson) CleanExit("Can't open jansson.library Interface");
+    if(!IJansson) return CleanExit("Can't open jansson.library Interface");
   }
-  else CleanExit("Can't open jansson.library version 2");
+  else return CleanExit("Can't open jansson.library version 2");
+
+  if ((AmiSSLMasterBase = IExec->OpenLibrary("amisslmaster.library", 4 )))
+  {
+    if (!LIB_IS_AT_LEAST(AmiSSLMasterBase, 4, 9))
+      return CleanExit("Can't open amisslmaster.library version 4.9 and above");
+  }
+  else return CleanExit("Can't open amisslmaster.library version 4.9 and above");
 
   if ((OOBase=IExec->OpenLibrary("oo.library", 1 )))
   {
     if (LIB_IS_AT_LEAST(OOBase, 1, 13))
     {
       IOO = (struct OOIFace *)IExec->GetInterface( OOBase, "main", 1, NULL );
-      if(!IOO) CleanExit("Can't open oo.library Interface");
+      if(!IOO) return CleanExit("Can't open oo.library Interface");
     }
-    else CleanExit("Can't open oo.library version 1.13 and above");
+    else return CleanExit("Can't open oo.library version 1.13 and above");
   }
-  else CleanExit("Can't open oo.library version 1.13 and above. Is it installed?");
-
-  if ((AmiSSLMasterBase = IExec->OpenLibrary("amisslmaster.library", 4 )))
-  {
-    if (!LIB_IS_AT_LEAST(AmiSSLMasterBase, 4, 9))
-      CleanExit("Can't open amisslmaster.library version 4.9 and above");
-  }
-  else CleanExit("Can't open amisslmaster.library version 4.9 and above");
+  else return CleanExit("Can't open oo.library version 1.13 and above. Is it installed?");
 
   //// Classes and Gadgets opening
   if ((ListBrowserBase = IIntuition->OpenClass( "gadgets/listbrowser.gadget", 1, &ListBrowserClass )))
   {
     IListBrowser = (struct ListBrowserIFace *)IExec->GetInterface( (struct Library *) ListBrowserBase, "main", 1, NULL );
-    if(!IListBrowser) CleanExit("Can't open ListBrowser Gadget Interface");
+    if(!IListBrowser) return CleanExit("Can't open ListBrowser Gadget Interface");
   }
-  else CleanExit("Can't open ListBrowser");
+  else return CleanExit("Can't open ListBrowser");
 
   WindowBase = IIntuition->OpenClass( "window.class", 53, &WindowClass );
-  if (!WindowBase) CleanExit("Can't open Window Class");
+  if (!WindowBase) return CleanExit("Can't open Window Class");
 
   LayoutBase = IIntuition->OpenClass( "layout.gadget", 53, &LayoutClass );
-  if (!LayoutBase) CleanExit("Can't open Layout Gadget");
+  if (!LayoutBase) return CleanExit("Can't open Layout Gadget");
 
   LabelBase = IIntuition->OpenClass( "label.image", 53, &LabelClass );
-  if (!LabelBase) CleanExit("Can't open Label Image");
+  if (!LabelBase) return CleanExit("Can't open Label Image");
 
   ChooserBase = IIntuition->OpenClass( "chooser.gadget", 53, &ChooserClass );
   if (!ChooserBase) CleanExit("Can't open Chooser Gadget");
 
   ButtonBase = IIntuition->OpenClass( "button.gadget", 53, &ButtonClass );
-  if (!ButtonBase) CleanExit("Can't open Button Gadget");
+  if (!ButtonBase) return CleanExit("Can't open Button Gadget");
 
   StringBase = IIntuition->OpenClass( "string.gadget", 53, &StringClass );
-  if (!StringBase) CleanExit("Can't open String Gadget");
+  if (!StringBase) return CleanExit("Can't open String Gadget");
 
   ScrollerBase = IIntuition->OpenClass( "scroller.gadget", 53, &ScrollerClass );
-  if (!ScrollerBase) CleanExit("Can't open Scroller Gadget");
+  if (!ScrollerBase) return CleanExit("Can't open Scroller Gadget");
 
   TextEditorBase = IIntuition->OpenClass( "texteditor.gadget", 53, &TextEditorClass );
-  if (!TextEditorBase) CleanExit("Can't open TextEditor Gadget");
+  if (!TextEditorBase) return CleanExit("Can't open TextEditor Gadget");
 
   BitMapBase = IIntuition->OpenClass( "bitmap.image", 53, &BitMapClass );
-  if (!BitMapBase) CleanExit("Can't open BitMap Image");
+  if (!BitMapBase) return CleanExit("Can't open BitMap Image");
 
   RequesterBase = IIntuition->OpenClass( "requester.class", 53, &RequesterClass );
-  if (!RequesterBase) CleanExit("Can't open Requester Class");  
+  if (!RequesterBase) return CleanExit("Can't open Requester Class");
+
+  return RETURN_OK;
 }
