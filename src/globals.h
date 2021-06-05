@@ -58,6 +58,7 @@ struct stationInfo
   char favicon[255];
   char codec[12];
   char bitrate[6];
+  ULONG votes;
 };
 
 

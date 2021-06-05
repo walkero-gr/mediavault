@@ -20,5 +20,6 @@
 
 STRPTR getResponseBody(char *, int);
 STRPTR urlEncode(STRPTR);
+void cacheFileFromUrl(STRPTR, int, STRPTR);
 
 #endif

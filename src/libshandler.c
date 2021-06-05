@@ -40,7 +40,7 @@ Class *WindowClass;
 
 int CleanExit(const char *str)
 {
-  //// Close Classes and Gadgets
+  //## Close Classes and Gadgets
   if(RequesterBase)     IIntuition->CloseClass(RequesterBase);
   if(BitMapBase)        IIntuition->CloseClass(BitMapBase);
   if(TextEditorBase)    IIntuition->CloseClass(TextEditorBase);
@@ -55,7 +55,7 @@ int CleanExit(const char *str)
   if(IListBrowser)      IExec->DropInterface((struct Interface *) IListBrowser);
   if(ListBrowserBase)   IIntuition->CloseClass(ListBrowserBase);
   
-  //// Close Libraries
+  //## Close Libraries
   if(AmiSSLMasterBase)  IExec->CloseLibrary(AmiSSLMasterBase);
 
   if(IOO)               IExec->DropInterface((struct Interface *) IOO);
@@ -78,14 +78,14 @@ int CleanExit(const char *str)
     IDOS->Printf("Error::%s\n",str);
     return RETURN_ERROR;
   }
-    
+
   return RETURN_OK;
 }
 
 
 int OpenLibs(void)
 {
-  //// Libraries
+  //## Libraries opening
   if ((ApplicationBase = IExec->OpenLibrary( "application.library", 53 )))
   {
     IApplication = (struct ApplicationIFace *)IExec->GetInterface( ApplicationBase, "application", 2, NULL );
@@ -125,7 +125,7 @@ int OpenLibs(void)
   }
   else return CleanExit("Can't open amisslmaster.library version 4.9 and above");
 
-  if ((OOBase=IExec->OpenLibrary("oo.library", 1 )))
+  if ((OOBase = IExec->OpenLibrary("oo.library", 1 )))
   {
     if (LIB_IS_AT_LEAST(OOBase, 1, 13))
     {
@@ -134,9 +134,9 @@ int OpenLibs(void)
     }
     else return CleanExit("Can't open oo.library version 1.13 and above");
   }
-  else return CleanExit("Can't open oo.library version 1.13 and above. Is it installed?");
+  else return CleanExit("Can't open oo.library version 1.13 and above");
 
-  //// Classes and Gadgets opening
+  //## Classes and Gadgets opening
   if ((ListBrowserBase = IIntuition->OpenClass( "gadgets/listbrowser.gadget", 1, &ListBrowserClass )))
   {
     IListBrowser = (struct ListBrowserIFace *)IExec->GetInterface( (struct Library *) ListBrowserBase, "main", 1, NULL );

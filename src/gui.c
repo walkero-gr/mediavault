@@ -107,7 +107,7 @@ void showGUI(void)
                 LBCIA_Weight,               10,
               TAG_DONE);
 
-          //// Register MediaVault as an application
+          //## Register MediaVault as an application
           if ( (appID = IApplication->RegisterApplication(APPNAME,
                   REGAPP_CanCreateNewDocs,  FALSE,
                   REGAPP_CanPrintDocs,      FALSE,
@@ -172,7 +172,7 @@ void showGUI(void)
                       res_node,
                       lsbNodeIdx;
 
-              //// Main Window events
+              //## Main Window events
               while ((result = IIntuition->IDoMethod(objects[OID_MAIN], WM_HANDLEINPUT, &code, TAG_DONE)))
               {
                 switch (result & WMHI_CLASSMASK)
@@ -306,31 +306,13 @@ void showGUI(void)
                           if (res_value == LBRE_DOUBLECLICK)
                           {
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
-                            /*
-                            IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-                                LBNA_Column,  3,
-                                LBNCA_Text,   &selListValue,
-                                TAG_DONE);
-                            */
                             playRadio((struct Node *)res_node);
                           }
 
                           if (res_value == LBRE_NORMAL)
-                          {
-                            
+                          {                            
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
-                            if (res_node)
-                            {
-                              struct stationInfo *stationData = NULL;
-                              IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-                                    LBNA_UserData, &stationData,
-                                    TAG_DONE);
-                              IDOS->Printf("User Data: name=%s\n", stationData->name);
-                              IDOS->Printf("User Data: url_resolved=%s\n", stationData->url_resolved);
-                            }
-                            
-                            
-                            //showRadioInfo((struct Node *)res_node);
+                            showRadioInfo((struct Node *)res_node);
                           }
                         }
                         break;                      
@@ -362,7 +344,7 @@ void showGUI(void)
                 }
               }
 
-              //// About Window events
+              //## About Window events
               while ((result = IIntuition->IDoMethod(objects[OID_ABOUT], WM_HANDLEINPUT, &code, TAG_DONE)))
               {
                 switch(result & WMHI_CLASSMASK)
@@ -468,7 +450,7 @@ static void listStations(
 
   // Dispose net here, after the creation of the listbrowser content,
   // because it trashes the response data, so to free the signals
-  //// TODO: adapt it to oo.library v1.11 changes
+  //## TODO: adapt it to oo.library v1.11 changes
   if (net)
   {
     net->DisposeConnection();

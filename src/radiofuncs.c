@@ -29,7 +29,7 @@ static char url[255];
 
 static void setBaseSearchUrl(void)
 {                   
-  char maxRadioResultsStr[4];
+  char maxRadioResultsStr[5];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
   IUtility->Strlcat(url, "/stations/search?hidebroken=true&limit=", sizeof(url));
@@ -104,8 +104,6 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
   json_t *jsonRoot;
   json_error_t jsonError;
   size_t cnt;
-  //iconv_t cd = (iconv_t) -1;
-  //char charsetName[128];
 
   jsonRoot = IJansson->json_loads(jsonData, 0, &jsonError);
   if(!jsonRoot)
@@ -121,9 +119,6 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
     return ~0UL;
   }                                                                         
 
-  ULONG votesNum;
-  //IDOS->GetVar("Charset", charsetName, sizeof(charsetName), GVF_GLOBAL_ONLY);
-  //cd = iconv_open(charsetName, "UTF-8");
 
   if (offset == 0)
   {
@@ -134,7 +129,7 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
   {
     struct Node *stationNode;
     struct stationInfo *stationData = NULL;
-    json_t *data, *stationuuid, *name, *country, *tags, *url_resolved, *votes;
+    json_t *data, *buf;
 
     stationData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
           AVT_Type,            MEMF_PRIVATE,
@@ -149,76 +144,82 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
       return ~0UL;
     }
 
-    stationuuid = IJansson->json_object_get(data, "stationuuid");
-    if(!json_is_string(stationuuid))
+    buf = IJansson->json_object_get(data, "stationuuid");
+    if(!json_is_string(buf))
     {
-      IDOS->Printf("error: commit %d: stationuuid is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
       return ~0UL;
     }
-    //IDOS->Printf("stationuuid: %s\n", IJansson->json_string_value(stationuuid));
+    IUtility->Strlcpy(stationData->uuid, IJansson->json_string_value(buf), sizeof(stationData->uuid));
 
-    name = IJansson->json_object_get(data, "name");
-    if(!json_is_string(name))
+    buf = IJansson->json_object_get(data, "name");
+    if(!json_is_string(buf))
     {
-      IDOS->Printf("error: commit %d: name is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
       return ~0UL;
     }
-    //IDOS->Printf("Station name: %s\n", IJansson->json_string_value(name));
-    IUtility->Strlcpy(stationData->name, charConv(IJansson->json_string_value(name)), sizeof(stationData->name));
-    //IDOS->Printf("Station name: %s\n", stationData.name);
+    IUtility->Strlcpy(stationData->name, charConv(IJansson->json_string_value(buf)), sizeof(stationData->name));
 
-    country = IJansson->json_object_get(data, "country");
-    if(!json_is_string(country))
+    buf = IJansson->json_object_get(data, "country");
+    if(!json_is_string(buf))
     {
-      IDOS->Printf("error: commit %d: country is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
       return ~0UL;
     }
-    //IDOS->Printf("Station country: %s\n", IJansson->json_string_value(country));
+    IUtility->Strlcpy(stationData->country, charConv(IJansson->json_string_value(buf)), sizeof(stationData->country));
 
-    tags = IJansson->json_object_get(data, "tags");
-    if(!json_is_string(tags))
+    buf = IJansson->json_object_get(data, "language");
+    if(!json_is_string(buf))
     {
-      IDOS->Printf("error: commit %d: tags is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
       return ~0UL;
     }
-    //IDOS->Printf("Station tags: %s\n", IJansson->json_string_value(tags));
+    IUtility->Strlcpy(stationData->language, charConv(IJansson->json_string_value(buf)), sizeof(stationData->language));
 
-    url_resolved = IJansson->json_object_get(data, "url_resolved");
-    if(!json_is_string(url_resolved))
+    buf = IJansson->json_object_get(data, "url_resolved");
+    if(!json_is_string(buf))
     {
-      IDOS->Printf("error: commit %d: url_resolved is not a string\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
       return ~0UL;
     }
-    //IDOS->Printf("Station url_resolved: %s\n", IJansson->json_string_value(url_resolved));
-    IUtility->Strlcpy(stationData->url_resolved, IJansson->json_string_value(url_resolved), sizeof(stationData->url_resolved));
+    IUtility->Strlcpy(stationData->url_resolved, IJansson->json_string_value(buf), sizeof(stationData->url_resolved));
 
-    votes = IJansson->json_object_get(data, "votes");
-    if(!json_is_integer(votes))
+    buf = IJansson->json_object_get(data, "homepage");
+    if(!json_is_string(buf))
     {
-      IDOS->Printf("error: commit %d: votes is not an integer\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
       return ~0UL;
     }
-    //IDOS->Printf("votes: %ld\n", (ULONG)IJansson->json_integer_value(votes));
-    votesNum = (ULONG)IJansson->json_integer_value(votes);
+    IUtility->Strlcpy(stationData->homepage, IJansson->json_string_value(buf), sizeof(stationData->homepage));
+
+    buf = IJansson->json_object_get(data, "favicon");
+    if(!json_is_string(buf))
+    {
+      IJansson->json_decref(jsonRoot);
+      return ~0UL;
+    }
+    IUtility->Strlcpy(stationData->favicon, IJansson->json_string_value(buf), sizeof(stationData->favicon));
+
+    buf = IJansson->json_object_get(data, "votes");
+    if(!json_is_integer(buf))
+    {
+      IJansson->json_decref(jsonRoot);
+      return ~0UL;
+    }
+    stationData->votes = (ULONG)IJansson->json_integer_value(buf);
 
     stationNode = IListBrowser->AllocListBrowserNode( 4,
-        LBNA_UserData, stationData,
-        LBNA_Column, 0,
-          LBNCA_CopyText, TRUE,
-          LBNCA_Text,     charConv(IJansson->json_string_value(name)),
-        LBNA_Column, 1,
-          LBNCA_CopyText, TRUE,
-          LBNCA_Text, IJansson->json_string_value(country),
-        LBNA_Column, 2,
-          LBNCA_CopyInteger, TRUE,
-          LBNCA_Integer, &votesNum,
-          LBNCA_Justification, LCJ_RIGHT,
+        LBNA_UserData,          stationData,
+        LBNA_Column,            0,
+          LBNCA_CopyText,       TRUE,
+          LBNCA_Text,           stationData->name,
+        LBNA_Column,            1,
+          LBNCA_CopyText,       TRUE,
+          LBNCA_Text,           stationData->country,
+        LBNA_Column,            2,
+          LBNCA_CopyInteger,    TRUE,
+          LBNCA_Integer,        &stationData->votes,
+          LBNCA_Justification,  LCJ_RIGHT,
         TAG_DONE);
 
     if(stationNode)
@@ -226,8 +227,6 @@ size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)
       IExec->AddTail(stationList, stationNode);
     }
   }
-
-  //if (cd != (iconv_t)-1) iconv_close(cd);
 
   IJansson->json_decref(jsonRoot);
   return cnt;
@@ -259,15 +258,29 @@ void playRadio(struct Node *res_node)
 
 void showRadioInfo(struct Node *res_node)
 {
-  STRPTR  selListValue;
-  
-  IListBrowser->GetListBrowserNodeAttrs(res_node,
-      LBNA_Column,  0,
-      LBNCA_Text,   &selListValue,
-      TAG_DONE);
-  IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_LBL_INFO_NAME], windows[WID_MAIN], NULL,
-    GA_Text,   selListValue,
-    TAG_DONE);
+  if (res_node)
+  {
+    char radioInfo[512];
+
+    struct stationInfo *stationData = NULL;
+    stationData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+          AVT_Type,            MEMF_PRIVATE,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+
+    IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+          LBNA_UserData, &stationData,
+          TAG_DONE);
+
+    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n", stationData->name, stationData->favicon);
+
+    cacheFileFromUrl(stationData->favicon, NET_PORT_HTTPS, stationData->uuid);
+
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_LBL_INFO_RADIO], windows[WID_MAIN], NULL,
+          GA_TEXTEDITOR_Contents,   radioInfo,
+          TAG_DONE);
+
+  }
 }
 
 void freeStationInfo(struct stationInfo *stationData)

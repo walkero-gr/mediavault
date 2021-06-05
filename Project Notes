@@ -25,7 +25,7 @@ DONE - HTTP encode of the request URL (convert spaces to %20 etc)
 DONE - Make fixes on listbrowser column sizes and sorting
 - Check and fix unfreed memory
 - Notifications support
-- Add AmiUpdate support
+- Add AmiUpdate support or create self-update process
 DONE - Add icon when iconified
 DONE - Add a message window/requester
 - Check if player exists and show a message if not
@@ -37,6 +37,9 @@ DONE - Application registration
 DONE - Window can jump screen 
 DONE - Window size and position can be saved
 DONE - Changed the way classes and gadgets are initiallized
+DONE - Download avatar images in cache folder
+- Add play button at the right sidebar menu and replace double click
+
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
@@ -60,6 +63,8 @@ DONE - Add Popular list of radio stations at the left sidebar
 - Add a favorites list of radio stations at the left sidebar
 - Let list bring most voted first
 DONE - Set list to hide the broken stations
+- Download radio avatar images
+- Show avatar images at the right sidebar
 
 ## Podcasts
 

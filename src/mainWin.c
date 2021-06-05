@@ -150,6 +150,7 @@ extern Class *LabelClass;
 extern Class *LayoutClass;
 extern Class *ListBrowserClass;
 extern Class *StringClass;
+extern Class *TextEditorClass;
 extern Class *WindowClass;
 
 
@@ -212,29 +213,36 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
             // END - Left Sidebar
 
             LAYOUT_AddChild, gadgets[GID_PAGES] = radioPages,
-            /*
             LAYOUT_WeightBar, TRUE,
 
             // START - Right Sidebar
             LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
               LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-              
-              LAYOUT_AddChild, gadgets[GID_LBL_INFO_NAME] = IIntuition->NewObject(ButtonClass, NULL,
-                GA_ID, GID_LBL_INFO_NAME,
-                GA_RelVerify, TRUE,
-                BUTTON_Justification, BCJ_CENTER,
-                BUTTON_Transparent, TRUE,
-                BUTTON_BevelStyle, BVS_NONE,
-                TAG_DONE),
-                CHILD_WeightedHeight, 0,
 
+              LAYOUT_AddChild, gadgets[GID_LBL_INFO_RADIO] = IIntuition->NewObject(TextEditorClass, NULL,
+                GA_ID,                      GID_LBL_INFO_RADIO,
+                GA_RelVerify,               TRUE,
+                GA_TEXTEDITOR_BevelStyle,   BVS_NONE,
+                GA_TEXTEDITOR_CursorX,      0,
+                GA_TEXTEDITOR_CursorY,      0,
+                GA_TEXTEDITOR_Flow,         GV_TEXTEDITOR_Flow_Center,
+                GA_TEXTEDITOR_ReadOnly,     TRUE,
+                GA_TEXTEDITOR_Transparent,  TRUE,
+                TAG_DONE),
+              /*
+              Intuition->NewObject(StringClass, NULL,
+                GA_ID,                  GID_LBL_INFO_LANGUAGE,
+                GA_TabCycle,            FALSE,
+                STRINGA_Justification,  GACT_STRINGCENTER,
+                TAG_DONE),
+              */
               LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
                 TAG_DONE),
               TAG_DONE),
               CHILD_WeightedWidth, 30,
               CHILD_MinWidth, 200,
             // END - Right Sidebar
-           */
+
          TAG_DONE),
       TAG_DONE),
     TAG_DONE);
@@ -246,25 +254,25 @@ Object *buildMainMenu(struct Screen *screen)
     MA_AddChild, IIntuition->NewObject(NULL,"menuclass",MA_Type,T_MENU,
       MA_Label, "Project",
       MA_AddChild, IIntuition->NewObject(NULL,"menuclass",MA_Type,T_ITEM,
-        MA_ID, MID_ABOUT,
-        MA_Label, "About...",
-        MA_Key,   "?",
-        MA_Image, MenuImage("info",screen),
+        MA_ID,      MID_ABOUT,
+        MA_Label,   "About...",
+        MA_Key,     "?",
+        MA_Image,   MenuImage("info", screen),
         TAG_END),
       MA_AddChild, IIntuition->NewObject(NULL,"menuclass",MA_Type,T_ITEM,
-        MA_ID, MID_ICONIFY,
-        MA_Label, "Iconify",
-        MA_Key,   "I",
-        MA_Image, MenuImage("iconify", screen),
+        MA_ID,      MID_ICONIFY,
+        MA_Label,   "Iconify",
+        MA_Key,     "I",
+        MA_Image,   MenuImage("iconify", screen),
         TAG_END),
       MA_AddChild, IIntuition->NewObject(NULL,"menuclass",MA_Type,T_ITEM,
         MA_Label, ML_SEPARATOR,
         TAG_END),
       MA_AddChild, IIntuition->NewObject(NULL,"menuclass",MA_Type,T_ITEM,
-        MA_ID, MID_QUIT,
-        MA_Label, "Quit",
-        MA_Key,   "Q",
-        MA_Image, MenuImage("quit",screen),
+        MA_ID,      MID_QUIT,
+        MA_Label,   "Quit",
+        MA_Key,     "Q",
+        MA_Image,   MenuImage("quit", screen),
         TAG_END),
       TAG_END),
     TAG_END);
