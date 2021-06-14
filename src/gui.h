@@ -47,6 +47,7 @@ enum
 {
   OID_MAIN,
   OID_ABOUT,
+  OID_AVATAR_IMAGE,
   OID_LAST
 };
 
@@ -74,7 +75,8 @@ enum
   GID_PAGE_3,
   GID_RADIO_POPULAR_LISTBROWSER,
   GID_RADIO_TREND_LISTBROWSER,
-  GID_LBL_INFO_RADIO,
+  GID_INFO_RADIO_DATA,
+  GID_INFO_AVATAR,
   GID_LAST
 };
 
@@ -95,7 +97,6 @@ struct List stationsList;
 Object *gadgets[GID_LAST];
 Object *objects[OID_LAST];
 Object *menus[MID_LAST];
-
 
 void showGUI(void);
 

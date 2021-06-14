@@ -19,6 +19,14 @@
 
 #include <classes/requester.h>
 
+struct RenderHook {
+    struct Hook hook;
+    Object *img;
+    UWORD w;
+    UWORD h;
+    BOOL fill;
+};
+
 struct Image *MenuImage(CONST_STRPTR name, struct Screen *);
 void windowBlocking(Object *, BOOL);
 void gadgetBlocking(struct Window *, Object *, BOOL);
@@ -30,5 +38,8 @@ void FreeList(
   struct List *,
   void (*freeUserDataCallback)(struct stationInfo *)
 );
+void showAvatarImage(STRPTR, STRPTR);
+ULONG renderfunct(struct RenderHook *, Object *, struct gpRender *);
+     
 
 #endif

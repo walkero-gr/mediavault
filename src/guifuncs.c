@@ -16,14 +16,18 @@
 
 #include <intuition/gadgetclass.h>
 #include <classes/window.h>
-#include <images/bitmap.h>
+#include <gadgets/space.h>
 
 #include <proto/application.h>
 #include <proto/listbrowser.h>
 
 #include "globals.h"
+#include "gui.h"
 #include "guifuncs.h"
 #include "radiofuncs.h"
+#include "httpfuncs.h"
+
+extern Class *BitMapClass;
 
 /**
  * The following code is from MenuClass.c as found at the SDK 53.30 examples
@@ -209,43 +213,259 @@ void FreeList(
 
   IExec->FreeSysObject(ASOT_LIST, listBrowser);
 }
-/*
-void myFreeListBrowserList(struct List *list)
+
+static STRPTR getCachedImageIfExists(STRPTR uuid)
 {
- struct Node *node = NULL;
- struct Node *nextNode = NULL;
- struct MyDataStructure *myData = NULL;
- if (list)
-  {
-   node = IExec->GetHead(list);
-   while (node)
-    {
-     nextNode = IExec->GetSucc(node);
-     
+  char buf[128];
+  char avatarBase[128];
+  IUtility->Strlcpy(avatarBase, CACHE_DIR, sizeof(avatarBase));
+  IUtility->Strlcat(avatarBase, uuid, sizeof(avatarBase));
 
-     // Unlink the node from the list.
-     IExec->Remove(node);
-
-
-
-     // Obtain and free the user data.
-
-     IListBrowser->GetListBrowserNodeAttrs(node, LBNA_UserData, &myData, TAG_END);
-
-     if (myData) IExec->FreeVec(myData);
-
-
-
-     // Dispose of the node.
-
-     IListBrowser->FreeListBrowserNode(node);
-
-     node = nextNode;
-    }
-
-   // Finally, dispose of the listbrowser list.
-   IExec->FreeSysObject(ASOT_LIST, list);
-  }
-
+  //char avatar[128];
+  IDOS->Printf("getCachedImageIfExists: %s\n",  uuid);
+  BPTR imgLock;        
+  const char ext[][6] = {".jpg", ".png", ".webp", ".ico", ".gif"};
+  
+  size_t i;
+  for (i = 0; i < sizeof(ext)/sizeof(ext[0]); i++)
+  {
+    IDOS->Printf("EXT: %s\n",  ext[i]);
+    
+    IUtility->Strlcpy(buf, avatarBase, sizeof(buf));
+    IUtility->Strlcat(buf, ext[i], sizeof(buf));
+    IDOS->Printf("Lock: %s\n", buf);
+    imgLock = IDOS->Lock(buf, SHARED_LOCK);
+    if (imgLock)
+    {
+      STRPTR avatar = IExec->AllocVecTags(sizeof(char) * 128,
+          AVT_Type,            MEMF_SHARED,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+      IDOS->UnLock(imgLock);
+      //IUtility->Strlcpy(avatar, buf, sizeof(avatar));
+      strcpy(avatar, buf);
+      //return avatar;
+      IDOS->Printf("Avatar found: %s\nbuf: %s\n", avatar, buf);
+      return avatar;
+      //break;
+    }
+  }
+  IDOS->Printf("Cached avatar not found\n");
+  return NULL;
 }
-*/
+
+void showAvatarImage(STRPTR uuid, STRPTR url)
+{
+  //Object *avatarImageObj = NULL;
+  struct Screen *screen = NULL;
+  
+  //STRPTR avatarImage = NULL;
+  IDOS->Printf("showAvatarImage\n");
+  //## TODO: First show MediaVault avatar in right sidebar
+
+  //## TODO: Check first if the avatar exists in cache
+  //IUtility->Strlcpy(avatarImage, getCachedImageIfExists(uuid), sizeof(avatarImage));
+  STRPTR avatarImage = getCachedImageIfExists(uuid);
+  IDOS->Printf("Avatar url: %s\n", url);
+
+  if (!avatarImage)
+  {
+    cacheFileFromUrl(url, getPortByURL(url), uuid);
+    avatarImage = getCachedImageIfExists(uuid);
+  }
+
+  if (!avatarImage)
+  {
+    avatarImage = (STRPTR)LOGO_IMAGE;
+  }
+  IDOS->Printf("Avatar found in cache: %s\n", avatarImage);
+
+
+  //if (screen) IDOS->Printf("Screen is set\n");
+
+  //## TODO: Show this image at the right sidebar
+  /*
+  */
+  if (avatarImage)
+  {
+    if((screen = IIntuition->LockPubScreen(NULL)))
+    {
+
+
+      /*
+      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
+          GA_Image, NULL,
+          TAG_END );
+
+      if (objects[OID_AVATAR_IMAGE]) IDOS->Printf("OID_AVATAR_IMAGE is set 1\n");
+      IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
+      */
+
+
+      objects[OID_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+          IA_Scalable,        FALSE,
+          BITMAP_Screen,      screen,
+          BITMAP_SourceFile,  avatarImage,
+          BITMAP_Masking,     TRUE,
+          TAG_END);
+
+      if (objects[OID_AVATAR_IMAGE]) IDOS->Printf("OID_AVATAR_IMAGE is set 2\n");
+
+      struct RenderHook *renderhook = (struct RenderHook *) IExec->AllocSysObjectTags(ASOT_HOOK,
+            ASOHOOK_Size,  sizeof(struct RenderHook),
+            ASOHOOK_Entry, (HOOKFUNC)renderfunct,
+            TAG_END);
+
+      if (renderhook && objects[OID_AVATAR_IMAGE])
+      {
+        renderhook->img  = objects[OID_AVATAR_IMAGE];
+        renderhook->w    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Width;
+        renderhook->h    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Height;
+        renderhook->fill = FALSE;
+        IDOS->Printf("W: %ld, H: %ld \n", renderhook->w, renderhook->h);
+
+        IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
+            SPACE_RenderHook,   renderhook,
+            GA_Image,           objects[OID_AVATAR_IMAGE],
+            TAG_END );
+
+        IIntuition->IDoMethod( objects[OID_MAIN], WM_RETHINK );
+        IIntuition->RefreshWindowFrame( windows[WID_MAIN] );
+      }
+
+
+
+
+
+      /*
+      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
+          BUTTON_RenderImage, NULL,
+        TAG_END );
+      IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
+
+      avatarImageObj = IIntuition->NewObject(BitMapClass, NULL,
+          GA_ID,              OID_AVATAR_IMAGE,
+          IA_Scalable,        TRUE,
+          BITMAP_Screen,      screen,
+          BITMAP_SourceFile,  avatarImage,
+          BITMAP_Masking,     TRUE,
+          TAG_END);
+
+      if (objects[OID_AVATAR_IMAGE]) IDOS->Printf("OID_AVATAR_IMAGE is set 2\n");
+
+
+      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
+          BUTTON_RenderImage, avatarImageObj,
+          TAG_END );
+      */
+      IIntuition->UnlockPubScreen(NULL, screen);
+      screen = NULL;
+    }
+  }
+  IDOS->Printf("================================\n");
+}
+
+struct Region *set_clip_region (struct RastPort *rp,struct Rectangle *rect, BOOL *in_refresh)
+{
+  struct Region *old_region = NULL;
+  struct Layer *layer = rp->Layer;
+
+  if (layer)
+    {
+    struct Region *new_region = IGraphics->NewRegion();
+
+    if (new_region)
+      IGraphics->OrRectRegion (new_region,rect);
+
+    if (layer->Flags & LAYERUPDATING)
+      {
+      ILayers->EndUpdate (layer,FALSE);
+      *in_refresh = TRUE;
+      }
+    else
+      *in_refresh = FALSE;
+
+    old_region = ILayers->InstallClipRegion (layer,new_region);
+    }
+
+  return (old_region);
+}
+
+void remove_clip_region (struct RastPort *rp,struct Region *old_region, BOOL in_refresh)
+{
+  struct Layer *layer = rp->Layer;
+
+  if (layer)
+    {
+    struct Region *new_region = ILayers->InstallClipRegion (layer,old_region);
+
+    if (new_region)
+      IGraphics->DisposeRegion (new_region);
+
+    if (in_refresh)
+      ILayers->BeginUpdate (layer);
+    }
+}
+
+ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
+{
+  Object *img = hook->img;
+  struct IBox box;
+  struct impDraw drawmsg;
+  long w,h;
+  struct Rectangle clip_rect;
+  struct Region *old_region;
+  BOOL in_refresh;
+
+  if (!img) return (0);
+
+  IIntuition->GetAttr (SPACE_RenderBox, obj, (ULONG *)&box);
+
+  // TODO: Put some more thought on resizing
+  w = box.Width;
+  h = hook->h * box.Width / hook->w;
+
+  //h = box.Height;
+  //w = hook->w * box.Height / hook->h;
+  /*
+  if (hook->fill)
+    {
+    if (h < box.Height)
+      {
+      h = box.Height;
+      w = hook->w * box.Height / hook->h;
+      }
+    }
+  else
+    {
+    if (h > box.Height)
+      {
+      h = box.Height;
+      w = hook->w * box.Height / hook->h;
+      }
+    }
+  */
+  clip_rect.MinX = box.Left;
+  clip_rect.MinY = box.Top;
+  clip_rect.MaxX = box.Left + box.Width - 1;
+  clip_rect.MaxY = box.Top + box.Height - 1;
+  old_region = set_clip_region (msg->gpr_RPort,&clip_rect,&in_refresh);
+
+  drawmsg.MethodID              = IM_DRAWFRAME;
+  drawmsg.imp_RPort             = msg->gpr_RPort;
+
+  drawmsg.imp_Offset.X          = box.Left + (box.Width  - w) / 2;
+  drawmsg.imp_Offset.Y          = box.Top  + (box.Height - h) / 2;
+  //drawmsg.imp_Offset.X          = box.Left;
+  //drawmsg.imp_Offset.Y          = box.Top - topMarginScroll;
+  
+  drawmsg.imp_State             = IDS_NORMAL;
+  drawmsg.imp_DrInfo            = msg->gpr_GInfo->gi_DrInfo;
+  drawmsg.imp_Dimensions.Width  = w;
+  drawmsg.imp_Dimensions.Height = h;
+  IIntuition->IDoMethodA (img, (Msg)&drawmsg);
+
+  remove_clip_region (msg->gpr_RPort,old_region,in_refresh);
+
+  return (0);
+}

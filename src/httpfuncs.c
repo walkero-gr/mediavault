@@ -129,7 +129,7 @@ static STRPTR doRequest(void)
   return NULL;
 }
   
-void cacheFileFromUrl(STRPTR url, int portNum, STRPTR filename)
+void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
 {
   if (IUtility->Stricmp(url, ""))
   {
@@ -155,7 +155,7 @@ void cacheFileFromUrl(STRPTR url, int portNum, STRPTR filename)
         {
           IDOS->Printf("Connection done fine!\n");
 
-          IDOS->Printf("Trying to load %s\n", requestUrl);
+          IDOS->Printf("Trying to load %s at port %ld \n", requestUrl, portNum);
           httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
           IDOS->Printf("Create HTTP Request: %s\n", httpreq);
           net->SendHTTPRequest(httpreq);
@@ -164,34 +164,37 @@ void cacheFileFromUrl(STRPTR url, int portNum, STRPTR filename)
           IDOS->Printf("GetContentType: %s\n", net->GetContentType());
           IDOS->Printf("GetContentLength: %lld\n", net->GetContentLength());
           IDOS->Printf("GetHTTPResponseLength: %lld\n", net->GetHTTPResponseLength());
+          STRPTR fileTypeExt = (STRPTR)getContentTypeExt(net->GetContentType());
 
-          STRPTR httpRespBody = net->GetResponseBody();
-          if (httpRespBody)
+          if ((net->GetContentLength() < net->GetHTTPResponseLength()) && fileTypeExt)
           {
-            char targetFile[128];
-            
-        		IUtility->Strlcpy(targetFile, "PROGDIR:cache/", sizeof(targetFile));
-        		IUtility->Strlcat(targetFile, filename, sizeof(targetFile));
-        		IUtility->Strlcat(targetFile, getContentTypeExt(net->GetContentType()), sizeof(targetFile));
-       		        		
-            BPTR fh = IDOS->FOpen(targetFile, MODE_NEWFILE, 0);
-            if (fh)
+            STRPTR httpRespBody = net->GetResponseBody();
+            if (httpRespBody)
             {
-              IDOS->Printf("File opened just fine!\n");
-              size_t i = 0;
-              for (; i < net->GetContentLength(); i++) {
-                IDOS->FPutC(fh, httpRespBody[i]);
+              char targetFile[128];
+              
+              IUtility->Strlcpy(targetFile, CACHE_DIR, sizeof(targetFile));
+              IUtility->Strlcat(targetFile, filename, sizeof(targetFile));
+              IUtility->Strlcat(targetFile, fileTypeExt, sizeof(targetFile));
+                        
+              BPTR fh = IDOS->FOpen(targetFile, MODE_NEWFILE, 0);
+              if (fh)
+              {
+                IDOS->Printf("File opened just fine!\n");
+                size_t i = 0;
+                for (; i < net->GetContentLength(); i++) {
+                  IDOS->FPutC(fh, httpRespBody[i]);
+                }
+                IDOS->Printf("After FPutC!\n");
+                IDOS->FClose(fh);
+                IDOS->Printf("After FClose!\n");
               }
-              IDOS->Printf("After FPutC!\n");
-              IDOS->FClose(fh);
-              IDOS->Printf("After FClose!\n");
+              else IDOS->Printf("File Open failed\n");
+              //return httpRespBody;
+              
             }
-            else IDOS->Printf("File Open failed\n");
-            //return httpRespBody;
-            
+            else IDOS->Printf("No response\n");
           }
-          else IDOS->Printf("No response\n");
-
 
         }
         else IDOS->Printf("Connection failed!\n");
@@ -209,19 +212,33 @@ void cacheFileFromUrl(STRPTR url, int portNum, STRPTR filename)
 
 static CONST_STRPTR getContentTypeExt(STRPTR contentType)
 {
-	
   if (!IUtility->Stricmp(contentType, "image/jpeg"))
-	{
-	  return ".jpg";
-	}
-	if (!IUtility->Stricmp(contentType, "image/png"))
-	{
-		return ".png";
-	}
-	if (!IUtility->Stricmp(contentType, "image/webp"))
-	{
-		return ".webp";
-	}
-	
-	return NULL;
+  {
+    return ".jpg";
+  }
+  if (!IUtility->Stricmp(contentType, "image/png"))
+  {
+    return ".png";
+  }
+  if (!IUtility->Stricmp(contentType, "image/webp"))
+  {
+    return ".webp";
+  }
+  if (!IUtility->Stricmp(contentType, "image/vnd.microsoft.icon"))
+  {
+    return ".ico";
+  }
+  if (!IUtility->Stricmp(contentType, "image/gif"))
+  {
+    return ".gif";
+  }
+  return NULL;
+}
+
+ULONG getPortByURL(STRPTR url)
+{
+  //if (!IUtility->Strnicmp(url, "https://", 8))  return NET_PORT_HTTPS;
+  if (!IUtility->Strnicmp(url, "http://", 7))  return NET_PORT_HTTP;
+
+  return NET_PORT_HTTPS;
 }

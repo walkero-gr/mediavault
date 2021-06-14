@@ -21,6 +21,7 @@
 #include "libshandler.h"
 #include "httpfuncs.h"
 #include "stringfuncs.h"
+#include "guifuncs.h"
 
 uint8 maxRadioResults = 20;
 
@@ -272,11 +273,11 @@ void showRadioInfo(struct Node *res_node)
           LBNA_UserData, &stationData,
           TAG_DONE);
 
-    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n", stationData->name, stationData->favicon);
+    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n", stationData->name, stationData->country);
 
-    cacheFileFromUrl(stationData->favicon, NET_PORT_HTTPS, stationData->uuid);
+    showAvatarImage(stationData->uuid, stationData->favicon);
 
-    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_LBL_INFO_RADIO], windows[WID_MAIN], NULL,
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,
           TAG_DONE);
 

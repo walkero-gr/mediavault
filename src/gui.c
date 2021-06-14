@@ -56,7 +56,7 @@ void showGUI(void)
     {
       //drInfo = IIntuition->GetScreenDrawInfo(screen);
       menus[MID_PROJECT]  = buildMainMenu(screen);
-      objects[OID_MAIN]   = buildMainWindow(appPort, menus[MID_PROJECT]);
+      objects[OID_MAIN]   = buildMainWindow(appPort, menus[MID_PROJECT], screen);
       objects[OID_ABOUT]  = buildAboutWindow(appPort, screen);
 
       gadgets[GID_MSG_REQ] = IIntuition->NewObject(NULL, "requester.class",
@@ -308,8 +308,7 @@ void showGUI(void)
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
                             playRadio((struct Node *)res_node);
                           }
-
-                          if (res_value == LBRE_NORMAL)
+                          else if (res_value == LBRE_NORMAL)
                           {                            
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
                             showRadioInfo((struct Node *)res_node);

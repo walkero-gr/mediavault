@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1370458091">
+<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1371165727">
 	<plugin name="PROGDIR:Plugins&#047;AmigaOS4SDK.CCPlugin" flags="0"/>
 	<target run="MediaVault"/>
 	<homedir name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault"/>
@@ -45,7 +45,7 @@
 	<flags value="0x0000000000068001"/>
 	<buildscript name="Makefile" depth="3" open="0"/>
 	<projectnotes open="0"/>
-	<buildwindow open="1"/>
+	<buildwindow open="0"/>
 	<targets>
 		<target name="MediaVault" linker="gcc:bin&#047;gcc" switches="-lauto" flags="0x00000002">
 			<file name="src&#047;mediavault.c"/>

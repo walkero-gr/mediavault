@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-
+## [1.3] - [future]
 
 ## [1.2.1] - 2021-05-31
 ### Fixed

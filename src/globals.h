@@ -20,8 +20,10 @@
 #include <proto/amijansson.h>
 #include <proto/dos.h>
 #include <proto/exec.h>   
+#include <proto/graphics.h>
 #include <proto/icon.h>
 #include <proto/intuition.h>
+#include <proto/layers.h>
 #include <proto/oo.h>          
 #include <proto/utility.h>
 
@@ -38,6 +40,9 @@ static CONST_STRPTR stack USED = "$STACK:102400";
 static CONST_STRPTR version USED = VERSTAG;
 
 void die(const char *s);
+
+#define CACHE_DIR "PROGDIR:cache/"
+#define LOGO_IMAGE "PROGDIR:images/logo_128.png"
 
 struct filters
 {

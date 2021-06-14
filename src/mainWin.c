@@ -15,6 +15,7 @@
 */
 
 #include <proto/listbrowser.h>
+#include <gadgets/space.h>
 
 #include "globals.h"
 #include "gui.h"
@@ -144,6 +145,7 @@ static const ULONG listToPage[] = {
     TAG_END
 };
 
+extern Class *BitMapClass;
 extern Class *ButtonClass;
 extern Class *ChooserClass;
 extern Class *LabelClass;
@@ -154,7 +156,7 @@ extern Class *TextEditorClass;
 extern Class *WindowClass;
 
 
-Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
+Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen *screen)
 {                                           
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
 
@@ -164,6 +166,27 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
         PAGE_Add, gadgets[GID_PAGE_2] = buildRadioPopularPage(),
         PAGE_Add, gadgets[GID_PAGE_3] = buildRadioTrendPage(),
         TAG_DONE);
+
+  objects[OID_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        GA_ID,              OID_AVATAR_IMAGE,
+        IA_Scalable,        FALSE,
+        BITMAP_Screen,      screen,
+        BITMAP_SourceFile,  LOGO_IMAGE,
+        BITMAP_Masking,     TRUE,
+        TAG_END);
+
+  struct RenderHook *renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
+        ASOHOOK_Size,  sizeof(struct RenderHook),
+        ASOHOOK_Entry, (HOOKFUNC)renderfunct,
+        TAG_END);
+
+  if (renderhook && objects[OID_AVATAR_IMAGE])
+  {
+    renderhook->img  = objects[OID_AVATAR_IMAGE];
+    renderhook->w    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Width;
+    renderhook->h    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Height;
+    renderhook->fill = FALSE;
+  }
 
   return IIntuition->NewObject(WindowClass, NULL,
     WA_ScreenTitle,         VSTRING,
@@ -218,9 +241,36 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
             // START - Right Sidebar
             LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
               LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+              /*
+              LAYOUT_AddImage, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(BitMapClass, NULL,
+                GA_ID,              GID_INFO_AVATAR,
+                IA_Scalable,        FALSE,
+                BITMAP_SourceFile,  "PROGDIR:images/logo_128.png",
+                BITMAP_Screen,      screen,
+                //BITMAP_Precision, PRECISION_EXACT,
+                BITMAP_Masking,     TRUE,
+                //BITMAP_Width, 50,
+                //BITMAP_Height, 50,
+                TAG_END),
+                CHILD_WeightedWidth, 30,     
+                CHILD_MaxHeight, 128,
+              */
 
-              LAYOUT_AddChild, gadgets[GID_LBL_INFO_RADIO] = IIntuition->NewObject(TextEditorClass, NULL,
-                GA_ID,                      GID_LBL_INFO_RADIO,
+              LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(NULL, "space.gadget", // SpaceObject,
+                GA_ID,                      GID_INFO_AVATAR,
+                SPACE_MinWidth,             128,
+                SPACE_MinHeight,            128,
+                SPACE_RenderHook,           renderhook,
+                GA_Image,                   objects[OID_AVATAR_IMAGE],
+                TAG_DONE),
+              /*
+              LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(ButtonClass, NULL,
+                GA_ID,                      GID_INFO_AVATAR,
+                GA_Image,                   objects[OID_AVATAR_IMAGE],
+                TAG_DONE),
+              */
+              LAYOUT_AddChild, gadgets[GID_INFO_RADIO_DATA] = IIntuition->NewObject(TextEditorClass, NULL,
+                GA_ID,                      GID_INFO_RADIO_DATA,
                 GA_RelVerify,               TRUE,
                 GA_TEXTEDITOR_BevelStyle,   BVS_NONE,
                 GA_TEXTEDITOR_CursorX,      0,
@@ -229,13 +279,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu)
                 GA_TEXTEDITOR_ReadOnly,     TRUE,
                 GA_TEXTEDITOR_Transparent,  TRUE,
                 TAG_DONE),
-              /*
-              Intuition->NewObject(StringClass, NULL,
-                GA_ID,                  GID_LBL_INFO_LANGUAGE,
-                GA_TabCycle,            FALSE,
-                STRINGA_Justification,  GACT_STRINGCENTER,
-                TAG_DONE),
-              */
+
               LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
                 TAG_DONE),
               TAG_DONE),

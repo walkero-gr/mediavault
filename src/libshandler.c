@@ -10,6 +10,8 @@
 struct Library *ApplicationBase;  struct ApplicationIFace   *IApplication;
 struct Library *IntuitionBase;    struct IntuitionIFace     *IIntuition;
 struct Library *UtilityBase;      struct UtilityIFace       *IUtility;
+struct Library *GraphicsBase;     struct GraphicsIFace      *IGraphics;
+struct Library *LayersBase;       struct LayersIFace        *ILayers;
 struct Library *OOBase;           struct OOIFace            *IOO;
 struct Library *JanssonBase;      struct JanssonIFace       *IJansson;
 struct Library *AmiSSLMasterBase;
@@ -64,6 +66,12 @@ int CleanExit(const char *str)
   if(IJansson)          IExec->DropInterface((struct Interface *) IJansson);
   if(JanssonBase)       IExec->CloseLibrary(JanssonBase);
 
+  if(ILayers)           IExec->DropInterface((struct Interface *) ILayers);
+  if(LayersBase)        IExec->CloseLibrary(LayersBase);
+
+  if(IGraphics)         IExec->DropInterface((struct Interface *) IGraphics);
+  if(GraphicsBase)      IExec->CloseLibrary(GraphicsBase);
+
   if(IUtility)          IExec->DropInterface((struct Interface *) IUtility);
   if(UtilityBase)       IExec->CloseLibrary(UtilityBase);
 
@@ -110,6 +118,20 @@ int OpenLibs(void)
     if(!IUtility) return CleanExit("Can't open utility.library Interface");
   }
   else return CleanExit("Can't open utility.library version 53");
+  
+  if ((GraphicsBase = IExec->OpenLibrary( "graphics.library", 54 )))
+  {
+    IGraphics = (struct GraphicsIFace *)IExec->GetInterface( GraphicsBase, "main", 1, NULL );
+    if(!IGraphics) return CleanExit("Can't open graphics.library Interface");
+  }
+  else return CleanExit("Can't open graphics.library version 54");
+
+  if ((LayersBase = IExec->OpenLibrary( "layers.library", 54 )))
+  {
+    ILayers = (struct LayersIFace *)IExec->GetInterface( LayersBase, "main", 1, NULL );
+    if(!ILayers) return CleanExit("Can't open layers.library Interface");
+  }
+  else return CleanExit("Can't open layers.library version 54");
 
   if ((JanssonBase = IExec->OpenLibrary( "jansson.library", 2 )))
   {

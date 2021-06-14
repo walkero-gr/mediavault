@@ -18,7 +18,7 @@
 #ifndef _MAINWIN_H
 #define _MAINWIN_H
 
-Object *buildMainWindow(struct MsgPort *, Object *);
+Object *buildMainWindow(struct MsgPort *, Object *, struct Screen *);
 Object *buildMainMenu(struct Screen *);
 CONST_STRPTR getChooserText(int gadgetId, uint16 code);
 void getLeftSidebarContent(void);

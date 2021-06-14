@@ -3,3 +3,8 @@ src/*.o
 MediaVault
 *.bak
 debug/
+cache/*.jpg
+cache/*.png
+cache/*.ico
+cache/*.gif
+cache/*.webp

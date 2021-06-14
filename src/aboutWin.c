@@ -108,12 +108,9 @@ Object *buildAboutWindow(struct MsgPort *appPort, struct Screen *screen)
         
         LAYOUT_AddImage, IIntuition->NewObject(BitMapClass, NULL,
           IA_Scalable,        FALSE,
-          BITMAP_SourceFile,  "PROGDIR:images/logo_128.png",
+          BITMAP_SourceFile,  LOGO_IMAGE,
           BITMAP_Screen,      screen,
-          //BITMAP_Precision, PRECISION_EXACT,
           BITMAP_Masking,     TRUE,
-          //BITMAP_Width, 50,
-          //BITMAP_Height, 50,
         TAG_END),
         CHILD_WeightedWidth, 30,     
         CHILD_MaxHeight, 128, 
