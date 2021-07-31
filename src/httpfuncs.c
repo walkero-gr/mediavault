@@ -35,8 +35,11 @@ STRPTR getResponseBody(char *url, int portNum)
   {
     requestUrl = url;
     requestPort = portNum;
-    //IDOS->Printf("URL: %s\n", url);
+    
+    IDOS->Printf("URL: %s\n", url);
+
     STRPTR httpResponse = doRequest();
+                                    
 
     if (httpResponse)
     {
@@ -135,34 +138,34 @@ void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
     requestUrl = url;
     requestPort = portNum;
 
-    //IDOS->Printf("URL: %s\n", url);
+    IDOS->Printf("URL: %s\n", url);
 
     STRPTR  httpreq = NULL;
 
-    //IDOS->Printf("cacheFileFromUrl called\n");
+    IDOS->Printf("cacheFileFromUrl called\n");
     net = (NETWORKOBJ *)IOO->NewNetworkObject();
 
     if (net != NULL)
     {
-      //IDOS->Printf("Network is fine!\n");
+      IDOS->Printf("Network is fine!\n");
 
       if (net->CreateConnection(requestUrl, requestPort, TRUE, TRUE))
       {
-        //IDOS->Printf("Connection created just fine!\n");
+        IDOS->Printf("Connection created just fine!\n");
 
         if (net->GetConnection())
         {
-          //IDOS->Printf("Connection done fine!\n");
+          IDOS->Printf("Connection done fine!\n");
 
-          //IDOS->Printf("Trying to load %s at port %ld \n", requestUrl, portNum);
+          IDOS->Printf("Trying to load %s at port %ld \n", requestUrl, portNum);
           httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
-          //IDOS->Printf("Create HTTP Request: %s\n", httpreq);
+          IDOS->Printf("Create HTTP Request: %s\n", httpreq);
           net->SendHTTPRequest(httpreq);
           //IDOS->Printf("GetResponseBody\n%s\n", net->GetResponseBody());
 
-          //IDOS->Printf("GetContentType: %s\n", net->GetContentType());
-          //IDOS->Printf("GetContentLength: %lld\n", net->GetContentLength());
-          //IDOS->Printf("GetHTTPResponseLength: %lld\n", net->GetHTTPResponseLength());
+          IDOS->Printf("GetContentType: %s\n", net->GetContentType());
+          IDOS->Printf("GetContentLength: %lld\n", net->GetContentLength());
+          IDOS->Printf("GetHTTPResponseLength: %lld\n", net->GetHTTPResponseLength());
           STRPTR fileTypeExt = (STRPTR)getContentTypeExt(net->GetContentType());
 
           if ((net->GetContentLength() < net->GetHTTPResponseLength()) && fileTypeExt)
@@ -179,14 +182,14 @@ void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
               BPTR fh = IDOS->FOpen(targetFile, MODE_NEWFILE, 0);
               if (fh)
               {
-                //IDOS->Printf("File opened just fine!\n");
+                IDOS->Printf("File opened just fine!\n");
                 size_t i = 0;
                 for (; i < net->GetContentLength(); i++) {
                   IDOS->FPutC(fh, httpRespBody[i]);
                 }
-                //IDOS->Printf("After FPutC!\n");
+                IDOS->Printf("After FPutC!\n");
                 IDOS->FClose(fh);
-                //IDOS->Printf("After FClose!\n");
+                IDOS->Printf("After FClose!\n");
               }
               else IDOS->Printf("File Open failed\n");
               //return httpRespBody;
@@ -206,7 +209,7 @@ void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
     }
     else IDOS->Printf("Network Object creation failed!\n");
   }
-  //IDOS->Printf("FIN!\n");
+  IDOS->Printf("FIN!\n");
 }
 
 static CONST_STRPTR getContentTypeExt(STRPTR contentType)
