@@ -96,7 +96,7 @@ Object *buildAboutWindow(struct MsgPort *appPort, struct Screen *screen)
       LAYOUT_Orientation,   LAYOUT_ORIENT_VERT,
       LAYOUT_SpaceOuter,    TRUE,
       LAYOUT_DeferLayout,   TRUE,
-               
+
       LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
         GA_ID,                  GID_ABOUT_LAYOUT_TEXT,
         LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
@@ -105,30 +105,30 @@ Object *buildAboutWindow(struct MsgPort *appPort, struct Screen *screen)
         LAYOUT_BevelStyle,      BVS_NONE,
         LAYOUT_BevelState,      IDS_SELECTED,
         LAYOUT_BackFill,        LAYERS_NOBACKFILL,
-        
+
         LAYOUT_AddImage, IIntuition->NewObject(BitMapClass, NULL,
           IA_Scalable,        FALSE,
           BITMAP_SourceFile,  LOGO_IMAGE,
           BITMAP_Screen,      screen,
           BITMAP_Masking,     TRUE,
         TAG_END),
-        CHILD_WeightedWidth, 30,     
-        CHILD_MaxHeight, 128, 
+        CHILD_WeightedWidth, 30,
+        CHILD_MaxHeight, 128,
 
         LAYOUT_AddChild, textBox,
         LAYOUT_AddChild, textBoxScroller,
 
       TAG_DONE),
-      CHILD_MinWidth,   520,    
-      CHILD_MinHeight,  200,   
-      
+      CHILD_MinWidth,   520,
+      CHILD_MinHeight,  200,
+
       LAYOUT_AddChild, IIntuition->NewObject(ButtonClass, NULL,
         GA_ID,              GID_ABOUT_BUTTON_OK,
         GA_RelVerify,       TRUE,
         GA_Text,            "_Okay",
         BUTTON_AutoButton,  0,
-      TAG_DONE),                
+      TAG_DONE),
       CHILD_MaxHeight, 40,
-    TAG_DONE), 
+    TAG_DONE),
   TAG_DONE);
 }

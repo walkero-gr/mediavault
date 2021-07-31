@@ -263,6 +263,8 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
                 SPACE_RenderHook,           renderhook,
                 GA_Image,                   objects[OID_AVATAR_IMAGE],
                 TAG_DONE),
+                //CHILD_MaxWidth, 256,
+                //CHILD_MaxHeight, 256,
               /*
               LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(ButtonClass, NULL,
                 GA_ID,                      GID_INFO_AVATAR,

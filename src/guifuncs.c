@@ -222,18 +222,18 @@ static STRPTR getCachedImageIfExists(STRPTR uuid)
   IUtility->Strlcat(avatarBase, uuid, sizeof(avatarBase));
 
   //char avatar[128];
-  IDOS->Printf("getCachedImageIfExists: %s\n",  uuid);
+  //IDOS->Printf("getCachedImageIfExists: %s\n",  uuid);
   BPTR imgLock;        
   const char ext[][6] = {".jpg", ".png", ".webp", ".ico", ".gif"};
   
   size_t i;
   for (i = 0; i < sizeof(ext)/sizeof(ext[0]); i++)
   {
-    IDOS->Printf("EXT: %s\n",  ext[i]);
+    //IDOS->Printf("EXT: %s\n",  ext[i]);
     
     IUtility->Strlcpy(buf, avatarBase, sizeof(buf));
     IUtility->Strlcat(buf, ext[i], sizeof(buf));
-    IDOS->Printf("Lock: %s\n", buf);
+    //IDOS->Printf("Lock: %s\n", buf);
     imgLock = IDOS->Lock(buf, SHARED_LOCK);
     if (imgLock)
     {
@@ -245,12 +245,12 @@ static STRPTR getCachedImageIfExists(STRPTR uuid)
       //IUtility->Strlcpy(avatar, buf, sizeof(avatar));
       strcpy(avatar, buf);
       //return avatar;
-      IDOS->Printf("Avatar found: %s\nbuf: %s\n", avatar, buf);
+      //IDOS->Printf("Avatar found: %s\nbuf: %s\n", avatar, buf);
       return avatar;
       //break;
     }
   }
-  IDOS->Printf("Cached avatar not found\n");
+  //IDOS->Printf("Cached avatar not found\n");
   return NULL;
 }
 
@@ -260,13 +260,13 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
   struct Screen *screen = NULL;
   
   //STRPTR avatarImage = NULL;
-  IDOS->Printf("showAvatarImage\n");
+  //IDOS->Printf("showAvatarImage\n");
   //## TODO: First show MediaVault avatar in right sidebar
 
   //## TODO: Check first if the avatar exists in cache
   //IUtility->Strlcpy(avatarImage, getCachedImageIfExists(uuid), sizeof(avatarImage));
   STRPTR avatarImage = getCachedImageIfExists(uuid);
-  IDOS->Printf("Avatar url: %s\n", url);
+  //IDOS->Printf("Avatar url: %s\n", url);
 
   if (!avatarImage)
   {
@@ -278,7 +278,7 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
   {
     avatarImage = (STRPTR)LOGO_IMAGE;
   }
-  IDOS->Printf("Avatar found in cache: %s\n", avatarImage);
+  //IDOS->Printf("Avatar found in cache: %s\n", avatarImage);
 
 
   //if (screen) IDOS->Printf("Screen is set\n");
@@ -309,7 +309,7 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
           BITMAP_Masking,     TRUE,
           TAG_END);
 
-      if (objects[OID_AVATAR_IMAGE]) IDOS->Printf("OID_AVATAR_IMAGE is set 2\n");
+      //if (objects[OID_AVATAR_IMAGE]) IDOS->Printf("OID_AVATAR_IMAGE is set 2\n");
 
       struct RenderHook *renderhook = (struct RenderHook *) IExec->AllocSysObjectTags(ASOT_HOOK,
             ASOHOOK_Size,  sizeof(struct RenderHook),
@@ -322,7 +322,7 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
         renderhook->w    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Width;
         renderhook->h    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Height;
         renderhook->fill = FALSE;
-        IDOS->Printf("W: %ld, H: %ld \n", renderhook->w, renderhook->h);
+        //IDOS->Printf("W: %ld, H: %ld \n", renderhook->w, renderhook->h);
 
         IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
             SPACE_RenderHook,   renderhook,
@@ -362,7 +362,7 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
       screen = NULL;
     }
   }
-  IDOS->Printf("================================\n");
+  //IDOS->Printf("================================\n");
 }
 
 struct Region *set_clip_region (struct RastPort *rp,struct Rectangle *rect, BOOL *in_refresh)
@@ -424,6 +424,10 @@ ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
   // TODO: Put some more thought on resizing
   w = box.Width;
   h = hook->h * box.Width / hook->w;
+
+  //IDOS->Printf("BOX: %ld x %d\n", box.Width, box.Height);
+  //IDOS->Printf("HOOK: %ld x %ld\n", hook->w, hook->h);
+  //IDOS->Printf("CALC: %ld x %ld\n", w, h);
 
   //h = box.Height;
   //w = hook->w * box.Height / hook->h;
