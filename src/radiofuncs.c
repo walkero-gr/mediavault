@@ -23,7 +23,7 @@
 #include "stringfuncs.h"
 #include "guifuncs.h"
 
-uint8 maxRadioResults = 20;
+uint8 maxRadioResults = 50;
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";  
 static char url[255];
@@ -79,7 +79,7 @@ STRPTR getRadioStations(struct filters lastFilters, int offset)
     IExec->FreeVec(encSelCountry);
   }
 
-  return getResponseBody(url, NET_PORT_HTTPS);
+  return getResponseBody(url, NET_PORT_HTTPS, HTTP_GET);
 }
 
 STRPTR getRadioTrendStations(void)
@@ -88,7 +88,7 @@ STRPTR getRadioTrendStations(void)
   IUtility->Strlcat(url, "&order=clicktrend", sizeof(url));
   IUtility->Strlcat(url, "&reverse=true", sizeof(url));   
 
-  return getResponseBody(url, NET_PORT_HTTPS);
+  return getResponseBody(url, NET_PORT_HTTPS, HTTP_GET);
 }
 
 STRPTR getRadioPopularStations(void)
@@ -97,7 +97,7 @@ STRPTR getRadioPopularStations(void)
   IUtility->Strlcat(url, "&order=clickcount", sizeof(url));
   IUtility->Strlcat(url, "&reverse=true", sizeof(url));  
 
-  return getResponseBody(url, NET_PORT_HTTPS);
+  return getResponseBody(url, NET_PORT_HTTPS, HTTP_GET);
 }
 
 size_t getRadioList(struct List *stationList, STRPTR jsonData, int offset)

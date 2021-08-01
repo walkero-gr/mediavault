@@ -21,20 +21,22 @@
 static STRPTR doRequest(void);
 static CONST_STRPTR getContentTypeExt(STRPTR);         
 
-static char *requestUrl;
-static int  requestPort;
-static char rfc3986[256] = {0},
-            html5[256] = {0};
+static STRPTR   requestUrl;
+static uint32   requestPort;
+static uint32   requestMethod;
+static char     rfc3986[256] = {0},
+                html5[256] = {0};
 
 
 NETWORKOBJ *net;
 
-STRPTR getResponseBody(char *url, int portNum)
+STRPTR getResponseBody(STRPTR url, uint32 portNum, uint32 method)
 {
   if (IUtility->Stricmp(url, ""))
   {
     requestUrl = url;
     requestPort = portNum;
+    requestMethod = method;
     //IDOS->Printf("URL: %s\n", url);
     STRPTR httpResponse = doRequest();
 
@@ -96,24 +98,43 @@ static STRPTR doRequest(void)
 
       if (net->GetConnection())
       {
-        //IDOS->Printf("Connection done fine!\n");
-
-        //IDOS->Printf("Trying to load %s\n", requestUrl);
-        httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
-        //IDOS->Printf("Create HTTP Request: %s\n", httpreq);
-        net->SendHTTPRequest(httpreq);
-        //IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode());
-
-        //IDOS->Printf("GetContentType\n%s\n", net->GetContentType());
-
-        httpRespBody = net->GetResponseBody();
-
-        if (httpRespBody)
+        IDOS->Printf("DBG Before create KEYVALUE!\n");
+        KEYVALUEOBJ *requestHeaders=IOO->NewKeyValueObject();
+        IDOS->Printf("DBG KEYVALUE CREATED!\n");
+        if (requestHeaders)
         {
-          //IDOS->Printf("Response\n------------------------\n%s\n", httpRespBody);
-          return httpRespBody;
+          IDOS->Printf("DBG Before add a value in KEYVALUE!\n");
+          requestHeaders->AddKeyValue((STRPTR)"User-Agent", (STRPTR)"Mozilla/5.0 (AmigaOS)");
+          IDOS->Printf("DBG After add a value in KEYVALUE!\n");
+          //IDOS->Printf("Connection done fine!\n");
+
+          //IDOS->Printf("Trying to load %s\n", requestUrl);
+          //httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
+          httpreq = net->CreateHTTPRequestMethod(requestUrl, requestPort, requestMethod, requestHeaders);
+          IDOS->Printf("DBG After CreateHTTPRequestMethod!\n");
+
+          requestHeaders->Clear();
+          IOO->DisposeKeyValueObject(requestHeaders);
+          requestHeaders=NULL;
+          IDOS->Printf("DBG After clean of KEYVALUE!\n");
+          //IDOS->Printf("Create HTTP Request: %s\n", httpreq);
+          net->SendHTTPRequest(httpreq);
+          IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode());
+
+          IDOS->Printf("GetContentType\n%s\n", net->GetContentType());
+
+          httpRespBody = net->GetResponseBody();
+
+          IDOS->Printf("DBG After GetResponseBody!\n");
+
+          if (httpRespBody)
+          {
+            IDOS->Printf("Response\n------------------------\n%s\n", httpRespBody);
+            return httpRespBody;
+          }
+          else IDOS->Printf("No response\n");
         }
-        else IDOS->Printf("No response\n");
+        else IDOS->Printf("DBG KEYVALUE is null!\n");
       }
       else IDOS->Printf("Connection failed!\n");
 

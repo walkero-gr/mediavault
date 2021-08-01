@@ -37,8 +37,9 @@ DONE - Application registration
 DONE - Window can jump screen 
 DONE - Window size and position can be saved
 DONE - Changed the way classes and gadgets are initiallized
-DONE - Download avatar images in cache folder
-- Add play button at the right sidebar menu and replace double click
+DONE - [v1.3] Download avatar images in cache folder
+- [v1.3] Add play button at the right sidebar menu and replace double click
+- [v1.3] Selfupdate process
 
 
 ## Radio

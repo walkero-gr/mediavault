@@ -32,6 +32,7 @@
                           
 #include <jansson/jansson.h>
 #include <oo/ooNetwork.h>
+#include <oo/ooKeyValue.h>
 
 #include "version.h"
 

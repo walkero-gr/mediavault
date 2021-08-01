@@ -20,5 +20,6 @@
 
 
 STRPTR charConv(CONST_STRPTR);
+ULONG convertVersionToInt(STRPTR);
 
 #endif

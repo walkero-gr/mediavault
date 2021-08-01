@@ -40,6 +40,6 @@ void FreeList(
 );
 void showAvatarImage(STRPTR, STRPTR);
 ULONG renderfunct(struct RenderHook *, Object *, struct gpRender *);
-     
+void checkForUpdates(void);
 
 #endif

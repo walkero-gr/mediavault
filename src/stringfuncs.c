@@ -39,6 +39,31 @@ STRPTR charConv(CONST_STRPTR value)
   return convertedValue;
 }
 
+ULONG convertVersionToInt(STRPTR version)
+{
+  char buf[10], *tmp;
+  uint32 versionNumber = 0;
+
+  IDOS->Printf("convertVersionToInt: %s\n", version);
+
+  if (!strncmp(version, "v", 1))
+    IUtility->Strlcpy(buf, version + 1, sizeof(buf));
+
+  IDOS->Printf("convertVersionToInt tmp=%s\n", buf);
+
+  tmp = strtok(buf, ".");
+  IDOS->Printf("1> %s\n", tmp);
+  versionNumber = versionNumber + (atoi(tmp) * 100);
+  tmp = strtok(NULL, ".");
+  IDOS->Printf("2> %s\n", tmp);
+  versionNumber = versionNumber + (atoi(tmp) * 10);
+  tmp = strtok(NULL, ".");
+  IDOS->Printf("3> %s\n", tmp);
+  versionNumber = versionNumber + atoi(tmp);
+
+  return versionNumber;
+}
+
 static STRPTR useIconv(iconv_t cd, CONST_STRPTR string)
 {
   static char buffer[ICONV_BUFFER];
@@ -59,3 +84,4 @@ static STRPTR useIconv(iconv_t cd, CONST_STRPTR string)
   else
     return buffer;
 }
+

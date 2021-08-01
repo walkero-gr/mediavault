@@ -26,8 +26,15 @@
 #include "guifuncs.h"
 #include "radiofuncs.h"
 #include "httpfuncs.h"
+#include "stringfuncs.h"
 
 extern Class *BitMapClass;
+
+struct releaseInfo {
+  char tag_name[10];
+  char browser_download_url[255];
+};
+static struct releaseInfo *release = NULL;
 
 /**
  * The following code is from MenuClass.c as found at the SDK 53.30 examples
@@ -472,4 +479,110 @@ ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
   remove_clip_region (msg->gpr_RPort,old_region,in_refresh);
 
   return (0);
+}  
+
+static void getGithubLatestTag(void)
+{
+  
+  release = (struct releaseInfo *)IExec->AllocVecTags(sizeof(struct releaseInfo),
+          AVT_Type,            MEMF_PRIVATE,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+  
+  IUtility->Strlcpy(release->tag_name, "v1.2.3", sizeof(release->tag_name));
+  IUtility->Strlcpy(release->browser_download_url, "https://github.com/walkero-gr/mediavault/releases/download/v1.2.1/MediaVault.lha", sizeof(release->browser_download_url));
+
+  // TODO: The following needs more work, when a bug in oo.library is fixed
+  /*
+  char url[] = "https://api.github.com/repos/walkero-gr/mediavault/releases/latest";
+
+  IDOS->Printf("DBG getGithubLatestTag 1\n");
+  STRPTR jsonData = getResponseBody(url, NET_PORT_HTTPS, HTTP_GET);
+  IDOS->Printf("%s\n", jsonData);
+
+  IDOS->Printf("DBG getGithubLatestTag 2\n");
+  if (jsonData)
+  {
+    json_t *jsonRoot;
+    json_error_t jsonError;
+    //size_t cnt;
+    IDOS->Printf("DBG getGithubLatestTag 3\n");
+    jsonRoot = IJansson->json_loads(jsonData, 0, &jsonError);
+    IDOS->Printf("DBG getGithubLatestTag 4\n");
+    
+    if (!jsonRoot)
+    {
+      IDOS->Printf("json error: on line %ld: %s\n", jsonError.line, jsonError.text);
+      IJansson->json_decref(jsonRoot);
+      return 0;
+    }
+    IDOS->Printf("DBG getGithubLatestTag 5\n");
+    if (!json_is_array(jsonRoot))
+    {
+      IJansson->json_decref(jsonRoot);
+      IDOS->Printf("JSON error: jsonRoot is not an array");
+      return 0;
+    }
+    IDOS->Printf("DBG getGithubLatestTag 6\n");
+
+    json_t *data, *buf;
+    char tagName[10];
+
+    data = IJansson->json_array_get(jsonRoot, 0);
+    if (!json_is_object(data))
+    {
+      IDOS->Printf("error: commit data is not an object\n");
+      IJansson->json_decref(jsonRoot);
+      return 0;
+    }
+
+    buf = IJansson->json_object_get(data, "tag_name");
+    if (!json_is_string(buf))
+    {
+      IJansson->json_decref(jsonRoot);
+      return 0;
+    }
+    IUtility->Strlcpy(tagName, IJansson->json_string_value(buf), sizeof(tagName));
+
+    IJansson->json_decref(jsonRoot);
+
+    IDOS->Printf("Latest tag %s\n", tagName);
+
+    //return tagName;
+    return 10;
+  }
+  
+  */
+  //return 0;
 }
+
+// TODO: Create method to download the update archive
+
+// TODO: Create the mechanism to dearchive the release and copy the files to the installation folder
+
+// TODO: Create the necessary requesters to inform the user
+
+void checkForUpdates(void)
+{
+  ULONG currentVersion = 0;
+  currentVersion = currentVersion + VERSION * 100;
+  currentVersion = currentVersion + REVISION * 10;
+  currentVersion = currentVersion + PATCH;
+
+  IDOS->Printf("Checking for updates\n");
+  getGithubLatestTag();
+
+  if (release->tag_name)
+  {
+    ULONG latestRelease = convertVersionToInt(release->tag_name);
+    
+    IDOS->Printf("currentVersion %ld\n", currentVersion);
+    IDOS->Printf("latestRelease %ld\n", latestRelease);
+    if (currentVersion < latestRelease)
+    {
+      IDOS->Printf("There is a new version available\n");
+    }
+    else IDOS->Printf("You have the latest version\n");
+  }
+}
+

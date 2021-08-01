@@ -196,6 +196,9 @@ void showGUI(void)
                     {
                       switch (selectedMenu)
                       {
+                        case MID_CHECKUPDATES:
+                          checkForUpdates();                     
+                          break;
                         case MID_ICONIFY:
                           if (appHide(appID, objects[OID_MAIN], WM_ICONIFY) == TRUE)
                           {
@@ -558,3 +561,4 @@ static void fillLeftSidebar(void)
       LISTBROWSER_ColumnInfo,     leftSidebarCI,
       TAG_DONE);
 }
+

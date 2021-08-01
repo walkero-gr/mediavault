@@ -18,7 +18,7 @@
 #define _HTTPFUNCS_H
 
 
-STRPTR getResponseBody(char *, int);
+STRPTR getResponseBody(STRPTR, uint32, uint32);
 STRPTR urlEncode(STRPTR);
 void cacheFileFromUrl(STRPTR, ULONG, STRPTR);
 ULONG getPortByURL(STRPTR);
