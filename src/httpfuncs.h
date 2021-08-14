@@ -20,7 +20,7 @@
 
 STRPTR getResponseBody(STRPTR, uint32, uint32);
 STRPTR urlEncode(STRPTR);
-void cacheFileFromUrl(STRPTR, ULONG, STRPTR);
+void cacheFileFromUrl(STRPTR, ULONG, STRPTR, CONST_STRPTR);
 ULONG getPortByURL(STRPTR);
 
 #endif

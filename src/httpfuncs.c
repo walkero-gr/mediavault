@@ -20,6 +20,7 @@
 
 static STRPTR doRequest(void);
 static CONST_STRPTR getContentTypeExt(STRPTR);         
+static CONST_STRPTR userAgent = "MediaVault/1.3 (AmigaOS)";
 
 static STRPTR   requestUrl;
 static uint32   requestPort;
@@ -104,7 +105,7 @@ static STRPTR doRequest(void)
         if (requestHeaders)
         {
           IDOS->Printf("DBG Before add a value in KEYVALUE!\n");
-          requestHeaders->AddKeyValue((STRPTR)"User-Agent", (STRPTR)"Mozilla/5.0 (AmigaOS)");
+          requestHeaders->AddKeyValue((STRPTR)"User-Agent", (STRPTR)userAgent);
           IDOS->Printf("DBG After add a value in KEYVALUE!\n");
           //IDOS->Printf("Connection done fine!\n");
 
@@ -149,7 +150,7 @@ static STRPTR doRequest(void)
   return NULL;
 }
   
-void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
+void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename, CONST_STRPTR targetFolder)
 {
   if (IUtility->Stricmp(url, ""))
   {
@@ -173,49 +174,86 @@ void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
 
         if (net->GetConnection())
         {
-          //IDOS->Printf("Connection done fine!\n");
+          IDOS->Printf("Connection done fine!\n");
 
-          //IDOS->Printf("Trying to load %s at port %ld \n", requestUrl, portNum);
-          httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
-          //IDOS->Printf("Create HTTP Request: %s\n", httpreq);
-          net->SendHTTPRequest(httpreq);
-          //IDOS->Printf("GetResponseBody\n%s\n", net->GetResponseBody());
+          KEYVALUEOBJ *requestHeaders=IOO->NewKeyValueObject();
 
-          //IDOS->Printf("GetContentType: %s\n", net->GetContentType());
-          //IDOS->Printf("GetContentLength: %lld\n", net->GetContentLength());
-          //IDOS->Printf("GetHTTPResponseLength: %lld\n", net->GetHTTPResponseLength());
-          STRPTR fileTypeExt = (STRPTR)getContentTypeExt(net->GetContentType());
-
-          if ((net->GetContentLength() < net->GetHTTPResponseLength()) && fileTypeExt)
+          if (requestHeaders)
           {
-            STRPTR httpRespBody = net->GetResponseBody();
-            if (httpRespBody)
-            {
-              char targetFile[128];
-              
-              IUtility->Strlcpy(targetFile, CACHE_DIR, sizeof(targetFile));
-              IUtility->Strlcat(targetFile, filename, sizeof(targetFile));
-              IUtility->Strlcat(targetFile, fileTypeExt, sizeof(targetFile));
-                        
-              BPTR fh = IDOS->FOpen(targetFile, MODE_NEWFILE, 0);
-              if (fh)
-              {
-                //IDOS->Printf("File opened just fine!\n");
-                size_t i = 0;
-                for (; i < net->GetContentLength(); i++) {
-                  IDOS->FPutC(fh, httpRespBody[i]);
-                }
-                //IDOS->Printf("After FPutC!\n");
-                IDOS->FClose(fh);
-                //IDOS->Printf("After FClose!\n");
-              }
-              else IDOS->Printf("File Open failed\n");
-              //return httpRespBody;
-              
-            }
-            else IDOS->Printf("No response\n");
-          }
+            requestHeaders->AddKeyValue((STRPTR)"User-Agent", (STRPTR)userAgent);
 
+            IDOS->Printf("Trying to load %s at port %ld \n", requestUrl, portNum);
+            //httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
+            httpreq = net->CreateHTTPRequestMethod(requestUrl, requestPort, HTTP_GET, requestHeaders);
+            IDOS->Printf("Create HTTP Request: %s\n", httpreq);
+            
+            
+            net->SendHTTPRequest(httpreq);
+
+            int32 responseCode = net->GetHTTPResponseCode();
+            IDOS->Printf("GetResponse\n%s\n\n", net->GetHTTPResponse());
+            IDOS->Printf("GetResponseBody\n%s\n\n", net->GetResponseBody());
+            IDOS->Printf("Response code=%ld\n\n", responseCode);
+            IDOS->Printf("GetContentType: %s\n\n", net->GetContentType());
+            IDOS->Printf("GetContentLength: %lld\n\n", net->GetContentLength());
+            IDOS->Printf("GetHTTPResponseLength: %lld\n\n", net->GetHTTPResponseLength());
+
+            if ((responseCode == 301) || (responseCode == 302))
+            {
+              IDOS->Printf("\n===============================\n");
+              IDOS->Printf("GetAlternativeURL: %s\n\n", net->GetAlternativeURL());
+              httpreq = net->CreateHTTPRequestMethod(net->GetAlternativeURL(), requestPort, HTTP_GET, requestHeaders);
+              net->SendHTTPRequest(httpreq);
+              responseCode = net->GetHTTPResponseCode();
+              IDOS->Printf("GetResponse\n%s\n\n", net->GetHTTPResponse());
+              IDOS->Printf("GetResponseBody\n%s\n\n", net->GetResponseBody());
+              IDOS->Printf("Response code=%ld\n\n", responseCode);
+              IDOS->Printf("GetAlternativeURL: %s\n\n", net->GetAlternativeURL());
+              IDOS->Printf("GetContentType: %s\n\n", net->GetContentType());
+              IDOS->Printf("GetContentLength: %lld\n\n", net->GetContentLength());
+              IDOS->Printf("GetHTTPResponseLength: %lld\n\n", net->GetHTTPResponseLength());
+              IDOS->Printf("\n===============================\n");
+            }
+
+
+            requestHeaders->Clear();
+            IOO->DisposeKeyValueObject(requestHeaders);
+            requestHeaders=NULL;
+            IDOS->Printf("Clear KeyValueObj\n");
+
+            STRPTR fileTypeExt = (STRPTR)getContentTypeExt(net->GetContentType());
+
+            //if ((net->GetContentLength() < net->GetHTTPResponseLength()) && fileTypeExt)
+            if (TRUE)
+            {
+              STRPTR httpRespBody = net->GetResponseBody();
+              if (httpRespBody)
+              {
+                char targetFile[128];
+                
+                IUtility->Strlcpy(targetFile, targetFolder, sizeof(targetFile));
+                IUtility->Strlcat(targetFile, filename, sizeof(targetFile));
+                IUtility->Strlcat(targetFile, fileTypeExt, sizeof(targetFile));
+                          
+                BPTR fh = IDOS->FOpen(targetFile, MODE_NEWFILE, 0);
+                if (fh)
+                {
+                  IDOS->Printf("File opened just fine!\n");
+                  size_t i = 0;
+                  for (; i < net->GetContentLength(); i++) {
+                    IDOS->FPutC(fh, httpRespBody[i]);
+                  }
+                  IDOS->Printf("After FPutC!\n");
+                  IDOS->FClose(fh);
+                  IDOS->Printf("After FClose!\n");
+                }
+                else IDOS->Printf("File Open failed\n");
+                //return httpRespBody;
+                
+              }
+              else IDOS->Printf("No response\n");
+            }
+          }
         }
         else IDOS->Printf("Connection failed!\n");
 
@@ -251,6 +289,10 @@ static CONST_STRPTR getContentTypeExt(STRPTR contentType)
   if (!IUtility->Stricmp(contentType, "image/gif"))
   {
     return ".gif";
+  }
+  if (!IUtility->Stricmp(contentType, "text/html"))
+  {
+    return ".html";
   }
   return NULL;
 }

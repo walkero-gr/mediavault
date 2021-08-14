@@ -29,10 +29,13 @@
 #include "stringfuncs.h"
 
 extern Class *BitMapClass;
+extern NETWORKOBJ *net;
 
 struct releaseInfo {
   char tag_name[10];
+  char content_type[24];
   char browser_download_url[255];
+  char changes[1024];
 };
 static struct releaseInfo *release = NULL;
 
@@ -98,17 +101,28 @@ void windowBlocking(Object *objId, BOOL disable)
   IIntuition->SetAttrs(objId, WA_BusyPointer, disable, TAG_DONE);
 }
 
-void showMsgReq(Object *reqGadget, CONST_STRPTR title, CONST_STRPTR message)
+LONG showMsgReq(
+  Object *reqGadget,
+  CONST_STRPTR title,
+  CONST_STRPTR message,
+  ULONG type,
+  CONST_STRPTR gadgetText,
+  ULONG image )
 {
   if(reqGadget)
   {
     IIntuition->SetAttrs(reqGadget,
+      REQ_Type,       type ? type : REQTYPE_INFO,
       REQ_TitleText,  title,
       REQ_BodyText,   message,
+      REQ_GadgetText, gadgetText ? gadgetText : "_Ok",
+      REQ_Image,      image ? image : REQIMAGE_DEFAULT,
+      REQ_StayOnTop,  FALSE,
+      REQ_WrapBorder, 32,
       TAG_END);
-
-    IIntuition->IDoMethod(reqGadget, RM_OPENREQ, NULL, NULL, NULL);
+    return IIntuition->IDoMethod(reqGadget, RM_OPENREQ, NULL, NULL, NULL);
   }
+  return -1;
 }
 
 void gadgetBlocking(struct Window *winId, Object *gadgetObj, BOOL disable)
@@ -277,7 +291,7 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
 
   if (!avatarImage)
   {
-    cacheFileFromUrl(url, getPortByURL(url), uuid);
+    cacheFileFromUrl(url, getPortByURL(url), uuid, CACHE_DIR);
     avatarImage = getCachedImageIfExists(uuid);
   }
 
@@ -481,88 +495,93 @@ ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
   return (0);
 }  
 
-static void getGithubLatestTag(void)
-{
-  
+static void getGithubLatestData(void)
+{  
   release = (struct releaseInfo *)IExec->AllocVecTags(sizeof(struct releaseInfo),
           AVT_Type,            MEMF_PRIVATE,
           AVT_ClearWithValue,  "\0",
           TAG_DONE);
   
-  IUtility->Strlcpy(release->tag_name, "v1.2.3", sizeof(release->tag_name));
-  IUtility->Strlcpy(release->browser_download_url, "https://github.com/walkero-gr/mediavault/releases/download/v1.2.1/MediaVault.lha", sizeof(release->browser_download_url));
+  // Temporary set
+  //IUtility->Strlcpy(release->tag_name, "v1.2.3", sizeof(release->tag_name));
+  //IUtility->Strlcpy(release->browser_download_url, "https://github.com/walkero-gr/mediavault/releases/download/v1.2.1/MediaVault.lha", sizeof(release->browser_download_url));
 
-  // TODO: The following needs more work, when a bug in oo.library is fixed
-  /*
   char url[] = "https://api.github.com/repos/walkero-gr/mediavault/releases/latest";
-
-  IDOS->Printf("DBG getGithubLatestTag 1\n");
   STRPTR jsonData = getResponseBody(url, NET_PORT_HTTPS, HTTP_GET);
-  IDOS->Printf("%s\n", jsonData);
 
   IDOS->Printf("DBG getGithubLatestTag 2\n");
   if (jsonData)
   {
     json_t *jsonRoot;
     json_error_t jsonError;
-    //size_t cnt;
-    IDOS->Printf("DBG getGithubLatestTag 3\n");
+
     jsonRoot = IJansson->json_loads(jsonData, 0, &jsonError);
-    IDOS->Printf("DBG getGithubLatestTag 4\n");
+
+    if (jsonRoot)
+    {
+      IDOS->Printf("DBG getGithubLatestTag 5\n");
+      if (json_is_object(jsonRoot))
+      {
+        json_t *buf, *assets, *assetItem;
+        size_t cnt;
+
+        buf = IJansson->json_object_get(jsonRoot, "tag_name");
+        if (json_is_string(buf))
+        {
+          IUtility->Strlcpy(release->tag_name, IJansson->json_string_value(buf), sizeof(release->tag_name));
+        }
+        else IDOS->Printf("tag_name was not found or not a string\n");
+
+        buf = IJansson->json_object_get(jsonRoot, "body");
+        if (json_is_string(buf))
+        {
+          IUtility->Strlcpy(release->changes, IJansson->json_string_value(buf), sizeof(release->changes));
+        }
+        else IDOS->Printf("body was not found or not a string\n");
+
+        assets = IJansson->json_object_get(jsonRoot, "assets");
+        if (json_is_array(assets))
+        {          
+          for(cnt = 0; cnt < IJansson->json_array_size(assets); cnt++)
+          {
+            assetItem = IJansson->json_array_get(assets, cnt);
+            if(json_is_object(assetItem))
+            {
+              buf = IJansson->json_object_get(assetItem, "browser_download_url");
+              if (json_is_string(buf))
+              {
+                IUtility->Strlcpy(release->browser_download_url, IJansson->json_string_value(buf), sizeof(release->browser_download_url));
+                IDOS->Printf("browser_download_url: %s\n", release->browser_download_url);
+              }
+              else IDOS->Printf("browser_download_url was not found or not a string\n");
+            }
+            else IDOS->Printf("assetItem was not found or not an object\n");
+
+            // TODO: Put here a break of the loop if the "content_type":"application/x-lha"
+          }
+        }
+        else IDOS->Printf("assets was not found or not a string\n");
+    }
+      else IDOS->Printf("json error: on line %ld: %s\n", jsonError.line, jsonError.text);
+
+      IJansson->json_decref(jsonRoot);
+    }
+    else IDOS->Printf("json error: on line %ld: %s\n", jsonError.line, jsonError.text);
     
-    if (!jsonRoot)
-    {
-      IDOS->Printf("json error: on line %ld: %s\n", jsonError.line, jsonError.text);
-      IJansson->json_decref(jsonRoot);
-      return 0;
-    }
-    IDOS->Printf("DBG getGithubLatestTag 5\n");
-    if (!json_is_array(jsonRoot))
-    {
-      IJansson->json_decref(jsonRoot);
-      IDOS->Printf("JSON error: jsonRoot is not an array");
-      return 0;
-    }
-    IDOS->Printf("DBG getGithubLatestTag 6\n");
-
-    json_t *data, *buf;
-    char tagName[10];
-
-    data = IJansson->json_array_get(jsonRoot, 0);
-    if (!json_is_object(data))
-    {
-      IDOS->Printf("error: commit data is not an object\n");
-      IJansson->json_decref(jsonRoot);
-      return 0;
-    }
-
-    buf = IJansson->json_object_get(data, "tag_name");
-    if (!json_is_string(buf))
-    {
-      IJansson->json_decref(jsonRoot);
-      return 0;
-    }
-    IUtility->Strlcpy(tagName, IJansson->json_string_value(buf), sizeof(tagName));
-
-    IJansson->json_decref(jsonRoot);
-
-    IDOS->Printf("Latest tag %s\n", tagName);
-
-    //return tagName;
-    return 10;
   }
-  
-  */
-  //return 0;
+
+  // Dispose net here, after the creation of the listbrowser content,
+  // because it trashes the response data, so to free the signals
+  //## TODO: adapt it to oo.library v1.11 changes
+  if (net)
+  {
+    net->DisposeConnection();
+    IOO->DisposeNetworkObject(net);
+    net = NULL;
+  }
 }
 
-// TODO: Create method to download the update archive
-
-// TODO: Create the mechanism to dearchive the release and copy the files to the installation folder
-
-// TODO: Create the necessary requesters to inform the user
-
-void checkForUpdates(void)
+static BOOL checkForUpdates(void)
 {
   ULONG currentVersion = 0;
   currentVersion = currentVersion + VERSION * 100;
@@ -570,19 +589,64 @@ void checkForUpdates(void)
   currentVersion = currentVersion + PATCH;
 
   IDOS->Printf("Checking for updates\n");
-  getGithubLatestTag();
+  
+  getGithubLatestData();
 
   if (release->tag_name)
   {
     ULONG latestRelease = convertVersionToInt(release->tag_name);
-    
+      
     IDOS->Printf("currentVersion %ld\n", currentVersion);
     IDOS->Printf("latestRelease %ld\n", latestRelease);
     if (currentVersion < latestRelease)
     {
-      IDOS->Printf("There is a new version available\n");
+      return TRUE;
     }
-    else IDOS->Printf("You have the latest version\n");
   }
+  return FALSE;
 }
 
+static BOOL downloadLatestUpdate(void)
+{
+  IDOS->Printf("download url %s\n", release->browser_download_url);
+
+  cacheFileFromUrl(release->browser_download_url, getPortByURL(release->browser_download_url), (STRPTR)"update.lha", "RAM:");
+
+  return FALSE;
+}
+
+void workOnUpdate(void)
+{
+  char  infoMsg[2048];
+
+  IUtility->Strlcpy(infoMsg, "Would you like to check if there is a\nnewer version of MediaVault available?", sizeof(infoMsg));
+  //char infoMsg[] = "Would you like to check if there is\na newer version of MediaVault available?";
+  LONG requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, REQTYPE_INFO, "_Yes|_No", REQIMAGE_QUESTION);
+
+  if (requesterResult)
+  {
+    if (checkForUpdates())
+    {
+      IDOS->Printf("There is a new version available\n");
+      IUtility->Strlcpy(infoMsg, "There is a new version available!\nWould you like to download and install the new version automatically?\n", sizeof(infoMsg));
+      IUtility->Strlcat(infoMsg, "\nChanges:\n", sizeof(infoMsg));
+      // TODO: Clear \r from the changes string
+      IUtility->Strlcat(infoMsg, release->changes, sizeof(infoMsg));
+      requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, REQTYPE_INFO, "_Sure|_Nah", REQIMAGE_QUESTION);
+      if (requesterResult)
+      {
+        // TODO: Block the window
+
+        // TODO: Create method to download the update archive
+        downloadLatestUpdate();
+
+        // TODO: Create the mechanism to dearchive the release and copy the files to the installation folder
+      }
+    }
+    else
+    {
+      IUtility->Strlcpy(infoMsg, "Congratulations!\nYou have the latest version installed on your machine.", sizeof(infoMsg));
+      requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
+    }
+  }
+}

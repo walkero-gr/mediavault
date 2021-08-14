@@ -180,24 +180,28 @@ void showGUI(void)
                   case WMHI_CLOSEWINDOW:
                     done = TRUE;
                     break;
+
                   case WMHI_ICONIFY:
                     if (appHide(appID, objects[OID_MAIN], WM_ICONIFY) == TRUE)
                     {
                       windows[WID_MAIN] = NULL;
                     }
                     break;
+
                   case WMHI_UNICONIFY:
                     windows[WID_MAIN] = appUnhide(appID, objects[OID_MAIN]);
                     if (windows[WID_MAIN] == NULL) done = TRUE; // error re-opening the window
                     break;
+
                   case WMHI_MENUPICK:
                     selectedMenu = NO_MENU_ID;
+
                     while ((selectedMenu = IIntuition->IDoMethod(menus[MID_PROJECT], MM_NEXTSELECT, 0, selectedMenu, TAG_DONE)) != NO_MENU_ID)
                     {
                       switch (selectedMenu)
                       {
                         case MID_CHECKUPDATES:
-                          checkForUpdates();                     
+                          workOnUpdate();
                           break;
                         case MID_ICONIFY:
                           if (appHide(appID, objects[OID_MAIN], WM_ICONIFY) == TRUE)
@@ -430,11 +434,11 @@ static void listStations(
     if (stationsCnt == ~0UL)
     {
       char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
-      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg);
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
     }
     else if (stationsCnt == 0)
     {
-      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg);
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
     }
     else if (stationsCnt == maxRadioResults)
     {
@@ -447,7 +451,7 @@ static void listStations(
   } else {
     char jsonErrorMsg[] = "There was an error with the returned data.\nPlease, try again or check your network.";
 
-    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg);
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
   }
 
   // Dispose net here, after the creation of the listbrowser content,
