@@ -17,10 +17,16 @@
 #ifndef _HTTPFUNCS_H
 #define _HTTPFUNCS_H
 
-
-STRPTR getResponseBody(char *, int);
-STRPTR urlEncode(STRPTR);
+void doHTTPRequest(STRPTR);
 void cacheFileFromUrl(STRPTR, ULONG, STRPTR);
-ULONG getPortByURL(STRPTR);
+
+struct memory
+{
+  char    *body;
+  char    *type;
+  size_t  size;
+  LONG    code;
+};
+
 
 #endif

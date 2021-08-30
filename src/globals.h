@@ -24,14 +24,12 @@
 #include <proto/icon.h>
 #include <proto/intuition.h>
 #include <proto/layers.h>
-#include <proto/oo.h>          
 #include <proto/utility.h>
 
 #include <string.h>
 #include <ctype.h>
                           
 #include <jansson/jansson.h>
-#include <oo/ooNetwork.h>
 
 #include "version.h"
 

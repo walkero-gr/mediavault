@@ -14,6 +14,7 @@
 
 */
 
+
 #include <intuition/gadgetclass.h>
 #include <classes/window.h>
 #include <gadgets/space.h>
@@ -191,27 +192,22 @@ struct Window *appUnhide(uint32 appID, Object *winObj)
   return window;
 }
 
-void FreeList(
+void freeList(
   struct List *listBrowser,
   void (*freeUserDataCallback)(struct stationInfo *)
 )
 {
   struct Node *node;
-
   while((node = IExec->RemHead( listBrowser )))
   {
     struct stationInfo *stationData = NULL;
-
     IListBrowser->GetListBrowserNodeAttrs( node,
           LBNA_UserData, &stationData,
           TAG_DONE);
-
     freeUserDataCallback(stationData);
-
     IListBrowser->FreeListBrowserNode(node);
   }
-
-  IExec->FreeSysObject(ASOT_LIST, listBrowser);
+  //IExec->FreeSysObject(ASOT_LIST, listBrowser);     // TODO: Find the reason why this freeze the machine
 }
 
 static STRPTR getCachedImageIfExists(STRPTR uuid)
@@ -270,7 +266,7 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
 
   if (!avatarImage)
   {
-    cacheFileFromUrl(url, getPortByURL(url), uuid);
+    cacheFileFromUrl(url, 443, uuid);
     avatarImage = getCachedImageIfExists(uuid);
   }
 

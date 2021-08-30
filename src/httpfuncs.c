@@ -14,120 +14,85 @@
 
 */
 
-#include "globals.h"
-#include "libshandler.h"
+#define __USE_INLINE__
+
+#include <curl/curl.h>
+#include <proto/dos.h>
+
+#include "version.h"
 #include "httpfuncs.h"
 
-static STRPTR doRequest(void);
-static CONST_STRPTR getContentTypeExt(STRPTR);         
+static CONST_STRPTR userAgent = APPNAME "/" STR(VERSION) "." STR(REVISION) " (AmigaOS)";
+//static CONST_STRPTR getContentTypeExt(STRPTR);
 
-static char *requestUrl;
-static int  requestPort;
-static char rfc3986[256] = {0},
-            html5[256] = {0};
+struct memory response = {0};
 
-
-NETWORKOBJ *net;
-
-STRPTR getResponseBody(char *url, int portNum)
+static size_t gotData(STRPTR buf, size_t itemSize, size_t numItems, void *userData)
 {
-  if (IUtility->Stricmp(url, ""))
+  size_t bytes = itemSize * numItems;
+  struct memory *mem = (struct memory *)userData;
+
+  char *ptr = realloc(mem->body, mem->size + bytes + 1);
+  if(ptr == NULL) return 0;  /* out of memory! */
+
+  mem->body = ptr;
+  memcpy(&(mem->body[mem->size]), buf, bytes);
+  mem->size += bytes;
+  mem->body[mem->size] = 0;
+
+  return bytes;
+}
+
+static void cleanResponse(void)
+{
+  if (response.body) response.body = NULL;
+  if (response.size) response.size = 0;
+}
+
+void doHTTPRequest(STRPTR url)
+{
+  if (stricmp(url, ""))
   {
-    requestUrl = url;
-    requestPort = portNum;
-    //IDOS->Printf("URL: %s\n", url);
-    STRPTR httpResponse = doRequest();
+    CURL *curl;
+    CURLcode res;
 
-    if (httpResponse)
-    {
-      return httpResponse;
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+
+    curl = curl_easy_init();
+    if(curl) {
+      cleanResponse();
+
+      curl_easy_setopt(curl, CURLOPT_URL, url);
+      curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
+
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+      //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+      
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, gotData);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
+
+      res = curl_easy_perform(curl);
+
+      if(res != CURLE_OK)
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
+      curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
+
+      curl_easy_cleanup(curl);
     }
-  }
-  return NULL;
-}
-
-
-void rfcTablesInit(void)
-{
-  uint16 i;
-  for (i = 0; i < 256; i++) {
-    rfc3986[i]  = ( isalnum(i)||i == '~'||i == '-'||i == '.'||i == '_' ) ? i : 0;
-    html5[i]    = ( isalnum(i)||i == '*'||i == '-'||i == '.'||i == '_' ) ? i : (i == ' ') ? '+' : 0;
+    curl_global_cleanup();
   }
 }
 
-void encode(unsigned char *s, char *enc, char *tb)
+void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
 {
-  for (; *s; s++) {
-    if (tb[*s]) sprintf(enc, "%c", tb[*s]);
-    else        sprintf(enc, "%%%02X", *s);
-    while (*++enc);
-  }
+  //STRPTR fileTypeExt = (STRPTR)getContentTypeExt((STRPTR)"image/webp");
+  printf("Trying to load %s %ld \n", url, portNum);
+  //Printf("filename: %s, %s\nsure", filename, fileTypeExt);
+  printf("filename: %s\nsure", filename);
 }
-
-STRPTR urlEncode(STRPTR value)
-{
-  STRPTR buf = IExec->AllocVecTags( (IUtility->Strlen(value) * 3) + 1,
-      AVT_Type,            MEMF_SHARED,
-      AVT_ClearWithValue,  "\0",
-      TAG_DONE);
-
-  rfcTablesInit();
-  encode((unsigned char*)value, buf, html5);
-
-  return buf;
-}
-
-static STRPTR doRequest(void)
-{
-  STRPTR  httpreq = NULL,
-          httpRespBody = NULL;
-
-  //IDOS->Printf("getRadioStations called\n");
-  net = (NETWORKOBJ *)IOO->NewNetworkObject();
-
-  if (net != NULL)
-  {
-    //IDOS->Printf("Network is fine!\n");
-
-    if (net->CreateConnection(requestUrl, requestPort, TRUE, TRUE))
-    {
-      //IDOS->Printf("Connection created just fine!\n");
-
-      if (net->GetConnection())
-      {
-        //IDOS->Printf("Connection done fine!\n");
-
-        //IDOS->Printf("Trying to load %s\n", requestUrl);
-        httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
-        //IDOS->Printf("Create HTTP Request: %s\n", httpreq);
-        net->SendHTTPRequest(httpreq);
-        //IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode());
-
-        //IDOS->Printf("GetContentType\n%s\n", net->GetContentType());
-
-        httpRespBody = net->GetResponseBody();
-
-        if (httpRespBody)
-        {
-          //IDOS->Printf("Response\n------------------------\n%s\n", httpRespBody);
-          return httpRespBody;
-        }
-        else IDOS->Printf("No response\n");
-      }
-      else IDOS->Printf("Connection failed!\n");
-
-      net->DisposeConnection();
-    }
-    else IDOS->Printf("Connection creation failed!\n");
-
-    IOO->DisposeNetworkObject(net);
-  }
-  else IDOS->Printf("Network Object creation failed!\n");
-
-  return NULL;
-}
-  
+/*
 void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
 {
   if (IUtility->Stricmp(url, ""))
@@ -208,7 +173,9 @@ void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
   }
   //IDOS->Printf("FIN!\n");
 }
+*/
 
+/*
 static CONST_STRPTR getContentTypeExt(STRPTR contentType)
 {
   if (!IUtility->Stricmp(contentType, "image/jpeg"))
@@ -233,11 +200,4 @@ static CONST_STRPTR getContentTypeExt(STRPTR contentType)
   }
   return NULL;
 }
-
-ULONG getPortByURL(STRPTR url)
-{
-  //if (!IUtility->Strnicmp(url, "https://", 8))  return NET_PORT_HTTPS;
-  if (!IUtility->Strnicmp(url, "http://", 7))  return NET_PORT_HTTP;
-
-  return NET_PORT_HTTPS;
-}
+*/

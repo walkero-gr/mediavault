@@ -4,17 +4,18 @@
   :ts=2 :vs=-ta
 */
 
+
 #include "globals.h"
 #include "libshandler.h"
+
 
 struct Library *ApplicationBase;  struct ApplicationIFace   *IApplication;
 struct Library *IntuitionBase;    struct IntuitionIFace     *IIntuition;
 struct Library *UtilityBase;      struct UtilityIFace       *IUtility;
 struct Library *GraphicsBase;     struct GraphicsIFace      *IGraphics;
 struct Library *LayersBase;       struct LayersIFace        *ILayers;
-struct Library *OOBase;           struct OOIFace            *IOO;
+struct Library *IconBase;         struct IconIFace          *IIcon;
 struct Library *JanssonBase;      struct JanssonIFace       *IJansson;
-struct Library *AmiSSLMasterBase;
 
 struct ClassLibrary *BitMapBase;
 struct ClassLibrary *ButtonBase;
@@ -58,13 +59,11 @@ int CleanExit(const char *str)
   if(ListBrowserBase)   IIntuition->CloseClass(ListBrowserBase);
   
   //## Close Libraries
-  if(AmiSSLMasterBase)  IExec->CloseLibrary(AmiSSLMasterBase);
-
-  if(IOO)               IExec->DropInterface((struct Interface *) IOO);
-  if(OOBase)            IExec->CloseLibrary(OOBase);
-
   if(IJansson)          IExec->DropInterface((struct Interface *) IJansson);
   if(JanssonBase)       IExec->CloseLibrary(JanssonBase);
+
+  if(IIcon)             IExec->DropInterface((struct Interface *) IIcon);
+  if(IconBase)          IExec->CloseLibrary(IconBase);
 
   if(ILayers)           IExec->DropInterface((struct Interface *) ILayers);
   if(LayersBase)        IExec->CloseLibrary(LayersBase);
@@ -133,30 +132,19 @@ int OpenLibs(void)
   }
   else return CleanExit("Can't open layers.library version 54");
 
+  if ((IconBase = IExec->OpenLibrary( "icon.library", 54 )))
+  {
+    IIcon = (struct IconIFace *)IExec->GetInterface( IconBase, "main", 1, NULL );
+    if(!IIcon) return CleanExit("Can't open icon.library Interface");
+  }
+  else return CleanExit("Can't open icon.library version 53");
+
   if ((JanssonBase = IExec->OpenLibrary( "jansson.library", 2 )))
   {
     IJansson = (struct JanssonIFace *)IExec->GetInterface( JanssonBase, "main", 1, NULL );
     if(!IJansson) return CleanExit("Can't open jansson.library Interface");
   }
   else return CleanExit("Can't open jansson.library version 2");
-
-  if ((AmiSSLMasterBase = IExec->OpenLibrary("amisslmaster.library", 4 )))
-  {
-    if (!LIB_IS_AT_LEAST(AmiSSLMasterBase, 4, 9))
-      return CleanExit("Can't open amisslmaster.library version 4.9 and above");
-  }
-  else return CleanExit("Can't open amisslmaster.library version 4.9 and above");
-
-  if ((OOBase = IExec->OpenLibrary("oo.library", 1 )))
-  {
-    if (LIB_IS_AT_LEAST(OOBase, 1, 13))
-    {
-      IOO = (struct OOIFace *)IExec->GetInterface( OOBase, "main", 1, NULL );
-      if(!IOO) return CleanExit("Can't open oo.library Interface");
-    }
-    else return CleanExit("Can't open oo.library version 1.13 and above");
-  }
-  else return CleanExit("Can't open oo.library version 1.13 and above");
 
   //## Classes and Gadgets opening
   if ((ListBrowserBase = IIntuition->OpenClass( "gadgets/listbrowser.gadget", 1, &ListBrowserClass )))

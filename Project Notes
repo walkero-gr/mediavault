@@ -39,6 +39,7 @@ DONE - Window size and position can be saved
 DONE - Changed the way classes and gadgets are initiallized
 DONE - Download avatar images in cache folder
 - Add play button at the right sidebar menu and replace double click
+- Add libcurl support
 
 
 ## Radio

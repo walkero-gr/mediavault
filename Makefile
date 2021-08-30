@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 27-05-2021 21:32:58
+# Created on: 19-08-2021 22:51:02
 #
 #
 
@@ -31,7 +31,7 @@ CC := gcc:bin/gcc
 
 INCPATH := -I.
 
-CFLAGS := $(INCPATH) -Wall -Werror -Wwrite-strings  -Wextra -O3
+CFLAGS := $(INCPATH) -Wall -Werror -Wwrite-strings -Wextra -O3
 
 
 ###################################################################
@@ -67,7 +67,7 @@ realclean:
 
 MediaVault: $(MediaVault_OBJ)
 	@echo "Linking MediaVault"
-	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) -lauto
+	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) -lcurl -lrtmp -lssl -lcrypto -lz -lpthread
 	@echo "Removing stale debug target: MediaVault"
 	@rm -f MediaVault.debug
 
@@ -98,10 +98,10 @@ src/gui.o: src/gui.c src/globals.h src/version.h \
 	 src/gui.h src/guifuncs.h src/mainWin.h \
 	 src/aboutWin.h
 
-src/httpfuncs.o: src/httpfuncs.c src/globals.h src/version.h \
-	 src/libshandler.h
+src/httpfuncs.o: src/httpfuncs.c
 
 src/guifuncs.o: src/guifuncs.c src/globals.h src/version.h \
+	 src/gui.h src/guifuncs.h src/radiofuncs.h \
 	
 
 src/mainWin.o: src/mainWin.c src/globals.h src/version.h \
@@ -112,7 +112,7 @@ src/aboutWin.o: src/aboutWin.c src/globals.h src/version.h \
 
 src/radiofuncs.o: src/radiofuncs.c src/globals.h src/version.h \
 	 src/gui.h src/libshandler.h src/httpfuncs.h \
-	
+	 src/stringfuncs.h
 
 src/stringfuncs.o: src/stringfuncs.c src/globals.h src/version.h \
 	
