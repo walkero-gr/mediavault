@@ -14,6 +14,7 @@
 
 */
 
+
 #include "globals.h"
 #include "gui.h"
 #include "aboutWin.h"
@@ -46,9 +47,9 @@ Object *buildAboutWindow(struct MsgPort *appPort, struct Screen *screen)
     "MediaVault is a media frontend for different sources.\n\n" \
     "My plan for MediaVault is to create an app where people can discover and listen to online " \
     "radio stations, podcasts and even to support UPnP servers to listen to music or watch movies.\n\n" \
-    "Created by George Sokianos\n" \
+    "Developed by George Sokianos\n" \
     "Contact email: walkero@gmail.com\n" \
-    "Report bugs at https://github.com/walkero-gr/mediavault/issues/\n\n"
+    "Report bugs at:\nhttps://github.com/walkero-gr/mediavault/issues/\n\n"
     "Dedicated to my beloved family, who have supported me all these years\nAris, Nefeli and Marily!\n\n" \
     "Distributed without warranty under the terms of the GNU General Public License.";
     

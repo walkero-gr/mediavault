@@ -24,14 +24,12 @@
 #include <proto/icon.h>
 #include <proto/intuition.h>
 #include <proto/layers.h>
-#include <proto/oo.h>          
 #include <proto/utility.h>
 
 #include <string.h>
 #include <ctype.h>
                           
 #include <jansson/jansson.h>
-#include <oo/ooNetwork.h>
 
 #include "version.h"
 
@@ -41,7 +39,6 @@ static CONST_STRPTR version USED = VERSTAG;
 
 void die(const char *s);
 
-#define CACHE_DIR "PROGDIR:cache/"
 #define LOGO_IMAGE "PROGDIR:images/logo_128.png"
 
 struct filters

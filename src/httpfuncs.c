@@ -14,233 +14,232 @@
 
 */
 
-#include "globals.h"
-#include "libshandler.h"
+#define __USE_INLINE__
+
+#include <curl/curl.h>
+#include <proto/dos.h>
+
+#include "version.h"
 #include "httpfuncs.h"
 
-static STRPTR doRequest(void);
-static CONST_STRPTR getContentTypeExt(STRPTR);         
+static CONST_STRPTR userAgent = APPNAME "/" STR(VERSION) "." STR(REVISION) " (AmigaOS)";
+static CONST_STRPTR getContentTypeExt(STRPTR);
 
-static char *requestUrl;
-static int  requestPort;
-static char rfc3986[256] = {0},
-            html5[256] = {0};
+extern uint32 cacheFilenameSize;
 
-
-NETWORKOBJ *net;
-
-STRPTR getResponseBody(char *url, int portNum)
+struct memory
 {
-  if (IUtility->Stricmp(url, ""))
-  {
-    requestUrl = url;
-    requestPort = portNum;
-    
-    IDOS->Printf("URL: %s\n", url);
+  char    *body;
+  char    *type;
+  size_t  size;
+  LONG    code;
+};
+static struct memory response = {0};
 
-    STRPTR httpResponse = doRequest();
-                                    
+static size_t gotData(STRPTR buf, size_t itemSize, size_t numItems, void *userData)
+{
+  size_t bytes = itemSize * numItems;
+  struct memory *mem = (struct memory *)userData;
 
-    if (httpResponse)
-    {
-      return httpResponse;
-    }
-  }
+  char *ptr = realloc(mem->body, mem->size + bytes + 1);
+  if(ptr == NULL) return 0;  /* out of memory! */
+
+  mem->body = ptr;
+  memcpy(&(mem->body[mem->size]), buf, bytes);
+  mem->size += bytes;
+  mem->body[mem->size] = 0;
+
+  return bytes;
+}
+
+static size_t write_data(void *ptr, size_t itemSize, size_t numItems, void *stream)
+{
+  size_t written = fwrite(ptr, itemSize, numItems, (FILE *)stream);
+  return written;
+}
+
+static size_t gotDataNoBody(STRPTR buf, size_t itemSize, size_t numItems, void *userData)
+{
+  size_t bytes = itemSize * numItems;
+  struct memory *mem = (struct memory *)userData;
+  if (buf) buf = NULL;
+  mem->size += bytes;
+
+  return bytes;
+}
+
+void cleanupHTTPRequest(void)
+{
+  if (response.body) response.body = NULL;
+  if (response.size) response.size = 0;
+}
+
+STRPTR getResponseBody(void)
+{
+  if (response.body) return response.body;
+
   return NULL;
 }
 
-
-void rfcTablesInit(void)
+LONG getResponseCode(void)
 {
-  uint16 i;
-  for (i = 0; i < 256; i++) {
-    rfc3986[i]  = ( isalnum(i)||i == '~'||i == '-'||i == '.'||i == '_' ) ? i : 0;
-    html5[i]    = ( isalnum(i)||i == '*'||i == '-'||i == '.'||i == '_' ) ? i : (i == ' ') ? '+' : 0;
-  }
+  if (response.code > 0) return response.code;
+
+  return 0;
 }
 
-void encode(unsigned char *s, char *enc, char *tb)
+STRPTR getResponseType(void)
 {
-  for (; *s; s++) {
-    if (tb[*s]) sprintf(enc, "%c", tb[*s]);
-    else        sprintf(enc, "%%%02X", *s);
-    while (*++enc);
-  }
+  if (response.type) return response.type;
+
+  return NULL;
 }
 
-STRPTR urlEncode(STRPTR value)
+void doHTTPRequest(STRPTR url)
 {
-  STRPTR buf = IExec->AllocVecTags( (IUtility->Strlen(value) * 3) + 1,
-      AVT_Type,            MEMF_SHARED,
-      AVT_ClearWithValue,  "\0",
-      TAG_DONE);
-
-  rfcTablesInit();
-  encode((unsigned char*)value, buf, html5);
-
-  return buf;
-}
-
-static STRPTR doRequest(void)
-{
-  STRPTR  httpreq = NULL,
-          httpRespBody = NULL;
-
-  //IDOS->Printf("getRadioStations called\n");
-  net = (NETWORKOBJ *)IOO->NewNetworkObject();
-
-  if (net != NULL)
+  if (stricmp(url, ""))
   {
-    //IDOS->Printf("Network is fine!\n");
+    CURL *curl;
+    CURLcode res;
 
-    if (net->CreateConnection(requestUrl, requestPort, TRUE, TRUE))
-    {
-      //IDOS->Printf("Connection created just fine!\n");
+    curl_global_init(CURL_GLOBAL_DEFAULT);
 
-      if (net->GetConnection())
+    curl = curl_easy_init();
+    if(curl) {
+      curl_easy_setopt(curl, CURLOPT_URL, url);
+      curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
+
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+      //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, gotData);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
+
+      res = curl_easy_perform(curl);
+      if(res != CURLE_OK)
       {
-        //IDOS->Printf("Connection done fine!\n");
-
-        //IDOS->Printf("Trying to load %s\n", requestUrl);
-        httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
-        //IDOS->Printf("Create HTTP Request: %s\n", httpreq);
-        net->SendHTTPRequest(httpreq);
-        //IDOS->Printf("Response code=%ld\n",(int32)net->GetHTTPResponseCode());
-
-        //IDOS->Printf("GetContentType\n%s\n", net->GetContentType());
-
-        httpRespBody = net->GetResponseBody();
-
-        if (httpRespBody)
-        {
-          //IDOS->Printf("Response\n------------------------\n%s\n", httpRespBody);
-          return httpRespBody;
-        }
-        else IDOS->Printf("No response\n");
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
       }
-      else IDOS->Printf("Connection failed!\n");
-
-      net->DisposeConnection();
-    }
-    else IDOS->Printf("Connection creation failed!\n");
-
-    IOO->DisposeNetworkObject(net);
-  }
-  else IDOS->Printf("Network Object creation failed!\n");
-
-  return NULL;
-}
-  
-void cacheFileFromUrl(STRPTR url, ULONG portNum, STRPTR filename)
-{
-  if (IUtility->Stricmp(url, ""))
-  {
-    requestUrl = url;
-    requestPort = portNum;
-
-    IDOS->Printf("URL: %s\n", url);
-
-    STRPTR  httpreq = NULL;
-
-    IDOS->Printf("cacheFileFromUrl called\n");
-    net = (NETWORKOBJ *)IOO->NewNetworkObject();
-
-    if (net != NULL)
-    {
-      IDOS->Printf("Network is fine!\n");
-
-      if (net->CreateConnection(requestUrl, requestPort, TRUE, TRUE))
+      else
       {
-        IDOS->Printf("Connection created just fine!\n");
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
+        curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
+      }
+      curl_easy_cleanup(curl);
+    }
+    curl_global_cleanup();
+  }
+}
 
-        if (net->GetConnection())
+void cacheFileFromUrl(STRPTR url, STRPTR filename)
+{
+  if (stricmp(url, ""))
+  {    
+    CURL *curl;
+    CURLcode res;
+
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+
+    curl = curl_easy_init();
+    if(curl) {
+      curl_easy_setopt(curl, CURLOPT_URL, url);
+      curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
+
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+      //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+      
+      curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+      curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 3L);
+      curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);            
+
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, gotDataNoBody);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
+
+      res = curl_easy_perform(curl);
+      if(res != CURLE_OK)
+      {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+      }
+      else
+      {
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
+        curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
+      }
+      
+      curl_easy_cleanup(curl);
+
+
+      CONST_STRPTR ext = getContentTypeExt(response.type);
+      if (ext)
+      {
+        char targetFile[cacheFilenameSize];
+        FILE *pagefile;
+
+        curl = curl_easy_init();
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
+
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 3L);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+
+        strcpy(targetFile, CACHE_DIR);
+        strcat(targetFile, filename);
+        strcat(targetFile, ext);
+
+        pagefile = fopen(targetFile, "wb");
+        if (pagefile)
         {
-          IDOS->Printf("Connection done fine!\n");
-
-          IDOS->Printf("Trying to load %s at port %ld \n", requestUrl, portNum);
-          httpreq = net->CreateHTTPRequest(requestUrl, requestPort);
-          IDOS->Printf("Create HTTP Request: %s\n", httpreq);
-          net->SendHTTPRequest(httpreq);
-          //IDOS->Printf("GetResponseBody\n%s\n", net->GetResponseBody());
-
-          IDOS->Printf("GetContentType: %s\n", net->GetContentType());
-          IDOS->Printf("GetContentLength: %lld\n", net->GetContentLength());
-          IDOS->Printf("GetHTTPResponseLength: %lld\n", net->GetHTTPResponseLength());
-          STRPTR fileTypeExt = (STRPTR)getContentTypeExt(net->GetContentType());
-
-          if ((net->GetContentLength() < net->GetHTTPResponseLength()) && fileTypeExt)
+          curl_easy_setopt(curl, CURLOPT_WRITEDATA, pagefile);
+          
+          res = curl_easy_perform(curl);
+          if(res != CURLE_OK)
           {
-            STRPTR httpRespBody = net->GetResponseBody();
-            if (httpRespBody)
-            {
-              char targetFile[128];
-              
-              IUtility->Strlcpy(targetFile, CACHE_DIR, sizeof(targetFile));
-              IUtility->Strlcat(targetFile, filename, sizeof(targetFile));
-              IUtility->Strlcat(targetFile, fileTypeExt, sizeof(targetFile));
-                        
-              BPTR fh = IDOS->FOpen(targetFile, MODE_NEWFILE, 0);
-              if (fh)
-              {
-                IDOS->Printf("File opened just fine!\n");
-                size_t i = 0;
-                for (; i < net->GetContentLength(); i++) {
-                  IDOS->FPutC(fh, httpRespBody[i]);
-                }
-                IDOS->Printf("After FPutC!\n");
-                IDOS->FClose(fh);
-                IDOS->Printf("After FClose!\n");
-              }
-              else IDOS->Printf("File Open failed\n");
-              //return httpRespBody;
-              
-            }
-            else IDOS->Printf("No response\n");
+            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
           }
-
+          else
+          {
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
+            curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
+          }
+          
+          fclose(pagefile);
         }
-        else IDOS->Printf("Connection failed!\n");
 
-        net->DisposeConnection();
+        curl_easy_cleanup(curl);
       }
-      else IDOS->Printf("Connection creation failed!\n");
-
-      IOO->DisposeNetworkObject(net);
     }
-    else IDOS->Printf("Network Object creation failed!\n");
+    curl_global_cleanup();
   }
-  IDOS->Printf("FIN!\n");
 }
 
 static CONST_STRPTR getContentTypeExt(STRPTR contentType)
 {
-  if (!IUtility->Stricmp(contentType, "image/jpeg"))
+  if (!stricmp(contentType, "image/jpeg"))
   {
     return ".jpg";
   }
-  if (!IUtility->Stricmp(contentType, "image/png"))
+  if (!stricmp(contentType, "image/png"))
   {
     return ".png";
   }
-  if (!IUtility->Stricmp(contentType, "image/webp"))
+  if (!stricmp(contentType, "image/webp"))
   {
     return ".webp";
   }
-  if (!IUtility->Stricmp(contentType, "image/vnd.microsoft.icon"))
+  if (!stricmp(contentType, "image/vnd.microsoft.icon"))
   {
     return ".ico";
   }
-  if (!IUtility->Stricmp(contentType, "image/gif"))
+  if (!stricmp(contentType, "image/gif"))
   {
     return ".gif";
   }
   return NULL;
 }
 
-ULONG getPortByURL(STRPTR url)
-{
-  //if (!IUtility->Strnicmp(url, "https://", 8))  return NET_PORT_HTTPS;
-  if (!IUtility->Strnicmp(url, "http://", 7))  return NET_PORT_HTTP;
-
-  return NET_PORT_HTTPS;
-}

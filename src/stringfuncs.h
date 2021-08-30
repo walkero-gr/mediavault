@@ -20,5 +20,6 @@
 
 
 STRPTR charConv(CONST_STRPTR);
+STRPTR urlEncode(STRPTR);
 
 #endif

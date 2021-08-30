@@ -31,10 +31,8 @@ My plan for MediaVault is to create an application which users will use to:
 
 Requirements
 --------------------------
-* oo.library v1.13 by Tuomas Hokka
 * jansson.library v2.12.1 by Simon Tyrrell
 * AmigaAmp3 v3.29 by Thomas Wenzel
-* AmiSSL 4.9 by the AmiSSL Open Source Team
 
 I would like to thank
 --------------------------

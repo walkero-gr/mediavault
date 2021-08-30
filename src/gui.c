@@ -14,6 +14,7 @@
 
 */
 
+
 #include <proto/application.h>
 #include <proto/listbrowser.h>
 
@@ -23,6 +24,7 @@
 #include "mainWin.h"
 #include "aboutWin.h"
 #include "radiofuncs.h"
+#include "httpfuncs.h"
 
 static struct ColumnInfo *columnInfo, *leftSidebarCI;
 struct List radioList,
@@ -31,6 +33,7 @@ struct List radioList,
             leftSidebarList;
 
 struct filters lastFilters, prevFilters;
+struct RenderHook *renderhook;
 
 static void fillLeftSidebar(void);
 static void fillRadioList(BOOL);
@@ -39,8 +42,8 @@ static void fillRadioTrendList(void);
 static BOOL checkFiltersChanged(void);
 static void changeDiscoverButton(BOOL);
 
-extern NETWORKOBJ *net;
 extern uint8 maxRadioResults;
+extern struct memory response;
 
 void showGUI(void)
 {
@@ -261,9 +264,11 @@ void showGUI(void)
                         }
                         windowBlocking(objects[OID_MAIN], FALSE);              
                         break;
+
                       case GID_FILTERS_NAME:
                         changeDiscoverButton(FALSE);
                         break;
+
                       case GID_CHOOSER_GENRES:
                         changeDiscoverButton(FALSE);
                         if (code > 0)
@@ -375,23 +380,25 @@ void showGUI(void)
           IListBrowser->FreeLBColumnInfo(columnInfo);
           if(listCount(&radioList))
           {
-            //IListBrowser->FreeListBrowserList(&radioList);
-            FreeList(&radioList, freeStationInfo);
+            freeList(&radioList, freeStationInfo);
           }
+
           if(listCount(&radioPopularList))
           {
-            //IListBrowser->FreeListBrowserList(&radioPopularList);
-            FreeList(&radioPopularList, freeStationInfo);
+            freeList(&radioPopularList, freeStationInfo);
           }
+
           if(listCount(&radioTrendList))
           {
-            //IListBrowser->FreeListBrowserList(&radioTrendList);
-            FreeList(&radioTrendList, freeStationInfo);
+            freeList(&radioTrendList, freeStationInfo);
           }
+
+          IExec->FreeSysObject(ASOT_HOOK, renderhook);         
 
           IListBrowser->FreeLBColumnInfo(leftSidebarCI);
           IListBrowser->FreeListBrowserList(&leftSidebarList);
 
+          IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
           IIntuition->DisposeObject(objects[OID_ABOUT]);
           IIntuition->DisposeObject(objects[OID_MAIN]);
           IIntuition->DisposeObject(menus[MID_PROJECT]);
@@ -407,7 +414,6 @@ void showGUI(void)
 
 static void listStations(
   struct Gadget *listbrowser,
-  STRPTR responseJSON,
   struct List *list,
   int offset,
   char *notFoundMsg,
@@ -415,50 +421,32 @@ static void listStations(
 ) {
   size_t stationsCnt = 0;
 
-  // Detach list before modify it
-  IIntuition->SetAttrs(listbrowser,
-      LISTBROWSER_Labels, NULL,
-      TAG_DONE);
+  stationsCnt = getRadioList(list, offset);
 
-  if (responseJSON)
+  if (stationsCnt == ~0UL)
   {
-    stationsCnt = getRadioList(list, responseJSON, offset);
-
-    if (stationsCnt == ~0UL)
-    {
-      char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
-      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg);
-    }
-    else if (stationsCnt == 0)
-    {
-      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg);
-    }
-    else if (stationsCnt == maxRadioResults)
-    {
-      if (maxResultCallback)
-      {
-        maxResultCallback(TRUE);
-      }
-    }
-
-  } else {
-    char jsonErrorMsg[] = "There was an error with the returned data.\nPlease, try again or check your network.";
-
+    char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
     showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg);
   }
-
-  // Dispose net here, after the creation of the listbrowser content,
-  // because it trashes the response data, so to free the signals
-  //## TODO: adapt it to oo.library v1.11 changes
-  if (net)
+  else if (stationsCnt == 0)
   {
-    net->DisposeConnection();
-    IOO->DisposeNetworkObject(net);
-    net = NULL;
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg);
+  }
+  else if (stationsCnt == maxRadioResults)
+  {
+    if (maxResultCallback)
+    {
+      maxResultCallback(TRUE);
+    }
   }
 
   if ((stationsCnt != ~0UL) && (stationsCnt > 0))
   {
+    // Detach list before modify it
+    IIntuition->SetAttrs(listbrowser,
+        LISTBROWSER_Labels, NULL,
+        TAG_DONE);
+
     IIntuition->SetGadgetAttrs(listbrowser, windows[WID_MAIN], NULL,
         LISTBROWSER_Labels,         list,
         LISTBROWSER_SortColumn,     0,
@@ -470,31 +458,34 @@ static void listStations(
 
 static void fillRadioList(BOOL newSearch)
 {
-  char notFoundMsg[] = "No Radio Stations found with these criteria!\nChange them and try again!";
   static int offset;
-
+  char notFoundMsg[128];
+  IUtility->Strlcpy(notFoundMsg, "No more Radio Stations found!", sizeof(notFoundMsg));
+  
   if (newSearch)
   {
     offset = 0;
+    IUtility->Strlcpy(notFoundMsg, "No Radio Stations found with these criteria!\nChange them and try again!", sizeof(notFoundMsg));
   }
-  else offset++;
-  
-  STRPTR responseJSON = getRadioStations(lastFilters, offset);
-  listStations((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], responseJSON, &radioList, offset, (char *)notFoundMsg, changeDiscoverButton);
+  else
+    offset++;
+
+  getRadioStations(lastFilters, offset);
+  listStations((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], &radioList, offset, (char *)notFoundMsg, changeDiscoverButton);
 }
 
 static void fillRadioPopularList(void)
 {
   char notFoundMsg[] = "No Popular Radio Stations found!";
-  STRPTR responseJSON = getRadioPopularStations();
-  listStations((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER], responseJSON, &radioPopularList, 0, (char *)notFoundMsg, NULL);
+  getRadioPopularStations();
+  listStations((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER], &radioPopularList, 0, (char *)notFoundMsg, NULL);
 }
 
 static void fillRadioTrendList(void)
 {
   char notFoundMsg[] = "No Trending Radio Stations found!";
-  STRPTR responseJSON = getRadioTrendStations();
-  listStations((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], responseJSON, &radioTrendList, 0, (char *)notFoundMsg, NULL);
+  getRadioTrendStations();
+  listStations((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], &radioTrendList, 0, (char *)notFoundMsg, NULL);
 }
 
 static BOOL checkFiltersChanged(void)
