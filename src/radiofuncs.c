@@ -31,7 +31,7 @@ static char url[255];
 extern struct memory response;
 
 static void setBaseSearchUrl(void)
-{                   
+{
   char maxRadioResultsStr[5];
 
   IUtility->Strlcpy(url, radioAPIUrl, sizeof(url));
@@ -88,7 +88,7 @@ void getRadioTrendStations(void)
 {
   setBaseSearchUrl();
   IUtility->Strlcat(url, "&order=clicktrend", sizeof(url));
-  IUtility->Strlcat(url, "&reverse=true", sizeof(url));   
+  IUtility->Strlcat(url, "&reverse=true", sizeof(url));
 
   doHTTPRequest(url);
 }
@@ -97,23 +97,28 @@ void getRadioPopularStations(void)
 {
   setBaseSearchUrl();
   IUtility->Strlcat(url, "&order=clickcount", sizeof(url));
-  IUtility->Strlcat(url, "&reverse=true", sizeof(url));  
+  IUtility->Strlcat(url, "&reverse=true", sizeof(url));
 
   doHTTPRequest(url);
 }
 
 size_t getRadioList(struct List *stationList, int offset)
 {
-  if (response.code != 200)
+  LONG  responseCode = getResponseCode();
+  if (responseCode != 200)
     return ~0UL;
-  
+
+  STRPTR responseBody = getResponseBody();
+  if (responseBody == NULL)
+    return ~0UL;
+
   json_t *jsonRoot;
   json_error_t jsonError;
   size_t cnt;
 
-  jsonRoot = IJansson->json_loads(response.body, 0, &jsonError);
-  free(response.body);
-  
+  jsonRoot = IJansson->json_loads(responseBody, 0, &jsonError);
+  cleanupHTTPRequest();
+
   if(!jsonRoot)
   {
     //IDOS->Printf("json error: on line %d: %s\n", jsonError.line, jsonError.text);
@@ -125,7 +130,7 @@ size_t getRadioList(struct List *stationList, int offset)
     IJansson->json_decref(jsonRoot);
     //IDOS->Printf("JSON error: jsonRoot is not an array");
     return ~0UL;
-  }                                                                         
+  }
 
   if (offset == 0)
   {

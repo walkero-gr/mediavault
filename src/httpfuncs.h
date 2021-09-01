@@ -17,16 +17,13 @@
 #ifndef _HTTPFUNCS_H
 #define _HTTPFUNCS_H
 
+#define CACHE_DIR "PROGDIR:cache/"
+
 void doHTTPRequest(STRPTR);
-void cacheFileFromUrl(STRPTR, ULONG, STRPTR);
-
-struct memory
-{
-  char    *body;
-  char    *type;
-  size_t  size;
-  LONG    code;
-};
-
+void cleanupHTTPRequest(void);
+STRPTR getResponseBody(void);
+LONG getResponseCode(void);
+STRPTR getResponseType(void);
+void cacheFileFromUrl(STRPTR, STRPTR);
 
 #endif

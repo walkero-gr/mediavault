@@ -29,6 +29,9 @@
 #include "httpfuncs.h"
 
 extern Class *BitMapClass;
+extern struct RenderHook *renderhook;
+
+uint32 cacheFilenameSize = 128;
 
 /**
  * The following code is from MenuClass.c as found at the SDK 53.30 examples
@@ -117,7 +120,7 @@ void gadgetBlocking(struct Window *winId, Object *gadgetObj, BOOL disable)
 
 int listCount(struct List *list)
 {
-  struct Node *node;        
+  struct Node *node;
   int cnt = 0;
 
   if (list->lh_Head)
@@ -136,7 +139,7 @@ int listCount(struct List *list)
 BOOL appHide(uint32 appID, Object *winObj, uint32 methodID)
 {
   BOOL retVal = FALSE;
-  
+
   if ( IIntuition->IDoMethod(winObj, methodID, NULL) == TRUE )
   {
     IIntuition->SetAttrs(winObj,
@@ -148,7 +151,7 @@ BOOL appHide(uint32 appID, Object *winObj, uint32 methodID)
                   TAG_DONE);
     retVal = TRUE;
   }
-  
+
   return retVal;
 }
 
@@ -158,24 +161,24 @@ struct Window *appUnhide(uint32 appID, Object *winObj)
   struct Screen *pubScr = NULL;
   struct Window *window = NULL;
   BOOL hidden;
-  
+
   IApplication->GetApplicationAttrs(appID,
                 APPATTR_Hidden, &hidden,
                 TAG_DONE);
-  
+
   if ( hidden == TRUE )
   {
     pubScr = IIntuition->LockPubScreen(NULL);
     if ( !pubScr ) return NULL;
-  
+
     IIntuition->SetAttrs(winObj, WA_PubScreen, pubScr, TAG_DONE);
-  
+
     if ( (window = (struct Window *) IIntuition->IDoMethod(winObj, WM_OPEN, NULL)) )
     {
       IIntuition->ScreenToFront(pubScr);
       IApplication->SetApplicationAttrs(appID, APPATTR_Hidden, FALSE, TAG_DONE);
     }
-  
+
     IIntuition->UnlockPubScreen(NULL, pubScr);
   }
   else {
@@ -188,7 +191,7 @@ struct Window *appUnhide(uint32 appID, Object *winObj)
       IIntuition->ActivateWindow(window);
     }
   }
-  
+
   return window;
 }
 
@@ -212,102 +215,72 @@ void freeList(
 
 static STRPTR getCachedImageIfExists(STRPTR uuid)
 {
-  char buf[128];
-  char avatarBase[128];
+  char buf[cacheFilenameSize];
+  char avatarBase[cacheFilenameSize];
   IUtility->Strlcpy(avatarBase, CACHE_DIR, sizeof(avatarBase));
   IUtility->Strlcat(avatarBase, uuid, sizeof(avatarBase));
 
-  //char avatar[128];
-  //IDOS->Printf("getCachedImageIfExists: %s\n",  uuid);
-  BPTR imgLock;        
+  BPTR imgLock;
   const char ext[][6] = {".jpg", ".png", ".webp", ".ico", ".gif"};
-  
+
   size_t i;
   for (i = 0; i < sizeof(ext)/sizeof(ext[0]); i++)
   {
-    //IDOS->Printf("EXT: %s\n",  ext[i]);
-    
     IUtility->Strlcpy(buf, avatarBase, sizeof(buf));
     IUtility->Strlcat(buf, ext[i], sizeof(buf));
-    //IDOS->Printf("Lock: %s\n", buf);
+
     imgLock = IDOS->Lock(buf, SHARED_LOCK);
     if (imgLock)
     {
-      STRPTR avatar = IExec->AllocVecTags(sizeof(char) * 128,
+      STRPTR avatar = IExec->AllocVecTags(sizeof(char) * cacheFilenameSize,
           AVT_Type,            MEMF_SHARED,
           AVT_ClearWithValue,  "\0",
           TAG_DONE);
       IDOS->UnLock(imgLock);
-      //IUtility->Strlcpy(avatar, buf, sizeof(avatar));
+
       strcpy(avatar, buf);
-      //return avatar;
-      //IDOS->Printf("Avatar found: %s\nbuf: %s\n", avatar, buf);
       return avatar;
-      //break;
     }
   }
-  //IDOS->Printf("Cached avatar not found\n");
   return NULL;
 }
 
 void showAvatarImage(STRPTR uuid, STRPTR url)
 {
-  //Object *avatarImageObj = NULL;
   struct Screen *screen = NULL;
-  
-  //STRPTR avatarImage = NULL;
-  //IDOS->Printf("showAvatarImage\n");
-  //## TODO: First show MediaVault avatar in right sidebar
 
-  //## TODO: Check first if the avatar exists in cache
-  //IUtility->Strlcpy(avatarImage, getCachedImageIfExists(uuid), sizeof(avatarImage));
   STRPTR avatarImage = getCachedImageIfExists(uuid);
-  //IDOS->Printf("Avatar url: %s\n", url);
 
   if (!avatarImage)
   {
-    cacheFileFromUrl(url, 443, uuid);
+    cacheFileFromUrl(url, uuid);
     avatarImage = getCachedImageIfExists(uuid);
   }
 
   if (!avatarImage)
   {
-    avatarImage = (STRPTR)LOGO_IMAGE;
+    avatarImage = (STRPTR)LOGO_IMAGE_BIG;
   }
-  //IDOS->Printf("Avatar found in cache: %s\n", avatarImage);
 
-
-  //if (screen) IDOS->Printf("Screen is set\n");
-
-  //## TODO: Show this image at the right sidebar
-  /*
-  */
   if (avatarImage)
   {
     if((screen = IIntuition->LockPubScreen(NULL)))
     {
-
-
-      /*
+      // Clean previous image shown
       IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
           GA_Image, NULL,
           TAG_END );
-
-      if (objects[OID_AVATAR_IMAGE]) IDOS->Printf("OID_AVATAR_IMAGE is set 1\n");
       IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
-      */
 
-
+      // Create a new object for the image
       objects[OID_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-          IA_Scalable,        FALSE,
+          IA_Scalable,        TRUE,
           BITMAP_Screen,      screen,
           BITMAP_SourceFile,  avatarImage,
           BITMAP_Masking,     TRUE,
           TAG_END);
 
-      //if (objects[OID_AVATAR_IMAGE]) IDOS->Printf("OID_AVATAR_IMAGE is set 2\n");
-
-      struct RenderHook *renderhook = (struct RenderHook *) IExec->AllocSysObjectTags(ASOT_HOOK,
+      renderhook = (struct RenderHook *) IExec->AllocSysObjectTags(ASOT_HOOK,
             ASOHOOK_Size,  sizeof(struct RenderHook),
             ASOHOOK_Entry, (HOOKFUNC)renderfunct,
             TAG_END);
@@ -318,7 +291,6 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
         renderhook->w    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Width;
         renderhook->h    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Height;
         renderhook->fill = FALSE;
-        //IDOS->Printf("W: %ld, H: %ld \n", renderhook->w, renderhook->h);
 
         IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
             SPACE_RenderHook,   renderhook,
@@ -329,36 +301,10 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
         IIntuition->RefreshWindowFrame( windows[WID_MAIN] );
       }
 
-
-
-
-
-      /*
-      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
-          BUTTON_RenderImage, NULL,
-        TAG_END );
-      IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
-
-      avatarImageObj = IIntuition->NewObject(BitMapClass, NULL,
-          GA_ID,              OID_AVATAR_IMAGE,
-          IA_Scalable,        TRUE,
-          BITMAP_Screen,      screen,
-          BITMAP_SourceFile,  avatarImage,
-          BITMAP_Masking,     TRUE,
-          TAG_END);
-
-      if (objects[OID_AVATAR_IMAGE]) IDOS->Printf("OID_AVATAR_IMAGE is set 2\n");
-
-
-      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
-          BUTTON_RenderImage, avatarImageObj,
-          TAG_END );
-      */
       IIntuition->UnlockPubScreen(NULL, screen);
       screen = NULL;
     }
   }
-  //IDOS->Printf("================================\n");
 }
 
 struct Region *set_clip_region (struct RastPort *rp,struct Rectangle *rect, BOOL *in_refresh)
@@ -367,22 +313,22 @@ struct Region *set_clip_region (struct RastPort *rp,struct Rectangle *rect, BOOL
   struct Layer *layer = rp->Layer;
 
   if (layer)
-    {
+  {
     struct Region *new_region = IGraphics->NewRegion();
 
     if (new_region)
       IGraphics->OrRectRegion (new_region,rect);
 
     if (layer->Flags & LAYERUPDATING)
-      {
+    {
       ILayers->EndUpdate (layer,FALSE);
       *in_refresh = TRUE;
-      }
+    }
     else
       *in_refresh = FALSE;
 
     old_region = ILayers->InstallClipRegion (layer,new_region);
-    }
+  }
 
   return (old_region);
 }
@@ -392,7 +338,7 @@ void remove_clip_region (struct RastPort *rp,struct Region *old_region, BOOL in_
   struct Layer *layer = rp->Layer;
 
   if (layer)
-    {
+  {
     struct Region *new_region = ILayers->InstallClipRegion (layer,old_region);
 
     if (new_region)
@@ -400,7 +346,7 @@ void remove_clip_region (struct RastPort *rp,struct Region *old_region, BOOL in_
 
     if (in_refresh)
       ILayers->BeginUpdate (layer);
-    }
+  }
 }
 
 ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
@@ -408,43 +354,24 @@ ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
   Object *img = hook->img;
   struct IBox box;
   struct impDraw drawmsg;
-  long w,h;
+  long w, h;
   struct Rectangle clip_rect;
   struct Region *old_region;
   BOOL in_refresh;
 
   if (!img) return (0);
 
-  IIntuition->GetAttr (SPACE_RenderBox, obj, (ULONG *)&box);
+  IIntuition->GetAttr(SPACE_RenderBox, obj, (ULONG *)&box);
 
-  // TODO: Put some more thought on resizing
   w = box.Width;
   h = hook->h * box.Width / hook->w;
 
-  //IDOS->Printf("BOX: %ld x %d\n", box.Width, box.Height);
-  //IDOS->Printf("HOOK: %ld x %ld\n", hook->w, hook->h);
-  //IDOS->Printf("CALC: %ld x %ld\n", w, h);
+  if (h > box.Height)
+  {
+    h = box.Height;
+    w = hook->w * box.Height / hook->h;
+  }
 
-  //h = box.Height;
-  //w = hook->w * box.Height / hook->h;
-  /*
-  if (hook->fill)
-    {
-    if (h < box.Height)
-      {
-      h = box.Height;
-      w = hook->w * box.Height / hook->h;
-      }
-    }
-  else
-    {
-    if (h > box.Height)
-      {
-      h = box.Height;
-      w = hook->w * box.Height / hook->h;
-      }
-    }
-  */
   clip_rect.MinX = box.Left;
   clip_rect.MinY = box.Top;
   clip_rect.MaxX = box.Left + box.Width - 1;
@@ -456,9 +383,7 @@ ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
 
   drawmsg.imp_Offset.X          = box.Left + (box.Width  - w) / 2;
   drawmsg.imp_Offset.Y          = box.Top  + (box.Height - h) / 2;
-  //drawmsg.imp_Offset.X          = box.Left;
-  //drawmsg.imp_Offset.Y          = box.Top - topMarginScroll;
-  
+
   drawmsg.imp_State             = IDS_NORMAL;
   drawmsg.imp_DrInfo            = msg->gpr_GInfo->gi_DrInfo;
   drawmsg.imp_Dimensions.Width  = w;

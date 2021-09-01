@@ -135,6 +135,7 @@ CONST_STRPTR countries[] =
 };
 
 extern struct List leftSidebarList;
+extern struct RenderHook *renderhook;
 
 static Object *buildRadioSearchPage(void);
 static Object *buildRadioPopularPage(void);
@@ -151,6 +152,7 @@ extern Class *ChooserClass;
 extern Class *LabelClass;
 extern Class *LayoutClass;
 extern Class *ListBrowserClass;
+extern Class *SpaceClass;
 extern Class *StringClass;
 extern Class *TextEditorClass;
 extern Class *WindowClass;
@@ -175,7 +177,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         BITMAP_Masking,     TRUE,
         TAG_END);
 
-  struct RenderHook *renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
+  renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
         ASOHOOK_Size,  sizeof(struct RenderHook),
         ASOHOOK_Entry, (HOOKFUNC)renderfunct,
         TAG_END);
@@ -241,36 +243,15 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
             // START - Right Sidebar
             LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
               LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-              /*
-              LAYOUT_AddImage, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(BitMapClass, NULL,
-                GA_ID,              GID_INFO_AVATAR,
-                IA_Scalable,        FALSE,
-                BITMAP_SourceFile,  "PROGDIR:images/logo_128.png",
-                BITMAP_Screen,      screen,
-                //BITMAP_Precision, PRECISION_EXACT,
-                BITMAP_Masking,     TRUE,
-                //BITMAP_Width, 50,
-                //BITMAP_Height, 50,
-                TAG_END),
-                CHILD_WeightedWidth, 30,     
-                CHILD_MaxHeight, 128,
-              */
 
-              LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(NULL, "space.gadget", // SpaceObject,
+              LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(SpaceClass, NULL,
                 GA_ID,                      GID_INFO_AVATAR,
                 SPACE_MinWidth,             128,
                 SPACE_MinHeight,            128,
                 SPACE_RenderHook,           renderhook,
                 GA_Image,                   objects[OID_AVATAR_IMAGE],
                 TAG_DONE),
-                //CHILD_MaxWidth, 256,
-                //CHILD_MaxHeight, 256,
-              /*
-              LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(ButtonClass, NULL,
-                GA_ID,                      GID_INFO_AVATAR,
-                GA_Image,                   objects[OID_AVATAR_IMAGE],
-                TAG_DONE),
-              */
+
               LAYOUT_AddChild, gadgets[GID_INFO_RADIO_DATA] = IIntuition->NewObject(TextEditorClass, NULL,
                 GA_ID,                      GID_INFO_RADIO_DATA,
                 GA_RelVerify,               TRUE,

@@ -33,6 +33,7 @@ struct List radioList,
             leftSidebarList;
 
 struct filters lastFilters, prevFilters;
+struct RenderHook *renderhook;
 
 static void fillLeftSidebar(void);
 static void fillRadioList(BOOL);
@@ -47,10 +48,10 @@ extern struct memory response;
 void showGUI(void)
 {
   struct Screen   *screen = NULL;
-  struct MsgPort  *appPort = NULL;  
+  struct MsgPort  *appPort = NULL;
   struct MsgPort  *notifyPort = NULL;
   uint32 appID = 0L;
-  
+
   appPort = (struct MsgPort *)IExec->AllocSysObject(ASOT_PORT, NULL);
   if (appPort)
   {
@@ -70,8 +71,6 @@ void showGUI(void)
       if (objects[OID_MAIN])
       {
         windows[WID_MAIN] = (struct Window*)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, TAG_DONE);
-        IIntuition->UnlockPubScreen(NULL, screen);
-        screen = NULL;
 
         if (windows[WID_MAIN])
         {
@@ -133,7 +132,7 @@ void showGUI(void)
           while (!done)
           {
             wait = IExec->Wait(winSignal | appSignal | SIGBREAKF_CTRL_C);
-            
+
             if ( wait & SIGBREAKF_CTRL_C )
             {
               done = TRUE;
@@ -215,23 +214,23 @@ void showGUI(void)
                     }
 
                     break;
-                    
+
                   case WMHI_JUMPSCREEN:
                     {
                       struct Screen *newScr = NULL;
-         
+
                       IIntuition->GetAttr(WA_PubScreen, objects[OID_MAIN], (uint32 *) &newScr);
-   
+
                       if (newScr)
                       {
                         if ( appHide(appID, objects[OID_MAIN], WM_CLOSE) == TRUE )
                         {
                           windows[WID_MAIN] = NULL;
                         }
-  
+
                         // Confirm the screen pointer and re-open the window.
                         IIntuition->SetAttrs(objects[OID_MAIN], WA_PubScreen, newScr, TAG_DONE);
-            
+
                         if ( (windows[WID_MAIN] = (struct Window *) IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, NULL)) )
                         {
                           IApplication->SetApplicationAttrs(appID,
@@ -239,12 +238,12 @@ void showGUI(void)
                                         TAG_DONE);
                           IIntuition->ScreenToFront(newScr);
                         }
-  
+
                         if ( windows[WID_MAIN] == NULL ) done = TRUE; // opening on the new screen failed
                       }
                     }
                     break;
-                                        
+
                   case WMHI_GADGETUP:
                     switch (result & WMHI_GADGETMASK)
                     {
@@ -256,16 +255,18 @@ void showGUI(void)
                         {
                           changeDiscoverButton(FALSE);
                           fillRadioList(TRUE);
-                        }                                                           
+                        }
                         else {
                           changeDiscoverButton(TRUE);
                           fillRadioList(FALSE);
                         }
-                        windowBlocking(objects[OID_MAIN], FALSE);              
+                        windowBlocking(objects[OID_MAIN], FALSE);
                         break;
+
                       case GID_FILTERS_NAME:
                         changeDiscoverButton(FALSE);
                         break;
+
                       case GID_CHOOSER_GENRES:
                         changeDiscoverButton(FALSE);
                         if (code > 0)
@@ -292,7 +293,7 @@ void showGUI(void)
                         }
                         else IUtility->Strlcpy(lastFilters.language, "", sizeof(lastFilters.language));
                         break;
-                      
+
                       case GID_RADIO_LISTBROWSER:
                       case GID_RADIO_POPULAR_LISTBROWSER:
                       case GID_RADIO_TREND_LISTBROWSER:
@@ -302,22 +303,26 @@ void showGUI(void)
                           if ((result & WMHI_GADGETMASK) == GID_RADIO_LISTBROWSER) lb = gadgets[GID_RADIO_LISTBROWSER];
                           else if ((result & WMHI_GADGETMASK) == GID_RADIO_POPULAR_LISTBROWSER) lb = gadgets[GID_RADIO_POPULAR_LISTBROWSER];
                           else lb = gadgets[GID_RADIO_TREND_LISTBROWSER];
-                            
+
 
                           IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+
+                          // TODO: Remove this when the play button is added at the right sidebar
                           if (res_value == LBRE_DOUBLECLICK)
                           {
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
                             playRadio((struct Node *)res_node);
                           }
                           else if (res_value == LBRE_NORMAL)
-                          {                            
+                          {
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+                            windowBlocking(objects[OID_MAIN], TRUE);
                             showRadioInfo((struct Node *)res_node);
+                            windowBlocking(objects[OID_MAIN], FALSE);
                           }
                         }
-                        break;                      
-                      
+                        break;
+
                       case GID_LEFT_SIDEBAR:
                         IIntuition->GetAttr(LISTBROWSER_Selected, gadgets[GID_LEFT_SIDEBAR], &lsbNodeIdx);
                         switch (lsbNodeIdx)
@@ -328,7 +333,7 @@ void showGUI(void)
                               windowBlocking(objects[OID_MAIN], TRUE);
                               fillRadioPopularList();
                               windowBlocking(objects[OID_MAIN], FALSE);
-                            }                            
+                            }
                             break;
                           case 2:
                             if(listCount(&radioTrendList) == 0)
@@ -341,7 +346,7 @@ void showGUI(void)
                         }
                         break;
                     }
-                    break; 
+                    break;
                 }
               }
 
@@ -395,13 +400,19 @@ void showGUI(void)
 
           IIntuition->DisposeObject(objects[OID_ABOUT]);
           IIntuition->DisposeObject(objects[OID_MAIN]);
+
+          IExec->FreeSysObject(ASOT_HOOK, renderhook);
+          IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
+
           IIntuition->DisposeObject(menus[MID_PROJECT]);
         }
       }
+      IIntuition->UnlockPubScreen(NULL, screen);
+      screen = NULL;
       //IIntuition->FreeScreenDrawInfo(screen, drInfo);
     }
   }
-  
+
   if (appID) IApplication->UnregisterApplicationA(appID, NULL);
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
@@ -455,7 +466,7 @@ static void fillRadioList(BOOL newSearch)
   static int offset;
   char notFoundMsg[128];
   IUtility->Strlcpy(notFoundMsg, "No more Radio Stations found!", sizeof(notFoundMsg));
-  
+
   if (newSearch)
   {
     offset = 0;

@@ -34,12 +34,12 @@ DONE - Add a message window/requester
 DONE - Added Unicode conversion to system charset on radio station names
 - Find a way to use different codesets and charsets based on station language on Unicode conversion
 DONE - Application registration
-DONE - Window can jump screen 
+DONE - Window can jump screen
 DONE - Window size and position can be saved
 DONE - Changed the way classes and gadgets are initiallized
 DONE - Download avatar images in cache folder
 - Add play button at the right sidebar menu and replace double click
-- Add libcurl support
+DONE - Add libcurl support
 
 
 ## Radio

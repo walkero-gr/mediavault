@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [1.3] - [future]
+### Added
+- Added right sidebar with station info and avatar image, wherever
+  this is available
+
 ### Fixed
 - Now the radio list is cleared if the search criteria change and
   no radio stations are found
@@ -47,7 +51,7 @@ All notable changes to this project will be documented in this file.
   Now, one method is used instead of three separated that had pretty
   much the same code. Better code, less problems.
 - A lot of refactoring, removing global variables.
-- Reduced a lot of duplicated code.                                                  
+- Reduced a lot of duplicated code.
 - Now the default radio station number increased to 50. The response
   is also much faster - Thanks to Tuomas Hokka and oo.library 1.13
   fixes
