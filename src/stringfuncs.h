@@ -6,7 +6,7 @@
 **
 ** Project: MediaVault
 **
-** File: 
+** File:
 **
 ** Date: 23-05-2021 13:48:52
 **
@@ -20,6 +20,6 @@
 
 
 STRPTR charConv(CONST_STRPTR);
-ULONG convertVersionToInt(STRPTR);
+STRPTR urlEncode(STRPTR);
 
 #endif

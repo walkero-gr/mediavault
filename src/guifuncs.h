@@ -34,7 +34,7 @@ LONG showMsgReq(Object *, CONST_STRPTR, CONST_STRPTR, ULONG, CONST_STRPTR, ULONG
 int listCount(struct List *);
 BOOL appHide(uint32, Object *, uint32);
 struct Window *appUnhide(uint32, Object *);
-void FreeList(
+void freeList(
   struct List *,
   void (*freeUserDataCallback)(struct stationInfo *)
 );
