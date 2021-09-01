@@ -258,13 +258,20 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
 
   if (!avatarImage)
   {
-    avatarImage = (STRPTR)LOGO_IMAGE;
+    avatarImage = (STRPTR)LOGO_IMAGE_BIG;
   }
 
   if (avatarImage)
   {
     if((screen = IIntuition->LockPubScreen(NULL)))
     {
+      // Clean previous image shown
+      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
+          GA_Image, NULL,
+          TAG_END );
+      IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);      
+      
+      // Create a new object for the image
       objects[OID_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
           IA_Scalable,        TRUE,
           BITMAP_Screen,      screen,
@@ -305,22 +312,22 @@ struct Region *set_clip_region (struct RastPort *rp,struct Rectangle *rect, BOOL
   struct Layer *layer = rp->Layer;
 
   if (layer)
-    {
+  {
     struct Region *new_region = IGraphics->NewRegion();
 
     if (new_region)
       IGraphics->OrRectRegion (new_region,rect);
 
     if (layer->Flags & LAYERUPDATING)
-      {
+    {
       ILayers->EndUpdate (layer,FALSE);
       *in_refresh = TRUE;
-      }
+    }
     else
       *in_refresh = FALSE;
 
     old_region = ILayers->InstallClipRegion (layer,new_region);
-    }
+  }
 
   return (old_region);
 }
@@ -330,7 +337,7 @@ void remove_clip_region (struct RastPort *rp,struct Region *old_region, BOOL in_
   struct Layer *layer = rp->Layer;
 
   if (layer)
-    {
+  {
     struct Region *new_region = ILayers->InstallClipRegion (layer,old_region);
 
     if (new_region)
@@ -338,7 +345,7 @@ void remove_clip_region (struct RastPort *rp,struct Region *old_region, BOOL in_
 
     if (in_refresh)
       ILayers->BeginUpdate (layer);
-    }
+  }
 }
 
 ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
@@ -353,7 +360,7 @@ ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
 
   if (!img) return (0);
 
-  IIntuition->GetAttr (SPACE_RenderBox, obj, (ULONG *)&box);
+  IIntuition->GetAttr(SPACE_RenderBox, obj, (ULONG *)&box);
 
   w = box.Width;
   h = hook->h * box.Width / hook->w;

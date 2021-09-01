@@ -39,7 +39,8 @@ static CONST_STRPTR version USED = VERSTAG;
 
 void die(const char *s);
 
-#define LOGO_IMAGE "PROGDIR:images/logo_128.png"
+#define LOGO_IMAGE      "PROGDIR:images/logo_128.png"
+#define LOGO_IMAGE_BIG  "PROGDIR:images/logo_256.png"
 
 struct filters
 {

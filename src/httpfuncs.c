@@ -108,7 +108,8 @@ void doHTTPRequest(STRPTR url)
     if(curl) {
       curl_easy_setopt(curl, CURLOPT_URL, url);
       curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
-
+                                                            
+      curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
       curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
       //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 
@@ -145,6 +146,7 @@ void cacheFileFromUrl(STRPTR url, STRPTR filename)
       curl_easy_setopt(curl, CURLOPT_URL, url);
       curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
 
+      curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
       curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
       //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
       
@@ -179,6 +181,7 @@ void cacheFileFromUrl(STRPTR url, STRPTR filename)
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
 
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 

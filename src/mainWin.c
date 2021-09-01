@@ -152,6 +152,7 @@ extern Class *ChooserClass;
 extern Class *LabelClass;
 extern Class *LayoutClass;
 extern Class *ListBrowserClass;
+extern Class *SpaceClass;
 extern Class *StringClass;
 extern Class *TextEditorClass;
 extern Class *WindowClass;
@@ -243,7 +244,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
             LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
               LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
 
-              LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(NULL, "space.gadget", // SpaceObject,
+              LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(SpaceClass, NULL,
                 GA_ID,                      GID_INFO_AVATAR,
                 SPACE_MinWidth,             128,
                 SPACE_MinHeight,            128,

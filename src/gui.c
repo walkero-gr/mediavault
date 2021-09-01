@@ -71,8 +71,6 @@ void showGUI(void)
       if (objects[OID_MAIN])
       {
         windows[WID_MAIN] = (struct Window*)IIntuition->IDoMethod(objects[OID_MAIN], WM_OPEN, TAG_DONE);
-        IIntuition->UnlockPubScreen(NULL, screen);
-        screen = NULL;
 
         if (windows[WID_MAIN])
         {
@@ -308,6 +306,8 @@ void showGUI(void)
                             
 
                           IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+
+                          // TODO: Remove this when the play button is added at the right sidebar
                           if (res_value == LBRE_DOUBLECLICK)
                           {
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
@@ -316,7 +316,9 @@ void showGUI(void)
                           else if (res_value == LBRE_NORMAL)
                           {                            
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+                            windowBlocking(objects[OID_MAIN], TRUE);
                             showRadioInfo((struct Node *)res_node);
+                            windowBlocking(objects[OID_MAIN], FALSE);
                           }
                         }
                         break;                      
@@ -391,19 +393,22 @@ void showGUI(void)
           if(listCount(&radioTrendList))
           {
             freeList(&radioTrendList, freeStationInfo);
-          }
-
-          IExec->FreeSysObject(ASOT_HOOK, renderhook);         
+          }                                                  
 
           IListBrowser->FreeLBColumnInfo(leftSidebarCI);
           IListBrowser->FreeListBrowserList(&leftSidebarList);
 
-          IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
           IIntuition->DisposeObject(objects[OID_ABOUT]);
           IIntuition->DisposeObject(objects[OID_MAIN]);
+
+          IExec->FreeSysObject(ASOT_HOOK, renderhook);
+          IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
+
           IIntuition->DisposeObject(menus[MID_PROJECT]);
         }
       }
+      IIntuition->UnlockPubScreen(NULL, screen);
+      screen = NULL;
       //IIntuition->FreeScreenDrawInfo(screen, drInfo);
     }
   }

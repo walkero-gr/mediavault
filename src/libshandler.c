@@ -25,6 +25,7 @@ struct ClassLibrary *LayoutBase;
 struct ClassLibrary *ListBrowserBase;  struct ListBrowserIFace *IListBrowser;
 struct ClassLibrary *RequesterBase;
 struct ClassLibrary *ScrollerBase;
+struct ClassLibrary *SpaceBase;
 struct ClassLibrary *StringBase;
 struct ClassLibrary *TextEditorBase;
 struct ClassLibrary *WindowBase;
@@ -37,6 +38,7 @@ Class *LayoutClass;
 Class *ListBrowserClass;
 Class *RequesterClass;
 Class *ScrollerClass;
+Class *SpaceClass;
 Class *StringClass;
 Class *TextEditorClass;
 Class *WindowClass;
@@ -48,6 +50,7 @@ int CleanExit(const char *str)
   if(BitMapBase)        IIntuition->CloseClass(BitMapBase);
   if(TextEditorBase)    IIntuition->CloseClass(TextEditorBase);
   if(ScrollerBase)      IIntuition->CloseClass(ScrollerBase);
+  if(SpaceBase)         IIntuition->CloseClass(SpaceBase);
   if(StringBase)        IIntuition->CloseClass(StringBase);
   if(ButtonBase)        IIntuition->CloseClass(ButtonBase);
   if(ChooserBase)       IIntuition->CloseClass(ChooserBase);
@@ -171,6 +174,9 @@ int OpenLibs(void)
 
   StringBase = IIntuition->OpenClass( "string.gadget", 53, &StringClass );
   if (!StringBase) return CleanExit("Can't open String Gadget");
+
+  SpaceBase = IIntuition->OpenClass( "space.gadget", 53, &SpaceClass );
+  if (!SpaceBase) return CleanExit("Can't open Space Gadget");
 
   ScrollerBase = IIntuition->OpenClass( "scroller.gadget", 53, &ScrollerClass );
   if (!ScrollerBase) return CleanExit("Can't open Scroller Gadget");
