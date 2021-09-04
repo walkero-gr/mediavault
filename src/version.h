@@ -28,7 +28,7 @@
 #endif
 
 #ifndef PATCH
-#define PATCH 1
+#define PATCH 0
 #endif
 
 #ifndef RELEASE_DATE
@@ -38,6 +38,6 @@
 #define APPNAME     "MediaVault"
 #define VERS        APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH)
 #define VSTRING     APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH) " (" RELEASE_DATE ")"
-#define VERSTAG     "\0$VER: " STR(VERSION) "." STR(REVISION) "." STR(PATCH) " (" RELEASE_DATE ")"
+#define VERSTAG     "\0$VER: " VSTRING
 
 #endif

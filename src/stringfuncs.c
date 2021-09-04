@@ -34,12 +34,32 @@ STRPTR charConv(CONST_STRPTR value)
   STRPTR convertedValue;
 
   IDOS->GetVar("Charset", charsetName, sizeof(charsetName), GVF_GLOBAL_ONLY);
-  cd = iconv_open(charsetName, "UTF-8");  
+  cd = iconv_open(charsetName, "UTF-8");
   convertedValue = useIconv(cd, value);
 
   if (cd != (iconv_t)-1) iconv_close(cd);
 
   return convertedValue;
+}
+
+ULONG convertVersionToInt(STRPTR version)
+{
+  char buf[10], *tmp;
+  uint32 versionNumber = 0;
+
+  if (!strncmp(version, "v", 1))
+    IUtility->Strlcpy(buf, version + 1, sizeof(buf));
+
+  tmp = strtok(buf, ".");
+  versionNumber = versionNumber + (atoi(tmp) * 100);
+  
+  tmp = strtok(NULL, ".");
+  versionNumber = versionNumber + (atoi(tmp) * 10);
+
+  tmp = strtok(NULL, ".");
+  versionNumber = versionNumber + atoi(tmp);
+
+  return versionNumber;
 }
 
 static STRPTR useIconv(iconv_t cd, CONST_STRPTR string)

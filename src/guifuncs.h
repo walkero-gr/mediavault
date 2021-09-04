@@ -30,7 +30,7 @@ struct RenderHook {
 struct Image *MenuImage(CONST_STRPTR name, struct Screen *);
 void windowBlocking(Object *, BOOL);
 void gadgetBlocking(struct Window *, Object *, BOOL);
-void showMsgReq(Object *, CONST_STRPTR, CONST_STRPTR);
+LONG showMsgReq(Object *, CONST_STRPTR, CONST_STRPTR, ULONG, CONST_STRPTR, ULONG);
 int listCount(struct List *);
 BOOL appHide(uint32, Object *, uint32);
 struct Window *appUnhide(uint32, Object *);
@@ -40,6 +40,6 @@ void freeList(
 );
 void showAvatarImage(STRPTR, STRPTR);
 ULONG renderfunct(struct RenderHook *, Object *, struct gpRender *);
-     
+void workOnUpdate(void);
 
 #endif

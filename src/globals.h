@@ -19,7 +19,7 @@
 
 #include <proto/amijansson.h>
 #include <proto/dos.h>
-#include <proto/exec.h>   
+#include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/icon.h>
 #include <proto/intuition.h>
@@ -28,7 +28,7 @@
 
 #include <string.h>
 #include <ctype.h>
-                          
+
 #include <jansson/jansson.h>
 
 #include "version.h"

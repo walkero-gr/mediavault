@@ -83,6 +83,7 @@ enum
 enum
 {
   MID_PROJECT = 1,  /* Zero is an invalid value for a menu ID */
+  MID_CHECKUPDATES,
   MID_ABOUT,
   MID_ICONIFY,
   MID_QUIT,

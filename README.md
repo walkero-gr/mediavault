@@ -64,6 +64,16 @@ https://github.com/walkero-gr/mediavault/issues
 Changelog
 --------------------------
 
+v1.3.0 - future
+* Added right sidebar with station info and avatar image, wherever the image is available
+* Added a new menu item to check for newer versions and start a selfupdate, if the user approves it. There is a way to see the latest changes before update.
+* Now the radio list is cleared if the search criteria change and no radio stations are found
+* Now the list is not cleared if the "Discover More" button is clicked and no more stations were found
+* Fixed a possible crash on window closing
+* Added a new message in case the "Discover More" button is clicked and no more stations were found
+* Dropped oo.library network support for libcurl, which more mature and has a lot more options and features. Unfortunately that increased the executable size a lot.
+* Now oo.library and AmiSSL are not required
+
 v1.2.1 - 2021-05-31
 * Reduced results to 20 as a temporary workaround of a bug that occurs with the default discovery of radio stations. Found where the problem is and it will be fixed on a later release.
 * Disabled the load of the window when AmiSSL 4.9 is missing

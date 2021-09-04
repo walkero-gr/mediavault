@@ -6,21 +6,21 @@
 **
 ** Project: MediaVault
 **
-** File:
+** File: fsfuncs.h
 **
-** Date: 23-05-2021 13:48:52
+** Date: 17-04-2021 10:59:22
 **
 ************************************************************
 
 */
 
 
-#ifndef _STRING_FUNCS_H
-#define _STRING_FUNCS_H
+#ifndef _FSFUNCS_H
+#define _FSFUNCS_H
 
-
-STRPTR charConv(CONST_STRPTR);
-STRPTR urlEncode(STRPTR);
-ULONG convertVersionToInt(STRPTR);
+STRPTR getFilePath(STRPTR);
+STRPTR getParentPath(STRPTR);
+BOOL downloadLatestUpdate(STRPTR);
+int32 unarcFile(STRPTR, STRPTR);
 
 #endif

@@ -27,8 +27,18 @@
 #include "guifuncs.h"
 #include "radiofuncs.h"
 #include "httpfuncs.h"
+#include "stringfuncs.h"
+#include "fsfuncs.h"
 
 extern Class *BitMapClass;
+
+struct releaseInfo {
+  char tag_name[10];
+  char content_type[24];
+  char browser_download_url[255];
+  char changes[1024];
+};
+static struct releaseInfo *release = NULL;
 extern struct RenderHook *renderhook;
 
 uint32 cacheFilenameSize = 128;
@@ -95,17 +105,28 @@ void windowBlocking(Object *objId, BOOL disable)
   IIntuition->SetAttrs(objId, WA_BusyPointer, disable, TAG_DONE);
 }
 
-void showMsgReq(Object *reqGadget, CONST_STRPTR title, CONST_STRPTR message)
+LONG showMsgReq(
+  Object *reqGadget,
+  CONST_STRPTR title,
+  CONST_STRPTR message,
+  ULONG type,
+  CONST_STRPTR gadgetText,
+  ULONG image )
 {
   if(reqGadget)
   {
     IIntuition->SetAttrs(reqGadget,
+      REQ_Type,       type ? type : REQTYPE_INFO,
       REQ_TitleText,  title,
       REQ_BodyText,   message,
+      REQ_GadgetText, gadgetText ? gadgetText : "_Ok",
+      REQ_Image,      image ? image : REQIMAGE_DEFAULT,
+      REQ_StayOnTop,  FALSE,
+      REQ_WrapBorder, 32,
       TAG_END);
-
-    IIntuition->IDoMethod(reqGadget, RM_OPENREQ, NULL, NULL, NULL);
+    return IIntuition->IDoMethod(reqGadget, RM_OPENREQ, NULL, NULL, NULL);
   }
+  return -1;
 }
 
 void gadgetBlocking(struct Window *winId, Object *gadgetObj, BOOL disable)
@@ -154,7 +175,6 @@ BOOL appHide(uint32 appID, Object *winObj, uint32 methodID)
 
   return retVal;
 }
-
 
 struct Window *appUnhide(uint32 appID, Object *winObj)
 {
@@ -253,7 +273,7 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
 
   if (!avatarImage)
   {
-    cacheFileFromUrl(url, uuid);
+    downloadFile(url, uuid, (STRPTR)CACHE_DIR);
     avatarImage = getCachedImageIfExists(uuid);
   }
 
@@ -393,4 +413,152 @@ ULONG renderfunct(struct RenderHook *hook, Object *obj, struct gpRender *msg)
   remove_clip_region (msg->gpr_RPort,old_region,in_refresh);
 
   return (0);
+}
+
+static void getGithubLatestData(void)
+{
+  release = (struct releaseInfo *)IExec->AllocVecTags(sizeof(struct releaseInfo),
+          AVT_Type,            MEMF_PRIVATE,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+
+  char url[] = "https://api.github.com/repos/walkero-gr/mediavault/releases/latest";
+  doHTTPRequest(url);
+
+  //LONG  responseCode = getResponseCode();
+  //if (responseCode != 200)
+  //  return ~0UL;
+
+  STRPTR responseBody = getResponseBody();
+  //if (responseBody == NULL)
+  //  return ~0UL;
+
+  if (responseBody)
+  {
+    json_t *jsonRoot;
+    json_error_t jsonError;
+
+    jsonRoot = IJansson->json_loads(responseBody, 0, &jsonError);
+
+    if (jsonRoot)
+    {
+      if (json_is_object(jsonRoot))
+      {
+        json_t *buf, *assets, *assetItem;
+        size_t cnt;
+
+        buf = IJansson->json_object_get(jsonRoot, "tag_name");
+        if (json_is_string(buf))
+        {
+          IUtility->Strlcpy(release->tag_name, IJansson->json_string_value(buf), sizeof(release->tag_name));
+        }
+
+        buf = IJansson->json_object_get(jsonRoot, "body");
+        if (json_is_string(buf))
+        {
+          IUtility->Strlcpy(release->changes, IJansson->json_string_value(buf), sizeof(release->changes));
+        }
+
+        assets = IJansson->json_object_get(jsonRoot, "assets");
+        if (json_is_array(assets))
+        {
+          for(cnt = 0; cnt < IJansson->json_array_size(assets); cnt++)
+          {
+            assetItem = IJansson->json_array_get(assets, cnt);
+            if(json_is_object(assetItem))
+            {
+              buf = IJansson->json_object_get(assetItem, "browser_download_url");
+              if (json_is_string(buf))
+              {
+                IUtility->Strlcpy(release->browser_download_url, IJansson->json_string_value(buf), sizeof(release->browser_download_url));
+              }
+            }
+          }
+        }
+      }
+
+      IJansson->json_decref(jsonRoot);
+    }
+  }
+}
+
+static BOOL checkForUpdates(void)
+{
+  ULONG currentVersion = 0;
+  currentVersion = currentVersion + VERSION * 100;
+  currentVersion = currentVersion + REVISION * 10;
+  currentVersion = currentVersion + PATCH;
+
+  getGithubLatestData();
+
+  if (release->tag_name)
+  {
+    ULONG latestRelease = convertVersionToInt(release->tag_name);
+
+    if (currentVersion < latestRelease)
+    {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+void workOnUpdate(void)
+{
+  uint32 infoMsgSize = sizeof(char) * 2048;
+  STRPTR infoMsg = IExec->AllocVecTags(infoMsgSize,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+  
+  IUtility->Strlcpy(infoMsg, "Would you like to check if there is a\nnewer version of MediaVault available?", infoMsgSize);
+  LONG requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, REQTYPE_INFO, "_Yes|_No", REQIMAGE_QUESTION);
+
+  if (requesterResult)
+  {
+    if (checkForUpdates())
+    {
+      IUtility->Strlcpy(infoMsg, "There is a new version available!\nWould you like to download and install the new version automatically?\n", infoMsgSize);
+      IUtility->Strlcat(infoMsg, "\nChanges:\n", infoMsgSize);
+    
+      // TODO: Clear \r from the changes string
+      IUtility->Strlcat(infoMsg, release->changes, infoMsgSize);
+      requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, REQTYPE_INFO, "_Sure|_Nah", REQIMAGE_QUESTION);
+      if (requesterResult)
+      {
+        // TODO: Block the window
+        windowBlocking(objects[OID_MAIN], TRUE);
+        
+        // download the update archive
+        if (downloadLatestUpdate((STRPTR)release->browser_download_url))
+        {
+          int32 unarcResult = unarcFile((STRPTR)"RAM:mediavault_update.lha", getParentPath((STRPTR)"PROGDIR:MediaVault"));
+          if (unarcResult >= 0)
+          {
+            IUtility->Strlcpy(infoMsg, "MediaVault was updated to the latest version.\nPlease, close this window and restart it.\n", infoMsgSize);
+            requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
+          }
+          else
+          {
+            IUtility->Strlcpy(infoMsg, "There was an error with the update.\nYou will find in RAM the update.lha file,\nwhich you can use to update MediaVault manually.\n", infoMsgSize);
+            requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
+          }
+        }
+        else
+        {
+          IUtility->Strlcpy(infoMsg, "There was an error with the download of the update.\nPlease, check your internet connection.\n", infoMsgSize);
+          requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
+        }
+        // TODO: Unblock the window
+        windowBlocking(objects[OID_MAIN], FALSE);
+
+      }
+    }
+    else
+    {
+      IUtility->Strlcpy(infoMsg, "Congratulations!\nYou have the latest version installed on your machine.", sizeof(infoMsg));
+      requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
+    }
+  }
+  IExec->FreeVec(infoMsg);
 }
