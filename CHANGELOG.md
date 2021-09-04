@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 ## [1.3] - [future]
 ### Added
 - Added right sidebar with station info and avatar image, wherever
-  this is available
+  the image is available
+- Added a new menu item to check for newer versions and start a
+  selfupdate, if the user approves it. There is a way to see the
+  latest changes before update.
 
 ### Fixed
 - Now the radio list is cleared if the search criteria change and
@@ -18,6 +21,7 @@ All notable changes to this project will be documented in this file.
   and no more stations were found
 - Dropped oo.library network support for libcurl. That's why the
   executable size is increased so much
+- Now oo.library and AmiSSL are not required
 
 ## [1.2.1] - 2021-05-31
 ### Fixed

@@ -24,6 +24,6 @@ void cleanupHTTPRequest(void);
 STRPTR getResponseBody(void);
 LONG getResponseCode(void);
 STRPTR getResponseType(void);
-void cacheFileFromUrl(STRPTR, STRPTR);
+BOOL downloadFile(STRPTR, STRPTR, STRPTR);
 
 #endif

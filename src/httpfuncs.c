@@ -117,11 +117,14 @@ void doHTTPRequest(STRPTR url)
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
 
       res = curl_easy_perform(curl);
+      /*
       if(res != CURLE_OK)
       {
         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
       }
       else
+      */
+      if(res == CURLE_OK)
       {
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
         curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
@@ -132,8 +135,10 @@ void doHTTPRequest(STRPTR url)
   }
 }
 
-void cacheFileFromUrl(STRPTR url, STRPTR filename)
+BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
 {
+  BOOL result = FALSE;
+
   if (stricmp(url, ""))
   {
     CURL *curl;
@@ -141,6 +146,9 @@ void cacheFileFromUrl(STRPTR url, STRPTR filename)
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
+    // TODO: Change the logic to do one call, rather than two.
+    //       Maybe get the file into memory and if it is the right extension,
+    //       then save it to a file and clear the memory
     curl = curl_easy_init();
     if(curl) {
       curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -158,18 +166,13 @@ void cacheFileFromUrl(STRPTR url, STRPTR filename)
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
 
       res = curl_easy_perform(curl);
-      if(res != CURLE_OK)
-      {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-      }
-      else
+      if(res == CURLE_OK)
       {
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
         curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
       }
 
       curl_easy_cleanup(curl);
-
 
       CONST_STRPTR ext = getContentTypeExt(response.type);
       if (ext)
@@ -191,7 +194,7 @@ void cacheFileFromUrl(STRPTR url, STRPTR filename)
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 
-        strcpy(targetFile, CACHE_DIR);
+        strcpy(targetFile, destination);
         strcat(targetFile, filename);
         strcat(targetFile, ext);
 
@@ -201,14 +204,13 @@ void cacheFileFromUrl(STRPTR url, STRPTR filename)
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, pagefile);
 
           res = curl_easy_perform(curl);
-          if(res != CURLE_OK)
-          {
-            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-          }
-          else
+
+          if(res == CURLE_OK)
           {
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
             curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
+
+            result = TRUE;
           }
 
           fclose(pagefile);
@@ -219,6 +221,8 @@ void cacheFileFromUrl(STRPTR url, STRPTR filename)
     }
     curl_global_cleanup();
   }
+
+  return result;
 }
 
 static CONST_STRPTR getContentTypeExt(STRPTR contentType)
@@ -243,9 +247,13 @@ static CONST_STRPTR getContentTypeExt(STRPTR contentType)
   {
     return ".gif";
   }
-  if (!IUtility->Stricmp(contentType, "text/html"))
+  if (!stricmp(contentType, "text/html"))
   {
     return ".html";
+  }
+  if (!stricmp(contentType, "application/octet-stream"))
+  {
+    return ".lha";
   }
   return NULL;
 }

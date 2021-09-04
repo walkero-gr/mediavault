@@ -438,11 +438,11 @@ static void listStations(
   if (stationsCnt == ~0UL)
   {
     char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
-    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg);
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
   }
   else if (stationsCnt == 0)
   {
-    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg);
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
   }
   else if (stationsCnt == maxRadioResults)
   {
