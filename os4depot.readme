@@ -1,13 +1,13 @@
 name: mediavault
 description: Discover online radio stations
-version: 1.2.1
+version: 1.3.0
 author: George Sokianos
 submitter: George Sokianos
 email: walkero@gmail.com
 url: https://github.com/walkero-gr/mediavault/
 category: network/misc
 replaces: network/misc/aiostreams.lha
-requirements: oo.library, jansson.library, AmigaAmp3
+requirements: jansson.library, AmigaAmp3
 license: Freeware
 minosversion: 4.1
 distribute: yes
@@ -40,25 +40,25 @@ My plan for MediaVault is to create an application which users will use to:
 
 Requirements
 --------------------------
-* oo.library v1.13 by Tuomas Hokka
 * jansson.library v2.12.1 by Simon Tyrrell
 * AmigaAmp3 v3.29 by Thomas Wenzel
-* AmiSSL 4.9 by the AmiSSL Open Source Team
 
 I would like to thank
 --------------------------
 - Tuomas Hokka for developing oo.library and listen to my requirements, ideas.
 - Simon Tyrrell for developing jansson.library and his help on debugging
   issues I had during development, listen to my ideas.
-- Thomas Wenzel for developing the best audio player for AmigaOS
-- Everyone at os4coding.net, who helped with proposals and solutions on
-  my questions.
+- Thomas Wenzel for developing the best audio player for AmigaOS, the AmigaAMP
 - Simon Archer who develops CodeBench, which helped me a lot during the
-  development of this application
-- AmigaOS 4 developers who develop the best OS out there.
+  development of this application                         
 - Daniel "trixie" Jedlicka who worked on a lot of features, fixes and 
   refactoring of MediaVault, providing proposals, ideas and information
   to my questions
+- Michael Trebilcock for his ports of libcurl, librtmp, libz and
+  libopenssl
+- Everyone at os4coding.net, who helped with proposals and solutions on
+  my questions.
+- AmigaOS 4 developers who develop the best OS out there.
 
 Without all the above MediaVault would not be possible.
 

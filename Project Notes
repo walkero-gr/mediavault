@@ -38,7 +38,7 @@ DONE - Window can jump screen
 DONE - Window size and position can be saved
 DONE - Changed the way classes and gadgets are initiallized
 DONE - [v1.3] Download avatar images in cache folder
-- [v1.3] Add play button at the right sidebar menu and replace double click
+DONE - [v1.3] Add play button at the right sidebar menu and replace double click
 DONE - [v1.3] Selfupdate process
 DONE - [v1.3] Add libcurl support
 - Simplify downloadFile() to make one http request
@@ -46,6 +46,8 @@ DONE - [v1.3] Add libcurl support
 - [v1.3] Add new icons in the archive, the ones that IconDesigner created
 - [v1.3] Fix icons' positions
 - [v1.3] Create automated release packaging in Makefile
+DONE - [v1.3] Fixed the version string to include the application name
+- [v1.3] Add COPYING/LICENSE files for the used libs
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
