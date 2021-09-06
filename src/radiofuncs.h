@@ -17,7 +17,7 @@
 #ifndef _RADIOFUNCS_H
 #define _RADIOFUNCS_H
 
-void getRadioStations(struct filters, int);
+BOOL getRadioStations(struct filters, int);
 void getRadioTrendStations(void);
 void getRadioPopularStations(void);
 size_t getRadioList(struct List *, int);

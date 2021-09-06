@@ -40,8 +40,9 @@ static void setBaseSearchUrl(void)
   IUtility->Strlcat(url, maxRadioResultsStr, sizeof(url));
 }
 
-void getRadioStations(struct filters lastFilters, int offset)
+BOOL getRadioStations(struct filters lastFilters, int offset)
 {
+  BOOL success = FALSE;
   setBaseSearchUrl();
 
   if (offset > 0)
@@ -82,6 +83,10 @@ void getRadioStations(struct filters lastFilters, int offset)
   }
 
   doHTTPRequest(url);
+  if (getResponseCode() == 200)
+    success = TRUE;
+
+  return success;
 }
 
 void getRadioTrendStations(void)
@@ -105,10 +110,12 @@ void getRadioPopularStations(void)
 size_t getRadioList(struct List *stationList, int offset)
 {
   LONG  responseCode = getResponseCode();
+
   if (responseCode != 200)
     return ~0UL;
 
   STRPTR responseBody = getResponseBody();
+
   if (responseBody == NULL)
     return ~0UL;
 
@@ -121,7 +128,7 @@ size_t getRadioList(struct List *stationList, int offset)
 
   if(!jsonRoot)
   {
-    //IDOS->Printf("json error: on line %d: %s\n", jsonError.line, jsonError.text);
+    //IDOS->Printf("json error: on line %ld: %s\n", jsonError.line, jsonError.text);
     return ~0UL;
   }
 
@@ -151,7 +158,7 @@ size_t getRadioList(struct List *stationList, int offset)
     data = IJansson->json_array_get(jsonRoot, cnt);
     if(!json_is_object(data))
     {
-      IDOS->Printf("error: commit data %d is not an object\n", (int)(cnt + 1));
+      //IDOS->Printf("error: commit data %d is not an object\n", (int)(cnt + 1));
       IJansson->json_decref(jsonRoot);
       return ~0UL;
     }
@@ -239,7 +246,6 @@ size_t getRadioList(struct List *stationList, int offset)
       IExec->AddTail(stationList, stationNode);
     }
   }
-
   IJansson->json_decref(jsonRoot);
   return cnt;
 }

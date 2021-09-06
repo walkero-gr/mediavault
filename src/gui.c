@@ -424,7 +424,7 @@ void showGUI(void)
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
 
-static void listStations(
+static BOOL listStations(
   struct Gadget *listbrowser,
   struct List *list,
   int offset,
@@ -432,6 +432,7 @@ static void listStations(
   void (*maxResultCallback)(BOOL)
 ) {
   size_t stationsCnt = 0;
+  BOOL success = FALSE;
 
   stationsCnt = getRadioList(list, offset);
 
@@ -452,7 +453,7 @@ static void listStations(
     }
   }
 
-  if (((stationsCnt != ~0UL) && (stationsCnt > 0)) || (offset == 0))
+  if ((stationsCnt != ~0UL) && (stationsCnt > 0))
   {
     // Detach list before modify it
     IIntuition->SetAttrs(listbrowser,
@@ -465,7 +466,11 @@ static void listStations(
         LISTBROWSER_Selected,       -1,
         LISTBROWSER_ColumnInfo,     columnInfo,
         TAG_DONE);
+
+    success = TRUE;
   }
+
+  return success;
 }
 
 static void fillRadioList(BOOL newSearch)
@@ -479,11 +484,14 @@ static void fillRadioList(BOOL newSearch)
     offset = 0;
     IUtility->Strlcpy(notFoundMsg, "No Radio Stations found with these criteria!\nChange them and try again!", sizeof(notFoundMsg));
   }
-  else
-    offset++;
 
-  getRadioStations(lastFilters, offset);
-  listStations((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], &radioList, offset, (char *)notFoundMsg, changeDiscoverButton);
+  if (getRadioStations(lastFilters, offset))
+  {
+    if (listStations((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], &radioList, offset, (char *)notFoundMsg, changeDiscoverButton))
+    {
+      offset++;
+    }
+  }
 }
 
 static void fillRadioPopularList(void)
