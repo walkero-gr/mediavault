@@ -48,6 +48,7 @@ enum
   OID_MAIN,
   OID_ABOUT,
   OID_AVATAR_IMAGE,
+  OID_PLAY_IMAGE,
   OID_LAST
 };
 
