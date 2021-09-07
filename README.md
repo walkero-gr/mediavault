@@ -73,6 +73,9 @@ v1.3.0 - future
 * Added a new message in case the "Discover More" button is clicked and no more stations were found
 * Dropped oo.library network support for libcurl, which more mature and has a lot more options and features. Unfortunately that increased the executable size a lot.
 * Now oo.library and AmiSSL are not required
+* Fixed the version string to include the application name
+* Added a play button at the right sidebar which is enabled as soon as the user selects a radio station. By clicking it the radio will be loaded at the default player. The double click on the radio list was disabled.
+* On every request of radio stations, a list of 100 stations are returned and listed
 
 v1.2.1 - 2021-05-31
 * Reduced results to 20 as a temporary workaround of a bug that occurs with the default discovery of radio stations. Found where the problem is and it will be fixed on a later release.

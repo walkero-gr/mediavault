@@ -247,10 +247,6 @@ static CONST_STRPTR getContentTypeExt(STRPTR contentType)
   {
     return ".gif";
   }
-  if (!stricmp(contentType, "text/html"))
-  {
-    return ".html";
-  }
   if (!stricmp(contentType, "application/octet-stream"))
   {
     return ".lha";

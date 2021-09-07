@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 - Added a new menu item to check for newer versions and start a
   selfupdate, if the user approves it. There is a way to see the
   latest changes before update.
+- Added a play button at the right sidebar which is enabled as soon
+  as the user selects a radio station. By clicking it the radio will
+  be loaded at the default player. The double click on the radio
+  list was disabled.
 
 ### Fixed
 - Now the radio list is cleared if the search criteria change and
@@ -22,6 +26,9 @@ All notable changes to this project will be documented in this file.
 - Dropped oo.library network support for libcurl. That's why the
   executable size is increased so much
 - Now oo.library and AmiSSL are not required
+- Fixed the version string to include the application name
+- On every request of radio stations, a list of 100 stations are
+  returned and listed
 
 ## [1.2.1] - 2021-05-31
 ### Fixed

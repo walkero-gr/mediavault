@@ -297,7 +297,10 @@ void showRadioInfo(struct Node *res_node)
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,
           TAG_DONE);
-
+    
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_PLAY_BUTTON], windows[WID_MAIN], NULL,
+          GA_Disabled,   FALSE,
+          TAG_DONE);
   }
 }
 

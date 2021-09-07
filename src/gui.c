@@ -311,21 +311,23 @@ void showGUI(void)
                           else if ((result & WMHI_GADGETMASK) == GID_RADIO_POPULAR_LISTBROWSER) lb = gadgets[GID_RADIO_POPULAR_LISTBROWSER];
                           else lb = gadgets[GID_RADIO_TREND_LISTBROWSER];
 
-
                           IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
-
-                          // TODO: Remove this when the play button is added at the right sidebar
-                          if (res_value == LBRE_DOUBLECLICK)
-                          {
-                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
-                            playRadio((struct Node *)res_node);
-                          }
-                          else if (res_value == LBRE_NORMAL)
+                          if (res_value == LBRE_NORMAL)
                           {
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
                             windowBlocking(objects[OID_MAIN], TRUE);
                             showRadioInfo((struct Node *)res_node);
                             windowBlocking(objects[OID_MAIN], FALSE);
+                          }
+                        }
+                        break;
+
+                      case GID_INFO_PLAY_BUTTON:
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          if (res_node)
+                          {
+                            playRadio((struct Node *)res_node);
                           }
                         }
                         break;
