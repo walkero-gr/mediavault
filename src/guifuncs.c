@@ -559,7 +559,7 @@ void workOnUpdate(void)
       }
       else
       {
-        IUtility->Strlcpy(infoMsg, "Congratulations!\nYou have the latest version installed on your machine.", sizeof(infoMsg));
+        IUtility->Strlcpy(infoMsg, "Congratulations!\nYou have the latest version installed on your machine.", infoMsgSize);
         requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
       }
     }

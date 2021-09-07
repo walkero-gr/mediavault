@@ -33,21 +33,26 @@ Requirements
 --------------------------
 * jansson.library v2.12.1 by Simon Tyrrell
 * AmigaAmp3 v3.29 by Thomas Wenzel
+* AISS by Martin (Mason) Merz
 
 I would like to thank
 --------------------------
 - Tuomas Hokka for developing oo.library and listen to my requirements, ideas.
 - Simon Tyrrell for developing jansson.library and his help on debugging
   issues I had during development, listen to my ideas.
-- Thomas Wenzel for developing the best audio player for AmigaOS
-- Everyone at os4coding.net, who helped with proposals and solutions on
-  my questions.
+- Thomas Wenzel for developing the best audio player for AmigaOS, the AmigaAMP
 - Simon Archer who develops CodeBench, which helped me a lot during the
-  development of this application
-- AmigaOS 4 developers who develop the best OS out there.
+  development of this application                         
 - Daniel "trixie" Jedlicka who worked on a lot of features, fixes and 
   refactoring of MediaVault, providing proposals, ideas and information
   to my questions
+- Michael Trebilcock for his ports of libcurl, librtmp, libz and
+  libopenssl
+- Martin (Mason) Merz for the permission to use his AISS icons
+- IconDesigner for the proper glow icons that are included in the release
+- Everyone at os4coding.net, who helped with proposals and solutions on
+  my questions.
+- AmigaOS 4 developers who develop the best OS out there.
 
 Without all the above MediaVault would not be possible.
 
