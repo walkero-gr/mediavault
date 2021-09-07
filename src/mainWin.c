@@ -282,7 +282,6 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
                   TAG_DONE),
                   CHILD_WeightedWidth, 30,
                 TAG_DONE),
-                //CHILD_WeightedHeight, 20,
                 CHILD_MaxHeight, 60,
               
               LAYOUT_AddChild, gadgets[GID_INFO_RADIO_DATA] = IIntuition->NewObject(TextEditorClass, NULL,
