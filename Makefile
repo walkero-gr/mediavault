@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 04-09-2021 10:28:25
+# Created on: 07-09-2021 21:31:59
 #
 #
 
@@ -100,7 +100,8 @@ src/gui.o: src/gui.c src/globals.h src/version.h \
 
 src/httpfuncs.o: src/httpfuncs.c src/version.h
 
-src/fsfuncs.o: src/fsfuncs.c
+src/fsfuncs.o: src/fsfuncs.c src/globals.h src/version.h \
+	
 
 src/guifuncs.o: src/guifuncs.c src/globals.h src/version.h \
 	 src/gui.h src/guifuncs.h src/radiofuncs.h \
@@ -119,3 +120,26 @@ src/radiofuncs.o: src/radiofuncs.c src/globals.h src/version.h \
 src/stringfuncs.o: src/stringfuncs.c src/globals.h src/version.h \
 	
 
+
+###################################################################
+##
+##////  Custom rules
+##
+###################################################################
+
+release:
+	mkdir -p release/MediaVault
+	cp release_files/* release/MediaVault/ -r
+	cp MediaVault release/MediaVault/
+	strip release/MediaVault/MediaVault
+	cp CHANGELOG.md release/MediaVault/
+	cp README.md release/MediaVault/
+	cp LICENSE release/MediaVault/
+	cp COPYING release/MediaVault/
+	cp images release/MediaVault/ -r
+	cp Libs:jansson.library release/MediaVault/libs/
+	cp release_files/Icons/IconDesigner.info release/MediaVault.info
+	lha -aeqr3 a MediaVault.lha release/
+
+
+###################################################################
