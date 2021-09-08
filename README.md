@@ -69,7 +69,7 @@ https://github.com/walkero-gr/mediavault/issues
 Changelog
 --------------------------
 
-v1.3.0 - future
+v1.3.0 - 2021-09-08
 * Added right sidebar with station info and avatar image, wherever the image is available
 * Added a new menu item to check for newer versions and start a selfupdate, if the user approves it. There is a way to see the latest changes before update.
 * Now the radio list is cleared if the search criteria change and no radio stations are found
