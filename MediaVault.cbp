@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<CodeBench_Project name="MediaVault" path="Applications:Programming/workspace/MyProjects/mediavault/MediaVault.cbp" created="1353847454" lastmodified="1378589509">
+<CodeBench_Project name="MediaVault" path="Applications:Programming/workspace/MyProjects/mediavault/MediaVault.cbp" created="1353847454" lastmodified="1378660167">
 	<plugin name="PROGDIR:Plugins/AmigaOS4SDK.CCPlugin" flags="0" />
 	<target run="MediaVault" />
 	<homedir name="Applications:Programming/workspace/MyProjects/mediavault" />
@@ -66,7 +66,8 @@
 	<search lastsearch="unicode" sensecase="1" replace_state="0"/>
 	<customrules>
 		<rule name="release" add="2">
-			<command>mkdir -p release&#047;MediaVault</command>
+			<command>mkdir -p release&#047;MediaVault&#047;libs</command>
+			<command>mkdir -p release&#047;MediaVault&#047;cache</command>
 			<command>cp release_files&#047;* release&#047;MediaVault&#047; -r</command>
 			<command>cp MediaVault release&#047;MediaVault&#047;</command>
 			<command>strip release&#047;MediaVault&#047;MediaVault</command>

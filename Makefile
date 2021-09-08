@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 07-09-2021 21:31:59
+# Created on: 08-09-2021 17:09:30
 #
 #
 
@@ -128,7 +128,8 @@ src/stringfuncs.o: src/stringfuncs.c src/globals.h src/version.h \
 ###################################################################
 
 release:
-	mkdir -p release/MediaVault
+	mkdir -p release/MediaVault/libs
+	mkdir -p release/MediaVault/cache
 	cp release_files/* release/MediaVault/ -r
 	cp MediaVault release/MediaVault/
 	strip release/MediaVault/MediaVault
