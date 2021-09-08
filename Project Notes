@@ -14,7 +14,6 @@ DONE - Update the Makefile.docker to compile
 DONE - Create first window
 DONE - Create about window
 - Connect filetypes with players
-- Make preferences window
 - Show metadata in the window
 - Add images on lists (optional)
 DONE - Create Project menu
@@ -25,7 +24,7 @@ DONE - HTTP encode of the request URL (convert spaces to %20 etc)
 DONE - Make fixes on listbrowser column sizes and sorting
 - Check and fix unfreed memory
 - Notifications support
-- Add AmiUpdate support or create self-update process
+- Add AmiUpdate support
 DONE - Add icon when iconified
 DONE - Add a message window/requester
 - Check if player exists and show a message if not
@@ -76,15 +75,39 @@ DONE - Download radio avatar images
 DONE - Show avatar images at the right sidebar
 
 ## Podcasts
+DONE - Add Podcasts page at the left sidebar
+DONE - Add first fields to search for a podcast, which should be a name field and a discover button
+DONE - Add the browserlist for the podcasts
+- Use the Podcasts online service and get the first data
+- Parse the Podcasts JSON data and fill up the browserlist
+- Add a new browserlist for the podcast episodes
+- When the user clicks on a podcast title, the right sidebar should be updated and the episodes
+  browserlist should get filled up with the latest episodes
+- When the user clicks on an episode add info at the right sidebar and enable the play button
+- When the play button is clicked AmigaAmp3 should start playing the episode
+- Mark podcasts as favorites
+- Download podcast episodes
 
 ## UPnP
-DONE - Create a unique list of the UPnP servers
-DONE - Move UPnP functions to separate source file
+- Create a unique list of the UPnP servers
 - Get the server metadata for each UPnP server and add them at the UPnP server list
 - Make a SOAP request function
 - Create the first browse request
 - Create server list
 - Click on window server list and make Browse SOAP request
+
+## Settings window
+- Create the Preferences window
+
+- Add Radio Station page
+- Add selection of the radio station online service
+- Add selection of the number of stations returned on every request
+- Add selection with the default sorting (name, country, votes etc.)
+
+- Add Podcast page
+
+
+
 
 
 //// BUGS

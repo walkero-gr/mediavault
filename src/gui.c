@@ -354,6 +354,25 @@ void showGUI(void)
                             break;
                         }
                         break;
+
+                      case GID_PODCAST_FILTER_BUTTON:
+                        IDOS->Printf("Search podcasts for: %s\n", ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer);
+                        /*
+                        IUtility->Strlcpy(lastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastFilters.name));
+
+                        windowBlocking(objects[OID_MAIN], TRUE);
+                        if(checkFiltersChanged())
+                        {
+                          changeDiscoverButton(FALSE);
+                          fillRadioList(TRUE);
+                        }
+                        else {
+                          changeDiscoverButton(TRUE);
+                          fillRadioList(FALSE);
+                        }
+                        windowBlocking(objects[OID_MAIN], FALSE);
+                        */
+                        break;
                     }
                     break;
                 }

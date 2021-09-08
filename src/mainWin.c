@@ -140,6 +140,7 @@ extern struct RenderHook *renderhook;
 static Object *buildRadioSearchPage(void);
 static Object *buildRadioPopularPage(void);
 static Object *buildRadioTrendPage(void);
+static Object *buildPodcastSearchPage(void);
 
 static const ULONG listToPage[] = {
     LISTBROWSER_Selected,    PAGE_Current,
@@ -167,6 +168,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         PAGE_Add, gadgets[GID_PAGE_1] = buildRadioSearchPage(),
         PAGE_Add, gadgets[GID_PAGE_2] = buildRadioPopularPage(),
         PAGE_Add, gadgets[GID_PAGE_3] = buildRadioTrendPage(),
+        PAGE_Add, gadgets[GID_PAGE_4] = buildPodcastSearchPage(),
         TAG_DONE);
 
   objects[OID_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
@@ -567,4 +569,82 @@ void getLeftSidebarContent(void)
   {
     IExec->AddTail( &leftSidebarList, node );
   }
+
+  node = IListBrowser->AllocListBrowserNode(1,
+    LBNA_Generation,    1,
+    //LBNA_Flags,         LBFLG_HASCHILDREN | LBFLG_SHOWCHILDREN,
+    LBNA_Column,        0,
+      LBNCA_CopyText,   TRUE,
+      LBNCA_Text,       "Podcast",
+    TAG_DONE);
+  if (node)
+  {
+    IExec->AddTail( &leftSidebarList, node );
+  }
+}
+
+static Object *buildPodcastSearchPage(void)
+{
+  return IIntuition->NewObject(LayoutClass, NULL,
+        LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+
+        // START - Top Filter Section
+        LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+          LAYOUT_BevelStyle,      BVS_GROUP,
+          LAYOUT_Label,           "Search Podcasts by",
+
+          // Top filter section with the Name Text Box with Label
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+            LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+            
+            LAYOUT_AddImage, IIntuition->NewObject(LabelClass, NULL,
+              //LABEL_DrawInfo, drInfo,
+              LABEL_Text, "_Name",
+              TAG_END),
+
+            LAYOUT_AddChild, gadgets[GID_PODCAST_FILTERS_NAME] = IIntuition->NewObject(StringClass, NULL,
+              GA_ID,                GID_PODCAST_FILTERS_NAME,
+              GA_RelVerify,         TRUE,
+              GA_TabCycle,          TRUE,
+              GA_ActivateKey,       "n",
+              STRINGA_MinVisible,   10,
+              STRINGA_MaxChars,     40,
+              TAG_DONE),
+
+            // Filters Button
+            LAYOUT_AddChild, gadgets[GID_PODCAST_FILTER_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,              GID_PODCAST_FILTER_BUTTON,
+              GA_Text,            "_Discover",
+              GA_TabCycle,        TRUE,
+              GA_RelVerify,       TRUE,
+              GA_ActivateKey,     "d",
+              TAG_DONE),
+
+            TAG_DONE),
+          TAG_DONE),
+          CHILD_WeightedHeight, 0,
+        // END - Top Filter Section
+
+        // START - Bottom List Section
+        LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+          
+          LAYOUT_AddChild, gadgets[GID_PODCAST_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+            GA_ID,                      GID_PODCAST_LISTBROWSER,
+            GA_RelVerify,               TRUE,
+            GA_TabCycle,                TRUE,
+            LISTBROWSER_ColumnTitles,   TRUE,
+            LISTBROWSER_HorizontalProp, TRUE,
+            LISTBROWSER_Separators,     TRUE,
+            LISTBROWSER_ShowSelected,   TRUE,
+            LISTBROWSER_Striping,       LBS_ROWS,
+            LISTBROWSER_SortColumn,     0,
+            LISTBROWSER_TitleClickable, TRUE,
+            TAG_DONE),
+          TAG_DONE),
+          CHILD_MinHeight,  300,
+          // END - Bottom List Section
+        
+        TAG_DONE);
 }
