@@ -24,7 +24,7 @@
 #endif
 
 #ifndef REVISION
-#define REVISION 2
+#define REVISION 3
 #endif
 
 #ifndef PATCH
@@ -32,7 +32,7 @@
 #endif
 
 #ifndef RELEASE_DATE
-#define RELEASE_DATE "31.5.2021"
+#define RELEASE_DATE "7.9.2021"
 #endif
 
 #define APPNAME     "MediaVault"

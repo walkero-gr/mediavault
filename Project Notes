@@ -43,11 +43,12 @@ DONE - [v1.3] Selfupdate process
 DONE - [v1.3] Add libcurl support
 - Simplify downloadFile() to make one http request
 - Add progress window at the Selfupdate process
-- [v1.3] Add new icons in the archive, the ones that IconDesigner created
-- [v1.3] Fix icons' positions
-- [v1.3] Create automated release packaging in Makefile
+DONE - [v1.3] Add new icons in the archive, the ones that IconDesigner created
+DONE - [v1.3] Fix icons' positions
+DONE - [v1.3] Create automated release packaging in Makefile
 DONE - [v1.3] Fixed the version string to include the application name
-- [v1.3] Add COPYING/LICENSE files for the used libs
+DONE - [v1.3] Add COPYING/LICENSE files for the used libs
+- Include in the package all the necessary AISS icons
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
@@ -62,7 +63,7 @@ WIP - Click on a station and show it's info at the side, with logo
 - Mark stations as favorites
 DONE - Add more tags
 DONE - Add more countries and languages
-- Empty list if invalid/empty JSON returns
+DONE - Empty list if invalid/empty JSON returns
 DONE - Add station votes in the list
 DONE - Block main window when user sent a request
 DONE - Add Trending list of radio stations at the left sidebar
@@ -71,8 +72,8 @@ DONE - Add Popular list of radio stations at the left sidebar
 - Add a favorites list of radio stations at the left sidebar
 - Let list bring most voted first
 DONE - Set list to hide the broken stations
-- Download radio avatar images
-- Show avatar images at the right sidebar
+DONE - Download radio avatar images
+DONE - Show avatar images at the right sidebar
 
 ## Podcasts
 
@@ -88,11 +89,7 @@ DONE - Move UPnP functions to separate source file
 
 //// BUGS
 *********
-FIXED - When ooNetwork is used I get some unfreed signals on exit
-FIXED - ooNetwork truncates the return info, so for now only 5 items return. Now it shows 20 stations. Maybe I need to some kind of pagination, based on the scrollbar.
-FIXED - A bug on requesting radio stations without using the filters
-        (https://www.amigans.net/modules/xforum/viewtopic.php?post_id=125112#forumpost125112 and
-        https://www.amigans.net/modules/xforum/viewtopic.php?post_id=125171#forumpost125171)
+
 
 
 //// IDEAS

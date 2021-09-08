@@ -413,6 +413,8 @@ void showGUI(void)
           IExec->FreeSysObject(ASOT_HOOK, renderhook);
           IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
 
+          IIntuition->DisposeObject(objects[OID_PLAY_IMAGE]);
+
           IIntuition->DisposeObject(menus[MID_PROJECT]);
         }
       }

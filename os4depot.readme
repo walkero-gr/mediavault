@@ -42,6 +42,7 @@ Requirements
 --------------------------
 * jansson.library v2.12.1 by Simon Tyrrell
 * AmigaAmp3 v3.29 by Thomas Wenzel
+* AISS by Martin (Mason) Merz
 
 I would like to thank
 --------------------------
@@ -56,6 +57,8 @@ I would like to thank
   to my questions
 - Michael Trebilcock for his ports of libcurl, librtmp, libz and
   libopenssl
+- Martin (Mason) Merz for his AISS icons
+- IconDesigner for the proper glow icons that are included in the release
 - Everyone at os4coding.net, who helped with proposals and solutions on
   my questions.
 - AmigaOS 4 developers who develop the best OS out there.
@@ -74,6 +77,28 @@ https://github.com/walkero-gr/mediavault/issues
 
 Changelog
 --------------------------
+v1.3.0 - 2021-09-07
+* Added right sidebar with station info and avatar image, wherever the image is 
+  available
+* Added a new menu item to check for newer versions and start a selfupdate, if 
+  the user approves it. There is a way to see the latest changes before update.
+* Now the radio list is cleared if the search criteria change and no radio 
+  stations are found
+* Now the list is not cleared if the "Discover More" button is clicked and no 
+  more stations were found
+* Fixed a possible crash on window closing
+* Added a new message in case the "Discover More" button is clicked and no
+  more stations were found
+* Dropped oo.library network support for libcurl, which more mature and has a
+  lot more options and features. Unfortunately that increased the executable
+  size a lot.
+* Now oo.library and AmiSSL are not required
+* Fixed the version string to include the application name
+* Added a play button at the right sidebar which is enabled as soon as the user
+  selects a radio station. By clicking it the radio will be loaded at the 
+  default player. The double click on the radio list was disabled.
+* On every request of radio stations, a list of 100 stations are returned and
+  listed
 
 v1.2.1 - 2021-05-31
 * Reduced results to 20 as a temporary workaround of a bug that occurs with the 

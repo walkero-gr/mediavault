@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.3] - [future]
+## [1.3.0] - [future]
 ### Added
 - Added right sidebar with station info and avatar image, wherever
   the image is available
