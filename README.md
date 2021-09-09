@@ -1,6 +1,5 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/walkero-gr/mediavault?label=MediaVault)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/634c72a5f74142228ed82c47848ba17d)](https://app.codacy.com/gh/walkero-gr/mediavault?utm_source=github.com&utm_medium=referral&utm_content=walkero-gr/mediavault&utm_campaign=Badge_Grade_Settings)
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W465887)
 
 # mediavault
 
@@ -67,6 +66,9 @@ If you have any requests or you would like to report any problems you found,
 you can do that at:
 https://github.com/walkero-gr/mediavault/issues
 
+Support me at
+--------------------------
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W465887)
 
 Changelog
 --------------------------
