@@ -1,6 +1,6 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/walkero-gr/mediavault?label=MediaVault)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/634c72a5f74142228ed82c47848ba17d)](https://app.codacy.com/gh/walkero-gr/mediavault?utm_source=github.com&utm_medium=referral&utm_content=walkero-gr/mediavault&utm_campaign=Badge_Grade_Settings)
-[![ko-fi](https://img.shields.io/badge/-Buy%20my%20a%20coffee-white?logo=ko-fi)](https://ko-fi.com/walkero)
+[![ko-fi](https://img.shields.io/badge/-Buy%20me%20a%20coffee-9cf?style=flat&logo=ko-fi)](https://ko-fi.com/walkero)
 
 # mediavault
 
