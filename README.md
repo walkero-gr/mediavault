@@ -16,7 +16,7 @@ stations will show up.
 To listen a radio station, double click on it's line, and AmigaAmp3 will
 start, playing the radio station. After that, you can close MediaVault.
 
-![preview](img/mediavault_1.0.0_pre.gif)
+![preview](img/mediavault_1.3.0.gif)
 
 Vision
 --------------------------
