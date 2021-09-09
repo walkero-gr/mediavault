@@ -66,8 +66,8 @@ If you have any requests or you would like to report any problems you found,
 you can do that at:
 https://github.com/walkero-gr/mediavault/issues
 
-Support me at
---------------------------
+Help me persuade my wife that what I am doing matters
+-----------------------------------------------------------
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W465887)
 
 Changelog
