@@ -58,7 +58,7 @@ DONE - Load results into a linked list
 DONE - List radio stations
 DONE - Double click on a station to play on player
 - Use ToolTypes to set the player and the arguments (optional)
-WIP - Click on a station and show it's info at the side, with logo
+DONE - Click on a station and show it's info at the side, with logo
 - Mark stations as favorites
 DONE - Add more tags
 DONE - Add more countries and languages
@@ -73,6 +73,7 @@ DONE - Add Popular list of radio stations at the left sidebar
 DONE - Set list to hide the broken stations
 DONE - Download radio avatar images
 DONE - Show avatar images at the right sidebar
+- Add a call to the API when a user selects a radio station to listen to
 
 ## Podcasts
 DONE - Add Podcasts page at the left sidebar

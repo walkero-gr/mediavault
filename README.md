@@ -1,4 +1,6 @@
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/walkero-gr/mediavault?label=MediaVault)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/634c72a5f74142228ed82c47848ba17d)](https://app.codacy.com/gh/walkero-gr/mediavault?utm_source=github.com&utm_medium=referral&utm_content=walkero-gr/mediavault&utm_campaign=Badge_Grade_Settings)
+[![ko-fi](https://img.shields.io/badge/-Buy%20me%20a%20coffee-blue?style=flat&logo=ko-fi&logoColor=red-light)](https://ko-fi.com/walkero)
 
 # mediavault
 
@@ -14,7 +16,7 @@ stations will show up.
 To listen a radio station, double click on it's line, and AmigaAmp3 will
 start, playing the radio station. After that, you can close MediaVault.
 
-![preview](img/mediavault_1.0.0_pre.gif)
+![preview](img/mediavault_1.3.0.gif)
 
 Vision
 --------------------------
@@ -65,6 +67,9 @@ If you have any requests or you would like to report any problems you found,
 you can do that at:
 https://github.com/walkero-gr/mediavault/issues
 
+Help me persuade my wife that what I am doing matters
+-----------------------------------------------------------
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W465887)
 
 Changelog
 --------------------------
