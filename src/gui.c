@@ -24,6 +24,7 @@
 #include "mainWin.h"
 #include "aboutWin.h"
 #include "radiofuncs.h"
+#include "podcastfuncs.h"
 #include "httpfuncs.h"
 
 static struct ColumnInfo *columnInfo, *leftSidebarCI;
@@ -32,7 +33,8 @@ struct List radioList,
             radioTrendList,
             leftSidebarList;
 
-struct filters lastFilters, prevFilters;
+struct filters lastFilters, prevFilters,
+               lastPodcastFilters;
 struct RenderHook *renderhook;
 
 static void fillLeftSidebar(void);

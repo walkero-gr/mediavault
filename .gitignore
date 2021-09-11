@@ -4,3 +4,4 @@ MediaVault
 *.bak
 debug/
 cache/*
+src/secrets.h
