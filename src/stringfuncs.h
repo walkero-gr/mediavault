@@ -22,5 +22,7 @@
 STRPTR charConv(CONST_STRPTR);
 STRPTR urlEncode(STRPTR);
 ULONG convertVersionToInt(STRPTR);
+STRPTR now(void);
+STRPTR SHA1Encrypt(STRPTR);
 
 #endif

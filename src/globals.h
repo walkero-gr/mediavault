@@ -24,7 +24,10 @@
 #include <proto/icon.h>
 #include <proto/intuition.h>
 #include <proto/layers.h>
+#include <proto/timer.h>
 #include <proto/utility.h>
+
+#include <devices/timer.h>
 
 #include <string.h>
 #include <ctype.h>

@@ -16,6 +16,8 @@ struct Library *GraphicsBase;     struct GraphicsIFace      *IGraphics;
 struct Library *LayersBase;       struct LayersIFace        *ILayers;
 struct Library *IconBase;         struct IconIFace          *IIcon;
 struct Library *JanssonBase;      struct JanssonIFace       *IJansson;
+struct Library *TTimerBase;       struct TimerIFace         *ITimer;
+struct MsgPort *TimerMP;          struct TimeRequest        *TimeReq;
 
 struct ClassLibrary *BitMapBase;
 struct ClassLibrary *ButtonBase;
@@ -64,6 +66,14 @@ int CleanExit(const char *str)
   //## Close Libraries
   if(IJansson)          IExec->DropInterface((struct Interface *) IJansson);
   if(JanssonBase)       IExec->CloseLibrary(JanssonBase);
+
+  if(ITimer)            IExec->DropInterface((struct Interface *) ITimer);
+  if(TimeReq)
+  {
+    IExec->CloseDevice((struct IORequest *) TimeReq);
+    IExec->FreeSysObject(ASOT_IOREQUEST, TimeReq);
+  }
+  if(TimerMP)           IExec->FreeSysObject(ASOT_PORT, TimerMP);
 
   if(IIcon)             IExec->DropInterface((struct Interface *) IIcon);
   if(IconBase)          IExec->CloseLibrary(IconBase);
@@ -141,6 +151,34 @@ int OpenLibs(void)
     if(!IIcon) return CleanExit("Can't open icon.library Interface");
   }
   else return CleanExit("Can't open icon.library version 53");
+
+
+
+  TimerMP = IExec->AllocSysObject(ASOT_PORT, NULL);
+  if (TimerMP != NULL)
+  {
+    TimeReq = IExec->AllocSysObjectTags(ASOT_IOREQUEST,
+        ASOIOR_Size,        sizeof(struct TimeRequest),
+        ASOIOR_ReplyPort,   TimerMP,
+        TAG_END);
+
+    if (TimeReq != NULL)
+    {
+      if (!IExec->OpenDevice("timer.device", UNIT_VBLANK, (struct IORequest *)TimeReq, 0))
+      {
+        if ((TTimerBase = (struct Library *)TimeReq->Request.io_Device))
+        {
+          ITimer = (struct TimerIFace *)IExec->GetInterface(TTimerBase, "main", 1, NULL);
+          if(!ITimer) return CleanExit("Can't open timer device Interface");
+        }
+        else return CleanExit("Can't open timer device");
+      }
+    }
+    else return CleanExit("Can't open timer device. Timer request failed.");
+  }
+  else return CleanExit("Can't open timer device. Timer msgport failed.");
+
+
 
   if ((JanssonBase = IExec->OpenLibrary( "jansson.library", 2 )))
   {

@@ -33,8 +33,9 @@ struct List radioList,
             radioTrendList,
             leftSidebarList;
 
-struct filters lastFilters, prevFilters,
-               lastPodcastFilters;
+struct filters  lastFilters,
+                prevFilters,
+                lastPodcastFilters;
 struct RenderHook *renderhook;
 
 static void fillLeftSidebar(void);
@@ -358,7 +359,11 @@ void showGUI(void)
                         break;
 
                       case GID_PODCAST_FILTER_BUTTON:
-                        IDOS->Printf("Search podcasts for: %s\n", ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer);
+                        //IDOS->Printf("Search podcasts for: %s\n", ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer);
+                        IUtility->Strlcpy(lastPodcastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastPodcastFilters.name));
+
+                        getPodcasts(lastPodcastFilters, 0);
+
                         /*
                         IUtility->Strlcpy(lastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastFilters.name));
 

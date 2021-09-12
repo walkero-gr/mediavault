@@ -1,20 +1,24 @@
-/*
-
-************************************************************
-**
-** Created by: codebench 0.55 (19.10.2017)
-**
-** Project: MediaVault
-**
-** File: stringfuncs.c
-**
-** Date: 23-05-2021 13:48:03
-**
-************************************************************
-
-*/
+ /**
+  * File:    stringfuncs.c
+  *
+  *   Copyright (c) 2021, Georgios Sokianos
+  *
+  *   This file is part of MediaVault
+  *
+  * Author:   Georgios Sokianos (walkero@gmail.com)
+  * Date:     May 2021
+  *
+  * Summary of File:
+  *
+  *   This file contains code that manipulate strings
+  *   like conversion or clearance.
+  *
+  */
 
 #include <iconv.h>
+#include <openssl/sha.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
 
 #include "globals.h"
 #include "stringfuncs.h"
@@ -110,6 +114,97 @@ STRPTR urlEncode(STRPTR value)
 
   rfcTablesInit();
   encode((unsigned char*)value, buf, html5);
+
+  return buf;
+}
+
+
+ /**
+  *
+  * STRPTR now(void)
+  *
+  * Summary:
+  *
+  *    This function get the system time and returns
+  *    the seconds as a string
+  *
+  * Parameters   :
+  *
+  * Return Value : pointer to the string in memory
+  *
+  */
+STRPTR now(void)
+{
+  uint8 timestampLen = 12;
+  STRPTR buf = IExec->AllocVecTags(sizeof(char) * timestampLen,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+  struct TimeVal tv;
+
+  ITimer->GetSysTime(&tv);
+  IUtility->SNPrintf(buf, sizeof(char) * timestampLen, "%lu", tv.Seconds);
+  
+  return buf;
+}
+
+ /**
+  *
+  * STRPTR SHA1Encrypt(STRPTR string, uint32 stringLen)
+  *
+  * Summary:
+  *
+  *    This function encrypts with SHA1 a sting and
+  *    and returns the description
+  *
+  * Parameters  : string: contains the string to be encrypted
+  *
+  * Return Value: pointer to the string in memory
+  *
+  * Description:
+  *
+  *     This function uses EVP methods from openssl
+  *     package to encrypt the given string with SHA1.
+  *     The EVP result is hex string which needs to be
+  *     converted to chars and then returns the result
+  *     with a pointer to memory
+  *
+  */
+STRPTR SHA1Encrypt(STRPTR string)
+{
+  char tmp[8] = "";
+  unsigned int stringLen = 41;
+
+  STRPTR buf = IExec->AllocVecTags(sizeof(char) * stringLen,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+
+  EVP_MD_CTX *mdctx;
+  const EVP_MD *md = EVP_get_digestbyname("SHA1");
+  unsigned char md_value[EVP_MAX_MD_SIZE];
+  unsigned int md_len, i;
+
+  mdctx = EVP_MD_CTX_new();
+  EVP_DigestInit_ex(mdctx, md, NULL);
+  EVP_DigestUpdate(mdctx, string, stringLen);
+  EVP_DigestFinal_ex(mdctx, md_value, &md_len);
+  EVP_MD_CTX_free(mdctx);
+
+  for (i = 0; i < md_len; i++)
+  {
+    sprintf(tmp, "%02x", md_value[i]);
+
+    if (i == 0)
+    {
+      IUtility->Strlcpy(buf, tmp, stringLen);
+    }
+    else
+    {
+      IUtility->Strlcat(buf, tmp, stringLen);
+    }
+
+  }
 
   return buf;
 }

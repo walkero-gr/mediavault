@@ -24,8 +24,6 @@
 #include "guifuncs.h"
 #include "secrets.h"
 
-
-
 /*
 https://api.podcastindex.org/api/1.0/search/byterm
   ?q=batman+university&pretty
@@ -68,9 +66,20 @@ BOOL getPodcasts(struct filters lastFilters, int offset)
     IExec->FreeVec(encSelName);
   }
 
+  char authString[71];
+  IUtility->Strlcpy(authString, PODCASTINDEX_KEY, sizeof(authString));
+  IUtility->Strlcat(authString, PODCASTINDEX_SECRET, sizeof(authString));
+  IUtility->Strlcat(authString, now(), sizeof(authString));
+
+  
+
+  IDOS->Printf("DBG: url:%s\nX-Auth-Date: %s\nX-Auth-Key: %s\nAuthorization: %s\n",
+    url, now(), PODCASTINDEX_KEY, SHA1Encrypt(authString));
+
   //doHTTPRequest(url);
   //if (getResponseCode() == 200)
   //  success = TRUE;
 
   return success;
 }
+

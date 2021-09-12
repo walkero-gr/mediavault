@@ -48,6 +48,7 @@ DONE - [v1.3] Create automated release packaging in Makefile
 DONE - [v1.3] Fixed the version string to include the application name
 DONE - [v1.3] Add COPYING/LICENSE files for the used libs
 - Include in the package all the necessary AISS icons
+- Add more comments in sources for every function and file
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
