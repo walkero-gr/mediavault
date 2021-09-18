@@ -25,6 +25,7 @@
 #include <proto/intuition.h>
 #include <proto/layers.h>
 #include <proto/timer.h>
+#include <proto/timezone.h>
 #include <proto/utility.h>
 
 #include <devices/timer.h>

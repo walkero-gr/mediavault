@@ -24,6 +24,7 @@
 
 static CONST_STRPTR userAgent = APPNAME "/" STR(VERSION) "." STR(REVISION) " (AmigaOS)";
 static CONST_STRPTR getContentTypeExt(STRPTR);
+static struct curl_slist *headersList = NULL;
 
 extern uint32 cacheFilenameSize;
 
@@ -94,7 +95,7 @@ STRPTR getResponseType(void)
 
   return NULL;
 }
-
+                                  
 void doHTTPRequest(STRPTR url)
 {
   if (stricmp(url, ""))
@@ -107,6 +108,8 @@ void doHTTPRequest(STRPTR url)
     curl = curl_easy_init();
     if(curl) {
       curl_easy_setopt(curl, CURLOPT_URL, url);
+
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headersList);
       curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
 
       curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
@@ -117,11 +120,12 @@ void doHTTPRequest(STRPTR url)
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
 
       res = curl_easy_perform(curl);
-      /*
+
       if(res != CURLE_OK)
       {
         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
       }
+      /*
       else
       */
       if(res == CURLE_OK)
@@ -133,6 +137,7 @@ void doHTTPRequest(STRPTR url)
     }
     curl_global_cleanup();
   }
+  headersList = NULL; // Clear the header list for the next call
 }
 
 BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
@@ -223,6 +228,11 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
   }
 
   return result;
+}
+
+void addRequestHeader(STRPTR headerString)
+{
+  headersList = curl_slist_append(headersList, headerString);
 }
 
 static CONST_STRPTR getContentTypeExt(STRPTR contentType)

@@ -424,6 +424,7 @@ static BOOL getGithubLatestData(void)
           TAG_DONE);
 
   char url[] = "https://api.github.com/repos/walkero-gr/mediavault/releases/latest";
+
   doHTTPRequest(url);
 
   if (getResponseCode() != 200)

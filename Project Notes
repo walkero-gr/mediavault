@@ -80,7 +80,7 @@ DONE - Show avatar images at the right sidebar
 DONE - Add Podcasts page at the left sidebar
 DONE - Add first fields to search for a podcast, which should be a name field and a discover button
 DONE - Add the browserlist for the podcasts
-- Use the Podcasts online service and get the first data
+DONE - Use the Podcasts online service and get the first data
 - Parse the Podcasts JSON data and fill up the browserlist
 - Add a new browserlist for the podcast episodes
 - When the user clicks on a podcast title, the right sidebar should be updated and the episodes

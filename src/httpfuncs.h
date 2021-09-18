@@ -25,5 +25,6 @@ STRPTR getResponseBody(void);
 LONG getResponseCode(void);
 STRPTR getResponseType(void);
 BOOL downloadFile(STRPTR, STRPTR, STRPTR);
+void addRequestHeader(STRPTR);
 
 #endif

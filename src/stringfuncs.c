@@ -11,7 +11,7 @@
   * Summary of File:
   *
   *   This file contains code that manipulate strings
-  *   like conversion or clearance.
+  *   and dates, like conversion or clearance.
   *
   */
 
@@ -21,9 +21,11 @@
 #include <openssl/err.h>
 
 #include "globals.h"
+#include "libshandler.h"
 #include "stringfuncs.h"
 
 #define ICONV_BUFFER 256
+#define UNIX_AMIGA_EPOCH_DIFF ((365 * 8 + 2) * 24 * 60 * 60)
 
 static STRPTR useIconv(iconv_t, CONST_STRPTR);
 static char rfc3986[256] = {0},
@@ -121,32 +123,87 @@ STRPTR urlEncode(STRPTR value)
 
  /**
   *
-  * STRPTR now(void)
+  * ULONG now(void)
   *
   * Summary:
   *
   *    This function get the system time and returns
-  *    the seconds as a string
+  *    the seconds
   *
   * Parameters   :
   *
   * Return Value : pointer to the string in memory
   *
+  * Description:
+  *
+  *     This function uses the timer.device to get the
+  *     current system date and time in epoch seconds
+  *
   */
-STRPTR now(void)
+ULONG now(void)
 {
-  uint8 timestampLen = 12;
-  STRPTR buf = IExec->AllocVecTags(sizeof(char) * timestampLen,
-      AVT_Type,            MEMF_SHARED,
-      AVT_ClearWithValue,  "\0",
-      TAG_DONE);
   struct TimeVal tv;
-
   ITimer->GetSysTime(&tv);
-  IUtility->SNPrintf(buf, sizeof(char) * timestampLen, "%lu", tv.Seconds);
-  
-  return buf;
+
+  return tv.Seconds;
 }
+
+ /**
+  *
+  * ULONG nowUnix(ULONG)
+  *
+  * Summary:
+  *
+  *     This function add the Unix epoch diff to the
+  *     given seconds
+  *
+  * Parameters   : seconds: contains the seconds
+  *
+  * Return Value : the given seconds + the unix epoch
+  *                difference
+  *
+  * Description:
+  *
+  *     Because the epoch of Amiga starts at 1/1/1978
+  *     but the UNIX one starts at 1/1/1970, there is
+  *     a difference of 8 years, that needs to be added
+  *     at the result.
+  *
+  */
+ULONG nowUnix(ULONG seconds)
+{
+  return seconds + UNIX_AMIGA_EPOCH_DIFF;
+}
+
+ /**
+  *
+  * int32 getOffsetUTC(void)
+  *
+  * Summary:
+  *
+  *     This function gets the system UTC offset in
+  *     minutes, based on the timezone
+  *
+  * Parameters   :
+  *
+  * Return Value : the UTC offset in seconds
+  *
+  * Description:
+  *
+  *     This function uses the timezone.library
+  *     to get the system timezone and get the
+  *     UTC offset in minutes, and returns it in
+  *     seconds
+  *
+  */
+int32 getOffsetUTC(void)
+{
+  int32 utcOffset = 0;
+  ITimezone->GetTimezoneAttrs(NULL, TZA_UTCOffset, &utcOffset, TAG_END);
+
+  return utcOffset * 60;
+}
+
 
  /**
   *
@@ -173,7 +230,7 @@ STRPTR now(void)
 STRPTR SHA1Encrypt(STRPTR string)
 {
   char tmp[8] = "";
-  unsigned int stringLen = 41;
+  unsigned int stringLen = 70;
 
   STRPTR buf = IExec->AllocVecTags(sizeof(char) * stringLen,
       AVT_Type,            MEMF_SHARED,
