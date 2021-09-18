@@ -233,6 +233,24 @@ void freeList(
   //IExec->FreeSysObject(ASOT_LIST, listBrowser);     // TODO: Find the reason why this freeze the machine
 }
 
+void freePodcastList(
+  struct List *listBrowser,
+  void (*freeUserDataCallback)(struct podcastInfo *)
+)
+{
+  struct Node *node;
+  while((node = IExec->RemHead( listBrowser )))
+  {
+    struct podcastInfo *itemData = NULL;
+    IListBrowser->GetListBrowserNodeAttrs( node,
+          LBNA_UserData, &itemData,
+          TAG_DONE);
+    freeUserDataCallback(itemData);
+    IListBrowser->FreeListBrowserNode(node);
+  }
+  //IExec->FreeSysObject(ASOT_LIST, listBrowser);     // TODO: Find the reason why this freeze the machine
+}
+
 static STRPTR getCachedImageIfExists(STRPTR uuid)
 {
   char buf[cacheFilenameSize];

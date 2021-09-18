@@ -38,6 +38,10 @@ void freeList(
   struct List *,
   void (*freeUserDataCallback)(struct stationInfo *)
 );
+void freePodcastList(
+  struct List *,
+  void (*freeUserDataCallback)(struct podcastInfo *)
+);
 void showAvatarImage(STRPTR, STRPTR);
 ULONG renderfunct(struct RenderHook *, Object *, struct gpRender *);
 void workOnUpdate(void);

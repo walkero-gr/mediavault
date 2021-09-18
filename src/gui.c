@@ -27,11 +27,13 @@
 #include "podcastfuncs.h"
 #include "httpfuncs.h"
 
-static struct ColumnInfo *columnInfo, *leftSidebarCI;
+static struct ColumnInfo *columnInfo, *leftSidebarCI,
+            *podcastColInfo;
 struct List radioList,
             radioPopularList,
             radioTrendList,
-            leftSidebarList;
+            leftSidebarList,
+            podcastList;
 
 struct filters  lastFilters,
                 prevFilters,
@@ -44,6 +46,7 @@ static void fillRadioPopularList(void);
 static void fillRadioTrendList(void);
 static BOOL checkFiltersChanged(void);
 static void changeDiscoverButton(BOOL);
+static void fillPodcastList(void);
 
 extern uint8 maxRadioResults;
 extern struct memory response;
@@ -109,6 +112,23 @@ void showGUI(void)
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
                 LBCIA_Weight,               10,
+              TAG_DONE);
+
+          podcastColInfo = IListBrowser->AllocLBColumnInfo( 2,
+              LBCIA_Column,                 0,
+                LBCIA_Title,                " Title",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               80,
+              LBCIA_Column,                 1,
+                LBCIA_Title,                " Language",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               20,
               TAG_DONE);
 
           //## Register MediaVault as an application
@@ -359,26 +379,11 @@ void showGUI(void)
                         break;
 
                       case GID_PODCAST_FILTER_BUTTON:
-                        //IDOS->Printf("Search podcasts for: %s\n", ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer);
                         IUtility->Strlcpy(lastPodcastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastPodcastFilters.name));
 
-                        getPodcasts(lastPodcastFilters, 0);
-
-                        /*
-                        IUtility->Strlcpy(lastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastFilters.name));
-
-                        windowBlocking(objects[OID_MAIN], TRUE);
-                        if(checkFiltersChanged())
-                        {
-                          changeDiscoverButton(FALSE);
-                          fillRadioList(TRUE);
-                        }
-                        else {
-                          changeDiscoverButton(TRUE);
-                          fillRadioList(FALSE);
-                        }
-                        windowBlocking(objects[OID_MAIN], FALSE);
-                        */
+                        // windowBlocking(objects[OID_MAIN], TRUE);
+                        fillPodcastList();
+                        // windowBlocking(objects[OID_MAIN], FALSE);
                         break;
                     }
                     break;
@@ -432,6 +437,12 @@ void showGUI(void)
 
           IListBrowser->FreeLBColumnInfo(leftSidebarCI);
           IListBrowser->FreeListBrowserList(&leftSidebarList);
+
+          IListBrowser->FreeLBColumnInfo(podcastColInfo);
+          if(listCount(&podcastList))
+          {
+            freePodcastList(&podcastList, freePodcastInfo);
+          }
 
           IIntuition->DisposeObject(objects[OID_ABOUT]);
           IIntuition->DisposeObject(objects[OID_MAIN]);
@@ -600,3 +611,60 @@ static void fillLeftSidebar(void)
       TAG_DONE);
 }
 
+static BOOL listPodcasts(
+  struct Gadget *listbrowser,
+  struct List *list,
+  int offset,
+  char *notFoundMsg,
+  void (*maxResultCallback)(BOOL)
+) {
+  size_t itemsCnt = 0;
+  BOOL success = FALSE;
+
+  itemsCnt = getPodcastList(list, offset);
+
+  if (itemsCnt == ~0UL)
+  {
+    char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
+  }
+  else if (itemsCnt == 0)
+  {
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
+  }
+  else if (itemsCnt == maxRadioResults) // TODO: Possibly obsolete and need to make it more simple
+  {
+    if (maxResultCallback)
+    {
+      maxResultCallback(TRUE);
+    }
+  }
+
+  if ((itemsCnt != ~0UL) && (itemsCnt > 0))
+  {
+    // Detach list before modify it
+    IIntuition->SetAttrs(listbrowser,
+        LISTBROWSER_Labels, NULL,
+        TAG_DONE);
+
+    IIntuition->SetGadgetAttrs(listbrowser, windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         list,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     podcastColInfo,
+        TAG_DONE);
+
+    success = TRUE;
+  }
+
+  return success;
+}
+
+static void fillPodcastList(void)
+{
+  char notFoundMsg[] = "No podcasts found!";
+  if (getPodcasts(lastPodcastFilters, 0))
+  {
+    listPodcasts((struct Gadget*)gadgets[GID_PODCAST_LISTBROWSER], &podcastList, 0, (char *)notFoundMsg, NULL);
+  }
+}

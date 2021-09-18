@@ -68,5 +68,15 @@ struct stationInfo
   ULONG votes;
 };
 
+struct podcastInfo
+{
+  ULONG id;
+  char title[128];
+  char author[64];
+  char language[8];
+  char url[255];
+  char originalUrl[255];
+  char image[255];
+};
 
 #endif

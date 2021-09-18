@@ -73,6 +73,7 @@ void cleanupHTTPRequest(void)
 {
   if (response.body) response.body = NULL;
   if (response.size) response.size = 0;
+  if (headersList)   headersList = NULL;
 }
 
 STRPTR getResponseBody(void)
@@ -230,6 +231,26 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
   return result;
 }
 
+ /**
+  *
+  * void addRequestHeader(STRPTR)
+  *
+  * Summary:
+  *
+  *     This function adds a header in headersList for the next
+  *     curl call
+  *
+  * Parameters   : headerString: the header as a string including
+  *                the name and the value
+  *
+  * Return Value : 
+  *
+  * Description:
+  *
+  *     This function uses curl's header list and appends a
+  *     new item. This is used with CURLOPT_HTTPHEADER curl option
+  *
+  */
 void addRequestHeader(STRPTR headerString)
 {
   headersList = curl_slist_append(headersList, headerString);
