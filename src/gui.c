@@ -359,7 +359,11 @@ void showGUI(void)
                         IIntuition->GetAttr(LISTBROWSER_Selected, gadgets[GID_LEFT_SIDEBAR], &lsbNodeIdx);
                         switch (lsbNodeIdx)
                         {
+                          case 0:
+                            switchRightSidebar(PAGE_RADIO_INFO);
+                            break;
                           case 1:
+                            switchRightSidebar(PAGE_RADIO_INFO);
                             if(listCount(&radioPopularList) == 0)
                             {
                               windowBlocking(objects[OID_MAIN], TRUE);
@@ -368,12 +372,16 @@ void showGUI(void)
                             }
                             break;
                           case 2:
+                            switchRightSidebar(PAGE_RADIO_INFO);
                             if(listCount(&radioTrendList) == 0)
                             {
                               windowBlocking(objects[OID_MAIN], TRUE);
                               fillRadioTrendList();
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
+                            break;
+                          case 3:
+                            switchRightSidebar(PAGE_PODCAST_INFO);
                             break;
                         }
                         break;

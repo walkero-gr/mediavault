@@ -45,5 +45,6 @@ void freePodcastList(
 void showAvatarImage(STRPTR, STRPTR);
 ULONG renderfunct(struct RenderHook *, Object *, struct gpRender *);
 void workOnUpdate(void);
+void switchRightSidebar(ULONG);
 
 #endif

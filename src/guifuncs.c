@@ -590,3 +590,38 @@ void workOnUpdate(void)
   }
   IExec->FreeVec(infoMsg);
 }
+
+ /**
+  *
+  * void switchRightSidebar(ULONG)
+  *
+  * Summary:
+  *
+  *     This function switches the pages at the right sidebar
+  *     depending the selected section from the left sidebar
+  *
+  * Parameters   : page: the page number
+  *
+  * Return Value :
+  *
+  * Description:
+  *
+  *     This function checks the current visible page at the
+  *     right sidebar, and if it needs switches to the one
+  *     that reflects the choice at the left sidebar
+  *
+  */
+void switchRightSidebar(ULONG page)
+{
+  ULONG currentRightSidebarPage;
+  IIntuition->GetAttr(PAGE_Current, objects[OID_RIGHT_SIDEBAR_PAGES], &currentRightSidebarPage);
+
+  if (currentRightSidebarPage != page)
+  {
+    IIntuition->SetAttrs(objects[OID_RIGHT_SIDEBAR_PAGES],
+        PAGE_Current, page,
+        TAG_END);
+
+    IIntuition->IDoMethod( objects[OID_MAIN], WM_RETHINK );
+  }
+}
