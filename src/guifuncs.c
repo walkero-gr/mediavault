@@ -283,10 +283,10 @@ static STRPTR getCachedImageIfExists(STRPTR uuid)
   return NULL;
 }
 
-void showAvatarImage(STRPTR uuid, STRPTR url)
+void showAvatarImage(STRPTR uuid, STRPTR url, Object *avatarWrapperGadget, Object *avatarImageObject)
 {
   struct Screen *screen = NULL;
-
+  IDOS->Printf("DBG: uuid ~%s~\n", uuid);
   STRPTR avatarImage = getCachedImageIfExists(uuid);
 
   if (!avatarImage)
@@ -305,34 +305,29 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
     if((screen = IIntuition->LockPubScreen(NULL)))
     {
       // Clean previous image shown
-      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
+      IIntuition->SetGadgetAttrs((struct Gadget*)avatarWrapperGadget, windows[WID_MAIN], NULL,
           GA_Image, NULL,
           TAG_END );
-      IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
+      IIntuition->DisposeObject(avatarImageObject);
 
       // Create a new object for the image
-      objects[OID_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+      avatarImageObject = IIntuition->NewObject(BitMapClass, NULL,
           IA_Scalable,        TRUE,
           BITMAP_Screen,      screen,
           BITMAP_SourceFile,  avatarImage,
           BITMAP_Masking,     TRUE,
           TAG_END);
 
-      renderhook = (struct RenderHook *) IExec->AllocSysObjectTags(ASOT_HOOK,
-            ASOHOOK_Size,  sizeof(struct RenderHook),
-            ASOHOOK_Entry, (HOOKFUNC)renderfunct,
-            TAG_END);
-
-      if (renderhook && objects[OID_AVATAR_IMAGE])
+      if (renderhook && avatarImageObject)
       {
-        renderhook->img  = objects[OID_AVATAR_IMAGE];
-        renderhook->w    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Width;
-        renderhook->h    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Height;
+        renderhook->img  = avatarImageObject;
+        renderhook->w    = ((struct Image *)avatarImageObject)->Width;
+        renderhook->h    = ((struct Image *)avatarImageObject)->Height;
         renderhook->fill = FALSE;
 
-        IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
+        IIntuition->SetGadgetAttrs((struct Gadget*)avatarWrapperGadget, windows[WID_MAIN], NULL,
             SPACE_RenderHook,   renderhook,
-            GA_Image,           objects[OID_AVATAR_IMAGE],
+            GA_Image,           avatarImageObject,
             TAG_END );
 
         IIntuition->IDoMethod( objects[OID_MAIN], WM_RETHINK );

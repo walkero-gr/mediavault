@@ -205,6 +205,14 @@ size_t getPodcastList(struct List *itemsList, int offset)
       }
       IUtility->Strlcpy(itemData->image, IJansson->json_string_value(buf), sizeof(itemData->image));
 
+      buf = IJansson->json_object_get(data, "description");
+      if(!json_is_string(buf))
+      {
+        IJansson->json_decref(jsonRoot);
+        return ~0UL;
+      }
+      IUtility->Strlcpy(itemData->description, IJansson->json_string_value(buf), sizeof(itemData->description));
+
       /*
       buf = IJansson->json_object_get(data, "votes");
       if(!json_is_integer(buf))
@@ -239,6 +247,38 @@ size_t getPodcastList(struct List *itemsList, int offset)
   return cnt;
 }
 
+void showPodcastInfo(struct Node *res_node)
+{
+  if (res_node)
+  {
+    char infoText[641], itemUID[32];
+
+    struct podcastInfo *podcastData = NULL;
+    podcastData = (struct podcastInfo *)IExec->AllocVecTags(sizeof(struct podcastInfo),
+          AVT_Type,            MEMF_PRIVATE,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+
+    IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+          LBNA_UserData, &podcastData,
+          TAG_DONE);
+
+    IUtility->SNPrintf(infoText, sizeof(infoText), "%s\n\n%s\n", podcastData->title, podcastData->description);
+    IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", podcastData->id);
+
+    showAvatarImage(itemUID, podcastData->image, gadgets[GID_PODCAST_INFO_DATA], objects[OID_PODCAST_AVATAR_IMAGE]);
+
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_INFO_DATA], windows[WID_MAIN], NULL,
+          GA_TEXTEDITOR_Contents,   infoText,
+          TAG_DONE);
+    /*
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_PLAY_BUTTON], windows[WID_MAIN], NULL,
+          GA_Disabled,   FALSE,
+          TAG_DONE);
+    */
+  }
+}
+
 void freePodcastInfo(struct podcastInfo *itemData)
 {
   if(itemData)
@@ -246,3 +286,4 @@ void freePodcastInfo(struct podcastInfo *itemData)
     IExec->FreeVec(itemData);
   }
 }
+

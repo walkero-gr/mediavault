@@ -387,11 +387,35 @@ void showGUI(void)
                         break;
 
                       case GID_PODCAST_FILTER_BUTTON:
+                        // TODO: Add check if the name has a value
+                        
                         IUtility->Strlcpy(lastPodcastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastPodcastFilters.name));
 
-                        // windowBlocking(objects[OID_MAIN], TRUE);
+                        windowBlocking(objects[OID_MAIN], TRUE);
                         fillPodcastList();
-                        // windowBlocking(objects[OID_MAIN], FALSE);
+                        windowBlocking(objects[OID_MAIN], FALSE);
+                        break;
+
+                      case GID_PODCAST_LISTBROWSER:
+                        {
+                          Object *lb = NULL;
+
+                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_LISTBROWSER)
+                          {
+                            lb = gadgets[GID_PODCAST_LISTBROWSER];
+
+                            IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+                            if (res_value == LBRE_NORMAL)
+                            {                     
+                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+
+                              windowBlocking(objects[OID_MAIN], TRUE);
+                              showPodcastInfo((struct Node *)res_node);
+                              windowBlocking(objects[OID_MAIN], FALSE);
+                            }
+                          }
+
+                        }
                         break;
                     }
                     break;
@@ -457,6 +481,7 @@ void showGUI(void)
 
           IExec->FreeSysObject(ASOT_HOOK, renderhook);
           IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_PODCAST_AVATAR_IMAGE]);
 
           IIntuition->DisposeObject(objects[OID_PLAY_IMAGE]);
 
@@ -619,6 +644,7 @@ static void fillLeftSidebar(void)
       TAG_DONE);
 }
 
+// TODO: Simplify listPodcasts and listStations to one function
 static BOOL listPodcasts(
   struct Gadget *listbrowser,
   struct List *list,

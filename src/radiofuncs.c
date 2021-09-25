@@ -292,7 +292,7 @@ void showRadioInfo(struct Node *res_node)
 
     IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n", stationData->name, stationData->country);
 
-    showAvatarImage(stationData->uuid, stationData->favicon);
+    showAvatarImage(stationData->uuid, stationData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE]);
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,

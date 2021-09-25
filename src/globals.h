@@ -77,6 +77,7 @@ struct podcastInfo
   char url[255];
   char originalUrl[255];
   char image[255];
+  char description[512];
 };
 
 #endif
