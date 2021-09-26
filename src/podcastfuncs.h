@@ -17,9 +17,9 @@
 #ifndef _PODCASTFUNCS_H
 #define _PODCASTFUNCS_H
 
-BOOL getPodcasts(struct filters, int);
 size_t getPodcastList(struct List *, int);
 void showPodcastInfo(struct Node *);
 void freePodcastInfo(struct podcastInfo *);
+void fillPodcastList(struct filters);
 
 #endif

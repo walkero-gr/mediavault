@@ -25,11 +25,14 @@
 #include "secrets.h"
 
 static CONST_STRPTR podcastAPIUrl = "https://api.podcastindex.org/api/1.0";
+static uint8 maxResults = 100;
 
 extern struct memory response;
 extern struct RenderHook *podcastImageRenderHook;
+extern struct ColumnInfo *podcastColInfo;
+extern struct List podcastList;
 
-BOOL getPodcasts(struct filters lastFilters, int offset)
+static BOOL getPodcasts(struct filters lastFilters, int offset)
 {
   BOOL success = FALSE;
   char url[255];
@@ -289,6 +292,65 @@ void freePodcastInfo(struct podcastInfo *itemData)
   if(itemData)
   {
     IExec->FreeVec(itemData);
+  }
+}
+
+// TODO: Simplify listPodcasts and listStations to one function
+static BOOL listPodcasts(
+  struct Gadget *listbrowser,
+  struct List *list,
+  int offset,
+  char *notFoundMsg,
+  void (*maxResultCallback)(BOOL)
+) {
+  size_t itemsCnt = 0;
+  BOOL success = FALSE;
+
+  itemsCnt = getPodcastList(list, offset);
+
+  if (itemsCnt == ~0UL)
+  {
+    char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
+  }
+  else if (itemsCnt == 0)
+  {
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
+  }
+  else if (itemsCnt == maxResults) // TODO: Possibly obsolete and need to make it more simple
+  {
+    if (maxResultCallback)
+    {
+      maxResultCallback(TRUE);
+    }
+  }
+
+  if ((itemsCnt != ~0UL) && (itemsCnt > 0))
+  {
+    // Detach list before modify it
+    IIntuition->SetAttrs(listbrowser,
+        LISTBROWSER_Labels, NULL,
+        TAG_DONE);
+
+    IIntuition->SetGadgetAttrs(listbrowser, windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         list,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     podcastColInfo,
+        TAG_DONE);
+
+    success = TRUE;
+  }
+
+  return success;
+}
+
+void fillPodcastList(struct filters lastFilters)
+{
+  char notFoundMsg[] = "No podcasts found based on your search criteria!";
+  if (getPodcasts(lastFilters, 0))
+  {
+    listPodcasts((struct Gadget*)gadgets[GID_PODCAST_LISTBROWSER], &podcastList, 0, (char *)notFoundMsg, NULL);
   }
 }
 
