@@ -42,13 +42,8 @@ struct RenderHook *renderhook;
 struct RenderHook *podcastImageRenderHook;
 
 static void fillLeftSidebar(void);
-static void fillRadioList(BOOL);
-static void fillRadioPopularList(void);
-static void fillRadioTrendList(void);
 static BOOL checkFiltersChanged(void);
-static void changeDiscoverButton(BOOL);
 
-extern uint8 maxRadioResults;
 extern struct memory response;
 
 void showGUI(void)
@@ -279,19 +274,17 @@ void showGUI(void)
                     switch (result & WMHI_GADGETMASK)
                     {
                       case GID_FILTER_BUTTON:
-                        IUtility->Strlcpy(lastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastFilters.name));
-
-                        windowBlocking(objects[OID_MAIN], TRUE);
-                        if(checkFiltersChanged())
                         {
-                          changeDiscoverButton(FALSE);
-                          fillRadioList(TRUE);
+                          BOOL filtersChanged = checkFiltersChanged();
+                          IUtility->Strlcpy(lastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastFilters.name));
+
+                          windowBlocking(objects[OID_MAIN], TRUE);
+
+                          changeDiscoverButton(!filtersChanged);
+                          fillRadioList(lastFilters, filtersChanged);
+                          
+                          windowBlocking(objects[OID_MAIN], FALSE);
                         }
-                        else {
-                          changeDiscoverButton(TRUE);
-                          fillRadioList(FALSE);
-                        }
-                        windowBlocking(objects[OID_MAIN], FALSE);
                         break;
 
                       case GID_FILTERS_NAME:
@@ -500,90 +493,6 @@ void showGUI(void)
   IExec->FreeSysObject(ASOT_PORT, appPort);
 }
 
-static BOOL listStations(
-  struct Gadget *listbrowser,
-  struct List *list,
-  int offset,
-  char *notFoundMsg,
-  void (*maxResultCallback)(BOOL)
-) {
-  size_t stationsCnt = 0;
-  BOOL success = FALSE;
-
-  stationsCnt = getRadioList(list, offset);
-
-  if (stationsCnt == ~0UL)
-  {
-    char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
-    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
-  }
-  else if (stationsCnt == 0)
-  {
-    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
-  }
-  else if (stationsCnt == maxRadioResults)
-  {
-    if (maxResultCallback)
-    {
-      maxResultCallback(TRUE);
-    }
-  }
-
-  if ((stationsCnt != ~0UL) && (stationsCnt > 0))
-  {
-    // Detach list before modify it
-    IIntuition->SetAttrs(listbrowser,
-        LISTBROWSER_Labels, NULL,
-        TAG_DONE);
-
-    IIntuition->SetGadgetAttrs(listbrowser, windows[WID_MAIN], NULL,
-        LISTBROWSER_Labels,         list,
-        LISTBROWSER_SortColumn,     0,
-        LISTBROWSER_Selected,       -1,
-        LISTBROWSER_ColumnInfo,     columnInfo,
-        TAG_DONE);
-
-    success = TRUE;
-  }
-
-  return success;
-}
-
-static void fillRadioList(BOOL newSearch)
-{
-  static int offset;
-  char notFoundMsg[128];
-  IUtility->Strlcpy(notFoundMsg, "No more Radio Stations found!", sizeof(notFoundMsg));
-
-  if (newSearch)
-  {
-    offset = 0;
-    IUtility->Strlcpy(notFoundMsg, "No Radio Stations found with these criteria!\nChange them and try again!", sizeof(notFoundMsg));
-  }
-
-  if (getRadioStations(lastFilters, offset))
-  {
-    if (listStations((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], &radioList, offset, (char *)notFoundMsg, changeDiscoverButton))
-    {
-      offset++;
-    }
-  }
-}
-
-static void fillRadioPopularList(void)
-{
-  char notFoundMsg[] = "No Popular Radio Stations found!";
-  getRadioPopularStations();
-  listStations((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER], &radioPopularList, 0, (char *)notFoundMsg, NULL);
-}
-
-static void fillRadioTrendList(void)
-{
-  char notFoundMsg[] = "No Trending Radio Stations found!";
-  getRadioTrendStations();
-  listStations((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], &radioTrendList, 0, (char *)notFoundMsg, NULL);
-}
-
 static BOOL checkFiltersChanged(void)
 {
   BOOL changed = FALSE;
@@ -617,7 +526,7 @@ static BOOL checkFiltersChanged(void)
   return changed;
 }
 
-static void changeDiscoverButton(BOOL isMore)
+void changeDiscoverButton(BOOL isMore)
 {
   char buttonText[16] = "_Discover";
   if (isMore)

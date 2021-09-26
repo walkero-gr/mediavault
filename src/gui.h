@@ -121,5 +121,6 @@ Object *objects[OID_LAST];
 Object *menus[MID_LAST];
 
 void showGUI(void);
+void changeDiscoverButton(BOOL);
 
 #endif
