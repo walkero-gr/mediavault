@@ -26,20 +26,44 @@
 
 static CONST_STRPTR podcastAPIUrl = "https://api.podcastindex.org/api/1.0";
 static uint8 maxResults = 100;
+static uint8 maxEpisodesResults = 10;
+
+static void fillEpisodesList(ULONG);
 
 extern struct memory response;
 extern struct RenderHook *podcastImageRenderHook;
 extern struct ColumnInfo *podcastColInfo;
-extern struct List podcastList;
+extern struct List podcastList, podcastEpisodeList;
+
+static void addRequestHeaders(void)
+{
+  STRPTR buf = IExec->AllocVecTags(sizeof(char) * 90,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+
+  char authString[71];   
+  ULONG nowSecondsUTC = nowUnix(now()) + getOffsetUTC();
+
+  IUtility->SNPrintf(authString, sizeof(authString), "%s%s%lu", PODCASTINDEX_KEY, PODCASTINDEX_SECRET, nowSecondsUTC);
+
+  IUtility->Strlcpy(buf, "X-Auth-Key: " PODCASTINDEX_KEY, sizeof(char) * 90);
+  addRequestHeader(buf);
+
+  IUtility->SNPrintf(buf, sizeof(char) * 90, "X-Auth-Date: %lu", nowSecondsUTC);
+  addRequestHeader(buf);
+
+  IUtility->Strlcpy(buf, "Authorization: ", sizeof(char) * 90);
+  IUtility->Strlcat(buf, SHA1Encrypt(authString), sizeof(char) * 90);
+  addRequestHeader(buf);
+
+  IExec->FreeVec(buf);
+}
 
 static BOOL getPodcasts(struct filters lastFilters, int offset)
 {
   BOOL success = FALSE;
   char url[255];
-  STRPTR buf = IExec->AllocVecTags(sizeof(char) * 90,
-      AVT_Type,            MEMF_SHARED,
-      AVT_ClearWithValue,  "\0",
-      TAG_DONE);
 
   IUtility->Strlcpy(url, podcastAPIUrl, sizeof(url));
   IUtility->Strlcat(url, "/search/byterm?pretty=", sizeof(url));
@@ -65,27 +89,7 @@ static BOOL getPodcasts(struct filters lastFilters, int offset)
     IExec->FreeVec(encSelName);
   }
 
-  char authString[71];
-  char nowString[11];
-  ULONG nowSecondsUTC = nowUnix(now()) + getOffsetUTC();
-
-  IUtility->SNPrintf(nowString, sizeof(nowString), "%lu", nowSecondsUTC);
-  
-  IUtility->Strlcpy(authString, PODCASTINDEX_KEY, sizeof(authString));
-  IUtility->Strlcat(authString, PODCASTINDEX_SECRET, sizeof(authString));
-  IUtility->Strlcat(authString, nowString, sizeof(authString));
-
-  IUtility->Strlcpy(buf, "X-Auth-Key: " PODCASTINDEX_KEY, sizeof(char) * 35);
-  addRequestHeader(buf);
-  
-  IUtility->Strlcpy(buf, "X-Auth-Date: ", sizeof(char) * 35);
-  IUtility->Strlcat(buf, nowString, sizeof(char) * 35);
-  addRequestHeader(buf);
-  
-  IUtility->Strlcpy(buf, "Authorization: ", sizeof(char) * 90);
-  IUtility->Strlcat(buf, SHA1Encrypt(authString), sizeof(char) * 90);
-  addRequestHeader(buf);
-
+  addRequestHeaders();
   doHTTPRequest(url);
   if (getResponseCode() == 200)
     success = TRUE;
@@ -93,7 +97,6 @@ static BOOL getPodcasts(struct filters lastFilters, int offset)
   //IDOS->Printf("DBG: url: %s\n", url);
   //IDOS->Printf("\n\n%s\n", getResponseBody());
 
-  IExec->FreeVec(buf);
   return success;
 }
 
@@ -276,6 +279,8 @@ void showPodcastInfo(struct Node *res_node)
       podcastImageRenderHook
     );
 
+    fillEpisodesList(podcastData->id);
+
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_INFO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   infoText,
           TAG_DONE);
@@ -287,15 +292,27 @@ void showPodcastInfo(struct Node *res_node)
   }
 }
 
-void freePodcastInfo(struct podcastInfo *itemData)
+static BOOL getEpisodesByID(ULONG feedID)
 {
-  if(itemData)
+  BOOL success = FALSE;
+  if (feedID > 0)
   {
-    IExec->FreeVec(itemData);
+    char url[255];
+
+    IUtility->SNPrintf(url, sizeof(url), "%s/episodes/byfeedid?pretty=&max=%ld&id=%lu", podcastAPIUrl, maxEpisodesResults, feedID);
+    IDOS->Printf("DBG: url: %s\n", url);
+    
+    addRequestHeaders();
+    doHTTPRequest(url);
+    if (getResponseCode() == 200)
+      success = TRUE;
+
+    IDOS->Printf("\n\n%s\n", getResponseBody());
   }
+
+  return success;
 }
 
-// TODO: Simplify listPodcasts and listStations to one function
 static BOOL listPodcasts(
   struct Gadget *listbrowser,
   struct List *list,
@@ -354,3 +371,15 @@ void fillPodcastList(struct filters lastFilters)
   }
 }
 
+//static void listEpisodes(void)
+
+static void fillEpisodesList(ULONG feedID)
+{
+  char notFoundMsg[] = "The selected podcast has no episodes!";
+  if (getEpisodesByID(feedID))
+  {
+    IDOS->Printf("%s\n", notFoundMsg);
+    //listEpisodes((struct Gadget*)gadgets[GID_PODCAST_EPISODES_LISTBROWSER], &podcastEpisodeList, 0, (char *)notFoundMsg, NULL);
+  }
+
+}

@@ -216,37 +216,42 @@ struct Window *appUnhide(uint32 appID, Object *winObj)
   return window;
 }
 
-void freeList(
-  struct List *listBrowser,
-  void (*freeUserDataCallback)(struct stationInfo *)
-)
+void freeList(struct List *listBrowser, int structID)
 {
   struct Node *node;
   while((node = IExec->RemHead( listBrowser )))
   {
-    struct stationInfo *stationData = NULL;
-    IListBrowser->GetListBrowserNodeAttrs( node,
-          LBNA_UserData, &stationData,
-          TAG_DONE);
-    freeUserDataCallback(stationData);
-    IListBrowser->FreeListBrowserNode(node);
-  }
-  //IExec->FreeSysObject(ASOT_LIST, listBrowser);     // TODO: Find the reason why this freeze the machine
-}
+    switch(structID)
+    {
+      case 0:
+        {
+          struct stationInfo *structData = NULL;
+          IListBrowser->GetListBrowserNodeAttrs( node,
+                LBNA_UserData, &structData,
+                TAG_DONE);
+          IExec->FreeVec(structData);
+        }
+        break;
+      case 1:
+        {
+          struct podcastInfo *structData = NULL;
+          IListBrowser->GetListBrowserNodeAttrs( node,
+                LBNA_UserData, &structData,
+                TAG_DONE);
+          IExec->FreeVec(structData);
+        }
+        break;
+      case 2:
+        {
+          struct podcastEpisodeInfo *structData = NULL;
+          IListBrowser->GetListBrowserNodeAttrs( node,
+                LBNA_UserData, &structData,
+                TAG_DONE);
+          IExec->FreeVec(structData);
+        }
+        break;
+    }
 
-void freePodcastList(
-  struct List *listBrowser,
-  void (*freeUserDataCallback)(struct podcastInfo *)
-)
-{
-  struct Node *node;
-  while((node = IExec->RemHead( listBrowser )))
-  {
-    struct podcastInfo *itemData = NULL;
-    IListBrowser->GetListBrowserNodeAttrs( node,
-          LBNA_UserData, &itemData,
-          TAG_DONE);
-    freeUserDataCallback(itemData);
     IListBrowser->FreeListBrowserNode(node);
   }
   //IExec->FreeSysObject(ASOT_LIST, listBrowser);     // TODO: Find the reason why this freeze the machine

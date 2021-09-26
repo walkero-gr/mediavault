@@ -23,7 +23,6 @@
 //size_t getRadioList(struct List *, int);
 void playRadio(struct Node *);
 void showRadioInfo(struct Node *);
-void freeStationInfo(struct stationInfo *);
 void fillRadioList(struct filters, BOOL);
 void fillRadioPopularList(void);
 void fillRadioTrendList(void);

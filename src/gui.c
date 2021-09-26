@@ -33,7 +33,8 @@ struct List radioList,
             radioPopularList,
             radioTrendList,
             leftSidebarList,
-            podcastList;
+            podcastList,
+            podcastEpisodeList;
 
 struct filters  lastFilters,
                 prevFilters;
@@ -448,17 +449,17 @@ void showGUI(void)
           IListBrowser->FreeLBColumnInfo(columnInfo);
           if(listCount(&radioList))
           {
-            freeList(&radioList, freeStationInfo);
+            freeList(&radioList, STRUCT_STATION_INFO);
           }
 
           if(listCount(&radioPopularList))
           {
-            freeList(&radioPopularList, freeStationInfo);
+            freeList(&radioPopularList, STRUCT_STATION_INFO);
           }
 
           if(listCount(&radioTrendList))
           {
-            freeList(&radioTrendList, freeStationInfo);
+            freeList(&radioTrendList, STRUCT_STATION_INFO);
           }
 
           IListBrowser->FreeLBColumnInfo(leftSidebarCI);
@@ -467,7 +468,11 @@ void showGUI(void)
           IListBrowser->FreeLBColumnInfo(podcastColInfo);
           if(listCount(&podcastList))
           {
-            freePodcastList(&podcastList, freePodcastInfo);
+            freeList(&podcastList, STRUCT_PODCAST_INFO);
+          }
+          if(listCount(&podcastEpisodeList))
+          {
+            freeList(&podcastEpisodeList, STRUCT_PODCAST_EPISODE_INFO);
           }
 
           IIntuition->DisposeObject(objects[OID_ABOUT]);

@@ -111,6 +111,14 @@ enum
   PAGE_LAST
 };
 
+enum
+{
+  STRUCT_STATION_INFO,
+  STRUCT_PODCAST_INFO,
+  STRUCT_PODCAST_EPISODE_INFO,
+  STRUCT_LAST
+};
+
 struct Window *windows[WID_LAST];
 //struct ColumnInfo   *columninfo = NULL;
 //struct DrawInfo     *drInfo;

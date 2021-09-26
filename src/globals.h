@@ -80,4 +80,18 @@ struct podcastInfo
   char description[512];
 };
 
+struct podcastEpisodeInfo
+{
+  ULONG id;
+  char  title[128];
+  char  description[512];
+  ULONG datePublished;
+  char  datePublishedPretty[32];
+  char  enclosureUrl[255];
+  char  enclosureType[11];
+  ULONG duration;
+  uint8 episode;
+  uint8 season;
+};
+
 #endif

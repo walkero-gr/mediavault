@@ -308,14 +308,6 @@ void showRadioInfo(struct Node *res_node)
   }
 }
 
-void freeStationInfo(struct stationInfo *stationData)
-{
-  if(stationData)
-  {
-    IExec->FreeVec(stationData);
-  }
-}
-
 static BOOL listStations(
   struct Gadget *listbrowser,
   struct List *list,
