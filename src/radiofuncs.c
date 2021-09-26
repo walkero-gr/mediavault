@@ -29,6 +29,7 @@ static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";
 static char url[255];
 
 extern struct memory response;
+extern struct RenderHook *renderhook;
 
 static void setBaseSearchUrl(void)
 {
@@ -292,7 +293,7 @@ void showRadioInfo(struct Node *res_node)
 
     IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n", stationData->name, stationData->country);
 
-    showAvatarImage(stationData->uuid, stationData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE]);
+    showAvatarImage(stationData->uuid, stationData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE], renderhook);
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,

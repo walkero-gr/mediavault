@@ -136,6 +136,7 @@ CONST_STRPTR countries[] =
 
 extern struct List leftSidebarList;
 extern struct RenderHook *renderhook;
+extern struct RenderHook *podcastImageRenderHook;
 
 static Object *buildRadioSearchPage(void);
 static Object *buildRadioPopularPage(void);
@@ -169,6 +170,11 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         ASOHOOK_Entry, (HOOKFUNC)renderfunct,
         TAG_END);
 
+  podcastImageRenderHook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
+        ASOHOOK_Size,  sizeof(struct RenderHook),
+        ASOHOOK_Entry, (HOOKFUNC)renderfunct,
+        TAG_END);
+
   Object *radioPages = IIntuition->NewObject(NULL, "page.gadget",
         LAYOUT_DeferLayout, TRUE,
         PAGE_Add, gadgets[GID_PAGE_1] = buildRadioSearchPage(),
@@ -181,7 +187,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
   objects[OID_RIGHT_SIDEBAR_PAGES] = IIntuition->NewObject(NULL, "page.gadget",
         LAYOUT_DeferLayout, TRUE,
         PAGE_Add, gadgets[GID_RIGHT_SIDEBAR_PAGE_1] = buildRadioRightSidebar(screen, renderhook),
-        PAGE_Add, gadgets[GID_RIGHT_SIDEBAR_PAGE_2] = buildPodcastRightSidebar(screen, renderhook),
+        PAGE_Add, gadgets[GID_RIGHT_SIDEBAR_PAGE_2] = buildPodcastRightSidebar(screen, podcastImageRenderHook),
         TAG_DONE);
 
   return IIntuition->NewObject(WindowClass, NULL,
@@ -701,10 +707,25 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
             GA_TEXTEDITOR_ReadOnly,     TRUE,
             GA_TEXTEDITOR_Transparent,  TRUE,
             TAG_DONE),
-            CHILD_WeightedHeight, 20,
+            CHILD_WeightedHeight, 18,
           
           LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
             TAG_DONE),
+            CHILD_WeightedHeight, 2,
+
+          LAYOUT_AddChild, gadgets[GID_PODCAST_EPISODES_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+            GA_ID,                      GID_PODCAST_EPISODES_LISTBROWSER,
+            GA_RelVerify,               TRUE,
+            GA_TabCycle,                TRUE,
+            LISTBROWSER_ColumnTitles,   TRUE,
+            LISTBROWSER_HorizontalProp, TRUE,
+            LISTBROWSER_Separators,     TRUE,
+            LISTBROWSER_ShowSelected,   TRUE,
+            LISTBROWSER_Striping,       LBS_ROWS,
+            LISTBROWSER_SortColumn,     0,
+            LISTBROWSER_TitleClickable, TRUE,
+            TAG_DONE),
             CHILD_WeightedHeight, 40,
+
           TAG_DONE);
 }

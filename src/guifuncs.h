@@ -42,7 +42,7 @@ void freePodcastList(
   struct List *,
   void (*freeUserDataCallback)(struct podcastInfo *)
 );
-void showAvatarImage(STRPTR, STRPTR, Object *, Object *);
+void showAvatarImage(STRPTR, STRPTR, Object *, Object *, struct RenderHook *);
 ULONG renderfunct(struct RenderHook *, Object *, struct gpRender *);
 void workOnUpdate(void);
 void switchRightSidebar(ULONG);

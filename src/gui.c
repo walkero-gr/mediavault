@@ -39,6 +39,7 @@ struct filters  lastFilters,
                 prevFilters,
                 lastPodcastFilters;
 struct RenderHook *renderhook;
+struct RenderHook *podcastImageRenderHook;
 
 static void fillLeftSidebar(void);
 static void fillRadioList(BOOL);
@@ -480,6 +481,7 @@ void showGUI(void)
           IIntuition->DisposeObject(objects[OID_MAIN]);
 
           IExec->FreeSysObject(ASOT_HOOK, renderhook);
+          IExec->FreeSysObject(ASOT_HOOK, podcastImageRenderHook);
           IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
           IIntuition->DisposeObject(objects[OID_PODCAST_AVATAR_IMAGE]);
 

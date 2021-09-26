@@ -39,7 +39,8 @@ struct releaseInfo {
   char changes[1024];
 };
 static struct releaseInfo *release = NULL;
-extern struct RenderHook *renderhook;
+//extern struct RenderHook *renderhook;
+//extern struct RenderHook *podcastImageRHook;
 
 uint32 cacheFilenameSize = 128;
 
@@ -283,10 +284,10 @@ static STRPTR getCachedImageIfExists(STRPTR uuid)
   return NULL;
 }
 
-void showAvatarImage(STRPTR uuid, STRPTR url, Object *avatarWrapperGadget, Object *avatarImageObject)
+void showAvatarImage(STRPTR uuid, STRPTR url, Object *avatarWrapperGadget, Object *avatarImageObject, struct RenderHook *renderhook)
 {
   struct Screen *screen = NULL;
-  IDOS->Printf("DBG: uuid ~%s~\n", uuid);
+
   STRPTR avatarImage = getCachedImageIfExists(uuid);
 
   if (!avatarImage)

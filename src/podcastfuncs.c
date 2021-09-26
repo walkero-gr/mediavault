@@ -27,6 +27,7 @@
 static CONST_STRPTR podcastAPIUrl = "https://api.podcastindex.org/api/1.0";
 
 extern struct memory response;
+extern struct RenderHook *podcastImageRenderHook;
 
 BOOL getPodcasts(struct filters lastFilters, int offset)
 {
@@ -266,7 +267,11 @@ void showPodcastInfo(struct Node *res_node)
     IUtility->SNPrintf(infoText, sizeof(infoText), "%s\n\n%s\n", podcastData->title, podcastData->description);
     IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", podcastData->id);
 
-    showAvatarImage(itemUID, podcastData->image, gadgets[GID_PODCAST_INFO_DATA], objects[OID_PODCAST_AVATAR_IMAGE]);
+    showAvatarImage(
+      itemUID, podcastData->image,
+      gadgets[GID_PODCAST_INFO_DATA], objects[OID_PODCAST_AVATAR_IMAGE],
+      podcastImageRenderHook
+    );
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_INFO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   infoText,
