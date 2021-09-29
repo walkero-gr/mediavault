@@ -82,11 +82,13 @@ DONE - Add first fields to search for a podcast, which should be a name field an
 DONE - Add the browserlist for the podcasts
 DONE - Use the Podcasts online service and get the first data
 DONE - Parse the Podcasts JSON data and fill up the browserlist
-- Add a new browserlist for the podcast episodes
-- When the user clicks on a podcast title, the right sidebar should be updated and the episodes
-  browserlist should get filled up with the latest episodes
-- When the user clicks on an episode add info at the right sidebar and enable the play button
+DONE - Add a new browserlist for the podcast episodes
+DONE - When the user clicks on a podcast title, the right sidebar should be updated and the episodes
+ browserlist should get filled up with the latest episodes
+DONE - When the user clicks on an episode add info at the right sidebar and enable the play button
 - When the play button is clicked AmigaAmp3 should start playing the episode
+- When a podcast episodes list is filled but the user selects an other podcast that has no
+ episodes, the list should be cleared.
 - Mark podcasts as favorites
 - Download podcast episodes
 

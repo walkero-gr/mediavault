@@ -28,7 +28,7 @@
 #include "httpfuncs.h"
 
 struct ColumnInfo *columnInfo, *leftSidebarCI,
-            *podcastColInfo;
+            *podcastColInfo, *podcastEpisodeColInfo;
 struct List radioList,
             radioPopularList,
             radioTrendList,
@@ -125,6 +125,17 @@ void showGUI(void)
                 LBCIA_DraggableSeparator,   TRUE,
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               20,
+              TAG_DONE);
+
+          podcastEpisodeColInfo = IListBrowser->AllocLBColumnInfo( 2,
+              LBCIA_Column,                 0,
+                LBCIA_Title,                " Title",
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Weight,               80,
+              LBCIA_Column,                 1,
+                LBCIA_Title,                " Released",
+                LBCIA_DraggableSeparator,   TRUE,
                 LBCIA_Weight,               20,
               TAG_DONE);
 
@@ -409,7 +420,27 @@ void showGUI(void)
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                           }
+                        }
+                        break;
 
+                      case GID_PODCAST_EPISODES_LISTBROWSER:
+                        {
+                          Object *lb = NULL;
+
+                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_EPISODES_LISTBROWSER)
+                          {
+                            lb = gadgets[GID_PODCAST_EPISODES_LISTBROWSER];
+
+                            IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+                            if (res_value == LBRE_NORMAL)
+                            {
+                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+
+                              windowBlocking(objects[OID_MAIN], TRUE);
+                              showPodcastEpisodeInfo((struct Node *)res_node);
+                              windowBlocking(objects[OID_MAIN], FALSE);
+                            }
+                          }
                         }
                         break;
                     }
@@ -470,6 +501,7 @@ void showGUI(void)
           {
             freeList(&podcastList, STRUCT_PODCAST_INFO);
           }
+          IListBrowser->FreeLBColumnInfo(podcastEpisodeColInfo);
           if(listCount(&podcastEpisodeList))
           {
             freeList(&podcastEpisodeList, STRUCT_PODCAST_EPISODE_INFO);

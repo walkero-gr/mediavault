@@ -722,8 +722,8 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
             LISTBROWSER_Separators,     TRUE,
             LISTBROWSER_ShowSelected,   TRUE,
             LISTBROWSER_Striping,       LBS_ROWS,
-            LISTBROWSER_SortColumn,     0,
-            LISTBROWSER_TitleClickable, TRUE,
+            //LISTBROWSER_SortColumn,     0,
+            //LISTBROWSER_TitleClickable, TRUE,
             TAG_DONE),
             CHILD_WeightedHeight, 40,
 
