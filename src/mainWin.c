@@ -537,14 +537,14 @@ static Object *buildPodcastSearchPage(void)
             
             LAYOUT_AddImage, IIntuition->NewObject(LabelClass, NULL,
               //LABEL_DrawInfo, drInfo,
-              LABEL_Text, "_Name",
+              LABEL_Text, "_Title",
               TAG_END),
 
             LAYOUT_AddChild, gadgets[GID_PODCAST_FILTERS_NAME] = IIntuition->NewObject(StringClass, NULL,
               GA_ID,                GID_PODCAST_FILTERS_NAME,
               GA_RelVerify,         TRUE,
               GA_TabCycle,          TRUE,
-              GA_ActivateKey,       "n",
+              GA_ActivateKey,       "t",
               STRINGA_MinVisible,   10,
               STRINGA_MaxChars,     40,
               TAG_DONE),
@@ -658,11 +658,12 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
             GA_TEXTEDITOR_ReadOnly,     TRUE,
             GA_TEXTEDITOR_Transparent,  TRUE,
             TAG_DONE),
-            CHILD_MaxHeight, 80,
+            CHILD_WeightedHeight, 18,
 
           LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
             TAG_DONE),
             CHILD_WeightedHeight, 40,
+
           TAG_DONE);
 }
 

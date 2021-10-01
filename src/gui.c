@@ -394,12 +394,18 @@ void showGUI(void)
 
                       case GID_PODCAST_FILTER_BUTTON:
                         // TODO: Add check if the name has a value
-                        
                         IUtility->Strlcpy(lastPodcastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastPodcastFilters.name));
-
-                        windowBlocking(objects[OID_MAIN], TRUE);
-                        fillPodcastList(lastPodcastFilters);
-                        windowBlocking(objects[OID_MAIN], FALSE);
+                        if (IUtility->Stricmp(lastPodcastFilters.name, ""))
+                        {
+                          windowBlocking(objects[OID_MAIN], TRUE);
+                          fillPodcastList(lastPodcastFilters);
+                          windowBlocking(objects[OID_MAIN], FALSE);
+                        }
+                        else
+                        {
+                          char notFoundMsg[] = "Please, add the podcast title you want to search!";
+                          showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (char *)notFoundMsg, 0, NULL, 0);
+                        }
                         break;
 
                       case GID_PODCAST_LISTBROWSER:

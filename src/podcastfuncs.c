@@ -510,7 +510,7 @@ void fillPodcastList(struct filters lastFilters)
     else if (itemsCnt == 0)
     {
       char notFoundMsg[] = "No podcasts found based on your search criteria!";
-      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (char *)notFoundMsg, 0, NULL, 0);
     }
 
     if ((itemsCnt != ~0UL) && (itemsCnt > 0))
@@ -534,7 +534,7 @@ static void fillEpisodesList(ULONG feedID)
     else if (itemsCnt == 0)
     {
       char notFoundMsg[] = "The selected podcast has no episodes!";
-      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (char *)notFoundMsg, 0, NULL, 0);
     }
 
     if ((itemsCnt != ~0UL) && (itemsCnt > 0))
