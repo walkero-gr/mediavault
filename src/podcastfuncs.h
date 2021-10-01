@@ -21,5 +21,6 @@ size_t getPodcastList(struct List *, int);
 void showPodcastInfo(struct Node *);
 void showPodcastEpisodeInfo(struct Node *);
 void fillPodcastList(struct filters);
+void playPodcast(struct Node *);
 
 #endif

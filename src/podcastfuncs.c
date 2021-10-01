@@ -26,7 +26,7 @@
 
 static CONST_STRPTR podcastAPIUrl = "https://api.podcastindex.org/api/1.0";
 //static uint8 maxResults = 100;
-static uint8 maxEpisodesResults = 10;
+static uint8 maxEpisodesResults = 50;
 
 static void fillEpisodesList(ULONG);
 
@@ -49,13 +49,16 @@ static void addRequestHeaders(void)
 
   IUtility->Strlcpy(buf, "X-Auth-Key: " PODCASTINDEX_KEY, sizeof(char) * 90);
   addRequestHeader(buf);
+  IDOS->Printf("X-Auth-Key: %s\n", buf);
 
   IUtility->SNPrintf(buf, sizeof(char) * 90, "X-Auth-Date: %lu", nowSecondsUTC);
   addRequestHeader(buf);
+  IDOS->Printf("X-Auth-Date: %s\n", buf);
 
   IUtility->Strlcpy(buf, "Authorization: ", sizeof(char) * 90);
   IUtility->Strlcat(buf, SHA1Encrypt(authString), sizeof(char) * 90);
   addRequestHeader(buf);
+  IDOS->Printf("Authorization: %s\n", buf);
 
   IExec->FreeVec(buf);
 }
@@ -66,7 +69,7 @@ static BOOL getPodcasts(struct filters lastFilters, int offset)
   char url[255];
 
   IUtility->Strlcpy(url, podcastAPIUrl, sizeof(url));
-  IUtility->Strlcat(url, "/search/byterm?pretty=", sizeof(url));
+  IUtility->Strlcat(url, "/search/byterm?", sizeof(url));
 
   // TODO: Check if there is offset in podcast API and use it here
   if (offset > 0)
@@ -84,7 +87,7 @@ static BOOL getPodcasts(struct filters lastFilters, int offset)
   if (IUtility->Stricmp(lastFilters.name, ""))
   {
     STRPTR encSelName = urlEncode(lastFilters.name);
-    IUtility->Strlcat(url, "&q=", sizeof(url));
+    IUtility->Strlcat(url, "q=", sizeof(url));
     IUtility->Strlcat(url, encSelName, sizeof(url));
     IExec->FreeVec(encSelName);
   }
@@ -281,6 +284,7 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
 
     for(cnt = 0; cnt < IJansson->json_array_size(feeds); cnt++)
     {
+      IDOS->Printf("===================================\n\nDBG1: cnt %ld\n", cnt);
       struct Node *itemNode;
       struct podcastEpisodeInfo *itemData = NULL;
       json_t *data, *buf;
@@ -301,6 +305,7 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_integer(buf))
       {
         IJansson->json_decref(jsonRoot);
+        IDOS->Printf("DBG: 1\n");
         return ~0UL;
       }
       itemData->id = (ULONG)IJansson->json_integer_value(buf);
@@ -309,6 +314,7 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
+        IDOS->Printf("DBG: 2\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->title, charConv(IJansson->json_string_value(buf)), sizeof(itemData->title));
@@ -317,6 +323,7 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
+        IDOS->Printf("DBG: 3\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->datePublishedPretty, IJansson->json_string_value(buf), sizeof(itemData->datePublishedPretty));
@@ -325,6 +332,7 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
+        IDOS->Printf("DBG: 4\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->enclosureUrl, IJansson->json_string_value(buf), sizeof(itemData->enclosureUrl));
@@ -333,6 +341,7 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
+        IDOS->Printf("DBG: 5\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->description, charConv(IJansson->json_string_value(buf)), sizeof(itemData->description));
@@ -341,6 +350,7 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
+        IDOS->Printf("DBG: 6\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->image, IJansson->json_string_value(buf), sizeof(itemData->image));
@@ -349,29 +359,23 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_integer(buf))
       {
         IJansson->json_decref(jsonRoot);
+        IDOS->Printf("DBG: 7\n");
         return ~0UL;
       }
       itemData->feedId = (ULONG)IJansson->json_integer_value(buf);
 
-      /*
-      buf = IJansson->json_object_get(data, "language");
-      if(!json_is_string(buf))
+      buf = IJansson->json_object_get(data, "season");
+      if(!json_is_integer(buf))
       {
-        IJansson->json_decref(jsonRoot);
-        return ~0UL;
-      }
-      IUtility->Strlcpy(itemData->language, charConv(IJansson->json_string_value(buf)), sizeof(itemData->language));
+        itemData->season = 0;
+      } else itemData->season = (ULONG)IJansson->json_integer_value(buf);
 
-      buf = IJansson->json_object_get(data, "originalUrl");
-      if(!json_is_string(buf))
+
+      buf = IJansson->json_object_get(data, "episode");
+      if(!json_is_integer(buf))
       {
-        IJansson->json_decref(jsonRoot);
-        return ~0UL;
-      }
-      IUtility->Strlcpy(itemData->originalUrl, IJansson->json_string_value(buf), sizeof(itemData->originalUrl));
-
-
-      */
+        itemData->episode = 0;
+      } else itemData->episode = (ULONG)IJansson->json_integer_value(buf);
 
       itemNode = IListBrowser->AllocListBrowserNode( 3,
           LBNA_UserData,          itemData,
@@ -412,7 +416,7 @@ void showPodcastInfo(struct Node *res_node)
 
     IUtility->SNPrintf(infoText, sizeof(infoText), "%s\n\n%s\n", podcastData->title, podcastData->description);
     IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", podcastData->id);
-
+    /*
     if (IUtility->Stricmp(itemUID, ""))
     {
       showAvatarImage(
@@ -421,17 +425,13 @@ void showPodcastInfo(struct Node *res_node)
         podcastImageRenderHook
       );
     }
-
-    fillEpisodesList(podcastData->id);
+    */
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_INFO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   infoText,
           TAG_DONE);
-    /*
-    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_PLAY_BUTTON], windows[WID_MAIN], NULL,
-          GA_Disabled,   FALSE,
-          TAG_DONE);
-    */
+    
+    fillEpisodesList(podcastData->id);
   }
 }
 
@@ -470,11 +470,10 @@ void showPodcastEpisodeInfo(struct Node *res_node)
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_INFO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   infoText,
           TAG_DONE);
-    /*
-    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_PLAY_BUTTON], windows[WID_MAIN], NULL,
+
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_PLAY_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,   FALSE,
           TAG_DONE);
-    */
   }
 }
 
@@ -485,15 +484,15 @@ static BOOL getEpisodesByID(ULONG feedID)
   {
     char url[255];
 
-    IUtility->SNPrintf(url, sizeof(url), "%s/episodes/byfeedid?pretty=&max=%ld&id=%lu", podcastAPIUrl, maxEpisodesResults, feedID);
-    //IDOS->Printf("DBG: url: %s\n", url);
+    IUtility->SNPrintf(url, sizeof(url), "%s/episodes/byfeedid?id=%lu&max=%ld&pretty=", podcastAPIUrl, feedID, maxEpisodesResults);
+    IDOS->Printf("DBG: url: %s\n", url);
     
     addRequestHeaders();
     doHTTPRequest(url);
     if (getResponseCode() == 200)
       success = TRUE;
 
-    //IDOS->Printf("\n\n%s\n", getResponseBody());
+    IDOS->Printf("\n\n%s\n", getResponseBody());
   }
 
   return success;
@@ -532,7 +531,10 @@ void fillPodcastList(struct filters lastFilters)
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
     }
 
-    addListItems((struct Gadget*)gadgets[GID_PODCAST_LISTBROWSER], &podcastList, podcastColInfo);
+    if ((itemsCnt != ~0UL) && (itemsCnt > 0))
+    {
+      addListItems((struct Gadget*)gadgets[GID_PODCAST_LISTBROWSER], &podcastList, podcastColInfo);
+    }
   }
 }
 
@@ -541,6 +543,8 @@ static void fillEpisodesList(ULONG feedID)
   if (getEpisodesByID(feedID))
   {
     size_t itemsCnt = getPodcastEpisodeList(&podcastEpisodeList, 0);
+
+    IDOS->Printf("DBG: fillEpisodesList %ld\n", itemsCnt);
 
     if (itemsCnt == ~0UL)
     {
@@ -552,7 +556,34 @@ static void fillEpisodesList(ULONG feedID)
       char notFoundMsg[] = "The selected podcast has no episodes!";
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
     }
-    
-    addListItems((struct Gadget*)gadgets[GID_PODCAST_EPISODES_LISTBROWSER], &podcastEpisodeList, podcastEpisodeColInfo);
+
+    if ((itemsCnt != ~0UL) && (itemsCnt > 0))
+    {
+      addListItems((struct Gadget*)gadgets[GID_PODCAST_EPISODES_LISTBROWSER], &podcastEpisodeList, podcastEpisodeColInfo);
+    }
+  }
+}
+
+void playPodcast(struct Node *res_node)
+{
+  if (res_node)
+  {
+    struct podcastEpisodeInfo *itemData = NULL;
+    itemData = (struct podcastEpisodeInfo *)IExec->AllocVecTags(sizeof(struct podcastEpisodeInfo),
+          AVT_Type,            MEMF_PRIVATE,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+
+    IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+          LBNA_UserData, &itemData,
+          TAG_DONE);
+
+    STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", itemData->enclosureUrl);
+    IDOS->SystemTags( cmd,
+        SYS_Input,    ZERO,
+        SYS_Output,   NULL,
+        SYS_Error,    ZERO,
+        SYS_Asynch,   TRUE,
+        TAG_DONE);
   }
 }

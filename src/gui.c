@@ -443,6 +443,15 @@ void showGUI(void)
                           }
                         }
                         break;
+                      case GID_PODCAST_PLAY_BUTTON:
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          if (res_node)
+                          {
+                            playPodcast((struct Node *)res_node);
+                          }
+                        }
+                        break;
                     }
                     break;
                 }
@@ -516,6 +525,7 @@ void showGUI(void)
           IIntuition->DisposeObject(objects[OID_PODCAST_AVATAR_IMAGE]);
 
           IIntuition->DisposeObject(objects[OID_PLAY_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_PODCAST_PLAY_IMAGE]);
 
           IIntuition->DisposeObject(menus[MID_PROJECT]);
         }

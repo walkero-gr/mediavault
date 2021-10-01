@@ -86,11 +86,13 @@ DONE - Add a new browserlist for the podcast episodes
 DONE - When the user clicks on a podcast title, the right sidebar should be updated and the episodes
  browserlist should get filled up with the latest episodes
 DONE - When the user clicks on an episode add info at the right sidebar and enable the play button
-- When the play button is clicked AmigaAmp3 should start playing the episode
+DONE - When the play button is clicked AmigaAmp3 should start playing the episode
 - When a podcast episodes list is filled but the user selects an other podcast that has no
  episodes, the list should be cleared.
+- Add a check if the podcast name is empty
 - Mark podcasts as favorites
 - Download podcast episodes
+- Add more filters, like categories, language etc.
 
 ## UPnP
 - Create a unique list of the UPnP servers
