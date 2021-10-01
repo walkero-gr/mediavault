@@ -53,22 +53,6 @@ static size_t gotData(STRPTR buf, size_t itemSize, size_t numItems, void *userDa
   return bytes;
 }
 
-static size_t write_data(void *ptr, size_t itemSize, size_t numItems, void *stream)
-{
-  size_t written = fwrite(ptr, itemSize, numItems, (FILE *)stream);
-  return written;
-}
-
-static size_t gotDataNoBody(STRPTR buf, size_t itemSize, size_t numItems, void *userData)
-{
-  size_t bytes = itemSize * numItems;
-  struct memory *mem = (struct memory *)userData;
-  if (buf) buf = NULL;
-  mem->size += bytes;
-
-  return bytes;
-}
-
 void cleanupHTTPRequest(void)
 {
   if (response.body) response.body = NULL;
@@ -126,9 +110,7 @@ void doHTTPRequest(STRPTR url)
       {
         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
       }
-      /*
-      else
-      */
+
       if(res == CURLE_OK)
       {
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
@@ -152,9 +134,6 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    // TODO: Change the logic to do one call, rather than two.
-    //       Maybe get the file into memory and if it is the right extension,
-    //       then save it to a file and clear the memory
     curl = curl_easy_init();
     if(curl) {
       curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -168,7 +147,7 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
       curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 3L);
       curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 
-      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, gotDataNoBody);
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, gotData);
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
 
       res = curl_easy_perform(curl);
@@ -176,6 +155,10 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
       {
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
         curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
+      }
+      else
+      {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
       }
 
       curl_easy_cleanup(curl);
@@ -185,21 +168,7 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
       {
         char targetFile[cacheFilenameSize];
         FILE *pagefile;
-
-        curl = curl_easy_init();
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
-
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-        //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 3L);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-
+        
         strcpy(targetFile, destination);
         strcat(targetFile, filename);
         strcat(targetFile, ext);
@@ -207,24 +176,15 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
         pagefile = fopen(targetFile, "wb");
         if (pagefile)
         {
-          curl_easy_setopt(curl, CURLOPT_WRITEDATA, pagefile);
-
-          res = curl_easy_perform(curl);
-
-          if(res == CURLE_OK)
-          {
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
-            curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
-
-            result = TRUE;
-          }
-
-          fclose(pagefile);
+          fwrite(response.body, 1, response.size, pagefile);
+          result = TRUE;
         }
 
-        curl_easy_cleanup(curl);
+        fclose(pagefile);
       }
+
     }
+    cleanupHTTPRequest();
     curl_global_cleanup();
   }
 

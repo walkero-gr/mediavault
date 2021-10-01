@@ -35,16 +35,6 @@ int listCount(struct List *);
 BOOL appHide(uint32, Object *, uint32);
 struct Window *appUnhide(uint32, Object *);
 void freeList(struct List *, int);
-/*
-void freePodcastList(
-  struct List *,
-  void (*freeUserDataCallback)(struct podcastInfo *)
-);
-void freePodcastEpisodeList(
-  struct List *,
-  void (*freeUserDataCallback)(struct podcastEpisodeInfo *)
-);
-*/
 void showAvatarImage(STRPTR, STRPTR, Object *, Object *, struct RenderHook *);
 ULONG renderfunct(struct RenderHook *, Object *, struct gpRender *);
 void workOnUpdate(void);

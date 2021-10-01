@@ -40,7 +40,7 @@ DONE - [v1.3] Download avatar images in cache folder
 DONE - [v1.3] Add play button at the right sidebar menu and replace double click
 DONE - [v1.3] Selfupdate process
 DONE - [v1.3] Add libcurl support
-- Simplify downloadFile() to make one http request
+DONE - Simplify downloadFile() to make one http request
 - Add progress window at the Selfupdate process
 DONE - [v1.3] Add new icons in the archive, the ones that IconDesigner created
 DONE - [v1.3] Fix icons' positions
@@ -84,12 +84,12 @@ DONE - Use the Podcasts online service and get the first data
 DONE - Parse the Podcasts JSON data and fill up the browserlist
 DONE - Add a new browserlist for the podcast episodes
 DONE - When the user clicks on a podcast title, the right sidebar should be updated and the episodes
- browserlist should get filled up with the latest episodes
+       browserlist should get filled up with the latest episodes
 DONE - When the user clicks on an episode add info at the right sidebar and enable the play button
 DONE - When the play button is clicked AmigaAmp3 should start playing the episode
 - When a podcast episodes list is filled but the user selects an other podcast that has no
- episodes, the list should be cleared.
-- Add a check if the podcast name is empty
+  episodes, the list should be cleared.
+- Add a check if the podcast name is empty when Discover button is pressed
 - Mark podcasts as favorites
 - Download podcast episodes
 - Add more filters, like categories, language etc.

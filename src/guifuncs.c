@@ -39,8 +39,6 @@ struct releaseInfo {
   char changes[1024];
 };
 static struct releaseInfo *release = NULL;
-//extern struct RenderHook *renderhook;
-//extern struct RenderHook *podcastImageRHook;
 
 uint32 cacheFilenameSize = 128;
 

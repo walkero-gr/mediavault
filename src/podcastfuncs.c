@@ -25,8 +25,8 @@
 #include "secrets.h"
 
 static CONST_STRPTR podcastAPIUrl = "https://api.podcastindex.org/api/1.0";
-//static uint8 maxResults = 100;
-static uint8 maxEpisodesResults = 50;
+static uint8 maxResults = 100;
+static uint8 maxEpisodesResults = 100;
 
 static void fillEpisodesList(ULONG);
 
@@ -49,16 +49,13 @@ static void addRequestHeaders(void)
 
   IUtility->Strlcpy(buf, "X-Auth-Key: " PODCASTINDEX_KEY, sizeof(char) * 90);
   addRequestHeader(buf);
-  IDOS->Printf("X-Auth-Key: %s\n", buf);
 
   IUtility->SNPrintf(buf, sizeof(char) * 90, "X-Auth-Date: %lu", nowSecondsUTC);
   addRequestHeader(buf);
-  IDOS->Printf("X-Auth-Date: %s\n", buf);
 
   IUtility->Strlcpy(buf, "Authorization: ", sizeof(char) * 90);
   IUtility->Strlcat(buf, SHA1Encrypt(authString), sizeof(char) * 90);
   addRequestHeader(buf);
-  IDOS->Printf("Authorization: %s\n", buf);
 
   IExec->FreeVec(buf);
 }
@@ -68,8 +65,7 @@ static BOOL getPodcasts(struct filters lastFilters, int offset)
   BOOL success = FALSE;
   char url[255];
 
-  IUtility->Strlcpy(url, podcastAPIUrl, sizeof(url));
-  IUtility->Strlcat(url, "/search/byterm?", sizeof(url));
+  IUtility->SNPrintf(url, sizeof(url), "%s/search/byterm?max=%ld", podcastAPIUrl, maxResults);
 
   // TODO: Check if there is offset in podcast API and use it here
   if (offset > 0)
@@ -87,7 +83,7 @@ static BOOL getPodcasts(struct filters lastFilters, int offset)
   if (IUtility->Stricmp(lastFilters.name, ""))
   {
     STRPTR encSelName = urlEncode(lastFilters.name);
-    IUtility->Strlcat(url, "q=", sizeof(url));
+    IUtility->Strlcat(url, "&q=", sizeof(url));
     IUtility->Strlcat(url, encSelName, sizeof(url));
     IExec->FreeVec(encSelName);
   }
@@ -96,9 +92,6 @@ static BOOL getPodcasts(struct filters lastFilters, int offset)
   doHTTPRequest(url);
   if (getResponseCode() == 200)
     success = TRUE;
-
-  //IDOS->Printf("DBG: url: %s\n", url);
-  //IDOS->Printf("\n\n%s\n", getResponseBody());
 
   return success;
 }
@@ -284,7 +277,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
 
     for(cnt = 0; cnt < IJansson->json_array_size(feeds); cnt++)
     {
-      IDOS->Printf("===================================\n\nDBG1: cnt %ld\n", cnt);
       struct Node *itemNode;
       struct podcastEpisodeInfo *itemData = NULL;
       json_t *data, *buf;
@@ -305,7 +297,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_integer(buf))
       {
         IJansson->json_decref(jsonRoot);
-        IDOS->Printf("DBG: 1\n");
         return ~0UL;
       }
       itemData->id = (ULONG)IJansson->json_integer_value(buf);
@@ -314,7 +305,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
-        IDOS->Printf("DBG: 2\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->title, charConv(IJansson->json_string_value(buf)), sizeof(itemData->title));
@@ -323,7 +313,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
-        IDOS->Printf("DBG: 3\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->datePublishedPretty, IJansson->json_string_value(buf), sizeof(itemData->datePublishedPretty));
@@ -332,7 +321,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
-        IDOS->Printf("DBG: 4\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->enclosureUrl, IJansson->json_string_value(buf), sizeof(itemData->enclosureUrl));
@@ -341,7 +329,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
-        IDOS->Printf("DBG: 5\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->description, charConv(IJansson->json_string_value(buf)), sizeof(itemData->description));
@@ -350,7 +337,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_string(buf))
       {
         IJansson->json_decref(jsonRoot);
-        IDOS->Printf("DBG: 6\n");
         return ~0UL;
       }
       IUtility->Strlcpy(itemData->image, IJansson->json_string_value(buf), sizeof(itemData->image));
@@ -359,7 +345,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       if(!json_is_integer(buf))
       {
         IJansson->json_decref(jsonRoot);
-        IDOS->Printf("DBG: 7\n");
         return ~0UL;
       }
       itemData->feedId = (ULONG)IJansson->json_integer_value(buf);
@@ -415,8 +400,15 @@ void showPodcastInfo(struct Node *res_node)
           TAG_DONE);
 
     IUtility->SNPrintf(infoText, sizeof(infoText), "%s\n\n%s\n", podcastData->title, podcastData->description);
+
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_INFO_DATA], windows[WID_MAIN], NULL,
+          GA_TEXTEDITOR_Contents,   infoText,
+          TAG_DONE);
+    
+    fillEpisodesList(podcastData->id);
+
     IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", podcastData->id);
-    /*
+
     if (IUtility->Stricmp(itemUID, ""))
     {
       showAvatarImage(
@@ -425,13 +417,6 @@ void showPodcastInfo(struct Node *res_node)
         podcastImageRenderHook
       );
     }
-    */
-
-    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_INFO_DATA], windows[WID_MAIN], NULL,
-          GA_TEXTEDITOR_Contents,   infoText,
-          TAG_DONE);
-    
-    fillEpisodesList(podcastData->id);
   }
 }
 
@@ -484,15 +469,12 @@ static BOOL getEpisodesByID(ULONG feedID)
   {
     char url[255];
 
-    IUtility->SNPrintf(url, sizeof(url), "%s/episodes/byfeedid?id=%lu&max=%ld&pretty=", podcastAPIUrl, feedID, maxEpisodesResults);
-    IDOS->Printf("DBG: url: %s\n", url);
+    IUtility->SNPrintf(url, sizeof(url), "%s/episodes/byfeedid?id=%lu&max=%ld", podcastAPIUrl, feedID, maxEpisodesResults);
     
     addRequestHeaders();
     doHTTPRequest(url);
     if (getResponseCode() == 200)
       success = TRUE;
-
-    IDOS->Printf("\n\n%s\n", getResponseBody());
   }
 
   return success;
@@ -543,8 +525,6 @@ static void fillEpisodesList(ULONG feedID)
   if (getEpisodesByID(feedID))
   {
     size_t itemsCnt = getPodcastEpisodeList(&podcastEpisodeList, 0);
-
-    IDOS->Printf("DBG: fillEpisodesList %ld\n", itemsCnt);
 
     if (itemsCnt == ~0UL)
     {
