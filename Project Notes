@@ -31,7 +31,8 @@ DONE - Add a message window/requester
 - Create documentation in amigaguide format
 - Add status bar at the bottom of the window for info
 DONE - Added Unicode conversion to system charset on radio station names
-- Find a way to use different codesets and charsets based on station language on Unicode conversion
+- Find a way to use different codesets and charsets based on station language
+  on Unicode conversion (charset.library ???)
 DONE - Application registration
 DONE - Window can jump screen
 DONE - Window size and position can be saved
@@ -49,9 +50,11 @@ DONE - [v1.3] Fixed the version string to include the application name
 DONE - [v1.3] Add COPYING/LICENSE files for the used libs
 - Include in the package all the necessary AISS icons
 - Add more comments in sources for every function and file
+- Add icons at the left sidebar based on the item
 
 ## Radio
-DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
+DONE - Add Radio filter section with fields at the top of the window (Genre,
+        Language, Country, Name)
 DONE - Make request based on info at the search fields
 DONE - Parse JSON response
 DONE - Break getRadioStations() to smaller methods
@@ -77,26 +80,31 @@ DONE - Show avatar images at the right sidebar
 - Add a call to the API when a user selects a radio station to listen to
 
 ## Podcasts
-DONE - Add Podcasts page at the left sidebar
-DONE - Add first fields to search for a podcast, which should be a name field and a discover button
-DONE - Add the browserlist for the podcasts
-DONE - Use the Podcasts online service and get the first data
-DONE - Parse the Podcasts JSON data and fill up the browserlist
-DONE - Add a new browserlist for the podcast episodes
-DONE - When the user clicks on a podcast title, the right sidebar should be updated and the episodes
-       browserlist should get filled up with the latest episodes
-DONE - When the user clicks on an episode add info at the right sidebar and enable the play button
-DONE - When the play button is clicked AmigaAmp3 should start playing the episode
-- When a podcast episodes list is filled but the user selects an other podcast that has no
-  episodes, the list should be cleared.
-DONE - Add a check if the podcast name is empty when Discover button is pressed
+DONE - [v1.4] Add Podcasts page at the left sidebar
+DONE - [v1.4] Add first fields to search for a podcast, which should be a name
+              field and a discover button
+DONE - [v1.4] Add the browserlist for the podcasts
+DONE - [v1.4] Use the Podcasts online service and get the first data
+DONE - [v1.4] Parse the Podcasts JSON data and fill up the browserlist
+DONE - [v1.4] Add a new browserlist for the podcast episodes
+DONE - [v1.4] When the user clicks on a podcast title, the right sidebar should
+              be updated and the episodes browserlist should get filled up with
+              the latest episodes
+DONE - [v1.4] When the user clicks on an episode add info at the right sidebar
+              and enable the play button
+DONE - [v1.4] When the play button is clicked AmigaAmp3 should start playing
+              the episode
+- When a podcast episodes list is filled but the user selects an other podcast that has no episodes, the list should be cleared.
+DONE - [v1.4] Add a check if the podcast name is empty when Discover button is
+              pressed
 - Mark podcasts as favorites
 - Download podcast episodes
 - Add more filters, like categories, language etc.
 
 ## UPnP
 - Create a unique list of the UPnP servers
-- Get the server metadata for each UPnP server and add them at the UPnP server list
+- Get the server metadata for each UPnP server and add them at the UPnP server
+  list
 - Make a SOAP request function
 - Create the first browse request
 - Create server list
