@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.4.0] - future
+## [1.4.0] - 2021-10-05
 ### Added
 - You can now search for podcasts based on their title, see info
   and their avatar and a list of the latest 100 episodes
