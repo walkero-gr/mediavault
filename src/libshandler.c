@@ -16,6 +16,9 @@ struct Library *GraphicsBase;     struct GraphicsIFace      *IGraphics;
 struct Library *LayersBase;       struct LayersIFace        *ILayers;
 struct Library *IconBase;         struct IconIFace          *IIcon;
 struct Library *JanssonBase;      struct JanssonIFace       *IJansson;
+struct Library *TTimerBase;       struct TimerIFace         *ITimer;
+struct MsgPort *TimerMP;          struct TimeRequest        *TimeReq;
+struct Library *TimezoneBase;     struct TimezoneIFace      *ITimezone;
 
 struct ClassLibrary *BitMapBase;
 struct ClassLibrary *ButtonBase;
@@ -65,8 +68,19 @@ int CleanExit(const char *str)
   if(IJansson)          IExec->DropInterface((struct Interface *) IJansson);
   if(JanssonBase)       IExec->CloseLibrary(JanssonBase);
 
+  if(ITimer)            IExec->DropInterface((struct Interface *) ITimer);
+  if(TimeReq)
+  {
+    IExec->CloseDevice((struct IORequest *) TimeReq);
+    IExec->FreeSysObject(ASOT_IOREQUEST, TimeReq);
+  }
+  if(TimerMP)           IExec->FreeSysObject(ASOT_PORT, TimerMP);
+
   if(IIcon)             IExec->DropInterface((struct Interface *) IIcon);
   if(IconBase)          IExec->CloseLibrary(IconBase);
+
+  if(ITimezone)         IExec->DropInterface((struct Interface *) ITimezone);
+  if(TimezoneBase)      IExec->CloseLibrary(TimezoneBase);
 
   if(ILayers)           IExec->DropInterface((struct Interface *) ILayers);
   if(LayersBase)        IExec->CloseLibrary(LayersBase);
@@ -140,7 +154,38 @@ int OpenLibs(void)
     IIcon = (struct IconIFace *)IExec->GetInterface( IconBase, "main", 1, NULL );
     if(!IIcon) return CleanExit("Can't open icon.library Interface");
   }
-  else return CleanExit("Can't open icon.library version 53");
+  else return CleanExit("Can't open icon.library version 54");
+
+  if ((TimezoneBase = IExec->OpenLibrary( "timezone.library", 53 )))
+  {
+    ITimezone = (struct TimezoneIFace *)IExec->GetInterface( TimezoneBase, "main", 1, NULL );
+    if(!ITimezone) return CleanExit("Can't open timezone.library Interface");
+  }
+  else return CleanExit("Can't open timezone.library version 53");
+
+  TimerMP = IExec->AllocSysObject(ASOT_PORT, NULL);
+  if (TimerMP != NULL)
+  {
+    TimeReq = IExec->AllocSysObjectTags(ASOT_IOREQUEST,
+        ASOIOR_Size,        sizeof(struct TimeRequest),
+        ASOIOR_ReplyPort,   TimerMP,
+        TAG_END);
+
+    if (TimeReq != NULL)
+    {
+      if (!IExec->OpenDevice(TIMERNAME, UNIT_VBLANK, (struct IORequest *)TimeReq, 0))
+      {
+        if ((TTimerBase = (struct Library *)TimeReq->Request.io_Device))
+        {
+          ITimer = (struct TimerIFace *)IExec->GetInterface(TTimerBase, "main", 1, NULL);
+          if(!ITimer) return CleanExit("Can't open timer device Interface");
+        }
+        else return CleanExit("Can't open timer device");
+      }
+    }
+    else return CleanExit("Can't open timer device. Timer request failed.");
+  }
+  else return CleanExit("Can't open timer device. Timer msgport failed.");
 
   if ((JanssonBase = IExec->OpenLibrary( "jansson.library", 2 )))
   {

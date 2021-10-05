@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - future
+### Added
+- You can now search for podcasts based on their title, see info
+  and their avatar and a list of the latest 100 episodes
+- By selecting an episode and clicking the play button the audio
+  is loaded to the player and starts playing
+
+### Fixed
+- Changed the way the avatar images are downloaded, which is now
+  faster and solves a lot of errors with network access, which
+  resulted connection error messages to appear.
+
+
 ## [1.3.0] - 2021-09-08
 ### Added
 - Added right sidebar with station info and avatar image, wherever

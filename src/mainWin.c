@@ -136,10 +136,14 @@ CONST_STRPTR countries[] =
 
 extern struct List leftSidebarList;
 extern struct RenderHook *renderhook;
+extern struct RenderHook *podcastImageRenderHook;
 
 static Object *buildRadioSearchPage(void);
 static Object *buildRadioPopularPage(void);
 static Object *buildRadioTrendPage(void);
+static Object *buildPodcastSearchPage(void);
+static Object *buildRadioRightSidebar(struct Screen *, struct RenderHook *);
+static Object *buildPodcastRightSidebar(struct Screen *, struct RenderHook *);
 
 static const ULONG listToPage[] = {
     LISTBROWSER_Selected,    PAGE_Current,
@@ -161,34 +165,30 @@ extern Class *WindowClass;
 Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen *screen)
 {                                           
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
+  renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
+        ASOHOOK_Size,  sizeof(struct RenderHook),
+        ASOHOOK_Entry, (HOOKFUNC)renderfunct,
+        TAG_END);
+
+  podcastImageRenderHook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
+        ASOHOOK_Size,  sizeof(struct RenderHook),
+        ASOHOOK_Entry, (HOOKFUNC)renderfunct,
+        TAG_END);
 
   Object *radioPages = IIntuition->NewObject(NULL, "page.gadget",
         LAYOUT_DeferLayout, TRUE,
         PAGE_Add, gadgets[GID_PAGE_1] = buildRadioSearchPage(),
         PAGE_Add, gadgets[GID_PAGE_2] = buildRadioPopularPage(),
         PAGE_Add, gadgets[GID_PAGE_3] = buildRadioTrendPage(),
+        PAGE_Add, gadgets[GID_PAGE_4] = buildPodcastSearchPage(),
         TAG_DONE);
 
-  objects[OID_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        GA_ID,              OID_AVATAR_IMAGE,
-        IA_Scalable,        FALSE,
-        BITMAP_Screen,      screen,
-        BITMAP_SourceFile,  LOGO_IMAGE,
-        BITMAP_Masking,     TRUE,
-        TAG_END);
-
-  renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
-        ASOHOOK_Size,  sizeof(struct RenderHook),
-        ASOHOOK_Entry, (HOOKFUNC)renderfunct,
-        TAG_END);
-
-  if (renderhook && objects[OID_AVATAR_IMAGE])
-  {
-    renderhook->img  = objects[OID_AVATAR_IMAGE];
-    renderhook->w    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Width;
-    renderhook->h    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Height;
-    renderhook->fill = FALSE;
-  }
+  //Object *rightSidebarPages = IIntuition->NewObject(NULL, "page.gadget",
+  objects[OID_RIGHT_SIDEBAR_PAGES] = IIntuition->NewObject(NULL, "page.gadget",
+        LAYOUT_DeferLayout, TRUE,
+        PAGE_Add, gadgets[GID_RIGHT_SIDEBAR_PAGE_1] = buildRadioRightSidebar(screen, renderhook),
+        PAGE_Add, gadgets[GID_RIGHT_SIDEBAR_PAGE_2] = buildPodcastRightSidebar(screen, podcastImageRenderHook),
+        TAG_DONE);
 
   return IIntuition->NewObject(WindowClass, NULL,
     WA_ScreenTitle,         VSTRING,
@@ -241,68 +241,9 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
             LAYOUT_WeightBar, TRUE,
 
             // START - Right Sidebar
-            LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
-              LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
-
-              LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(SpaceClass, NULL,
-                GA_ID,                      GID_INFO_AVATAR,
-                SPACE_MinWidth,             128,
-                SPACE_MinHeight,            128,
-                SPACE_RenderHook,           renderhook,
-                GA_Image,                   objects[OID_AVATAR_IMAGE],
-                TAG_DONE),
-                CHILD_WeightedHeight, 30,
-
-              LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
-                LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
-                LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
-                  TAG_DONE),
-                  CHILD_WeightedWidth, 30,
-
-                LAYOUT_AddChild, gadgets[GID_INFO_PLAY_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
-                  GA_ID,                      GID_INFO_PLAY_BUTTON,
-                  GA_Disabled,                TRUE,
-                  BUTTON_Transparent,         TRUE,
-                  BUTTON_AutoButton,          0,
-                  BUTTON_BevelStyle,          BVS_NONE,
-                  BUTTON_Justification,       1,
-                  BUTTON_RenderImage, objects[OID_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-                    BITMAP_SourceFile,            "tbimages:td_tn_play",
-                    BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",
-                    BITMAP_SelectSourceFile,      "tbimages:td_tn_play_s",
-                    BITMAP_Screen,                screen,
-                    BITMAP_Precision,             PRECISION_EXACT,
-                    BITMAP_Masking,               TRUE,
-                    TAG_END),
-                  TAG_DONE),
-                  CHILD_MaxHeight, 60,
-                  CHILD_WeightedWidth, 40,
-
-                LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
-                  TAG_DONE),
-                  CHILD_WeightedWidth, 30,
-                TAG_DONE),
-                CHILD_MaxHeight, 60,
-              
-              LAYOUT_AddChild, gadgets[GID_INFO_RADIO_DATA] = IIntuition->NewObject(TextEditorClass, NULL,
-                GA_ID,                      GID_INFO_RADIO_DATA,
-                GA_RelVerify,               TRUE,
-                GA_TEXTEDITOR_BevelStyle,   BVS_NONE,
-                GA_TEXTEDITOR_Contents,     VERS,
-                GA_TEXTEDITOR_CursorX,      0,
-                GA_TEXTEDITOR_CursorY,      0,
-                GA_TEXTEDITOR_Flow,         GV_TEXTEDITOR_Flow_Center,
-                GA_TEXTEDITOR_ReadOnly,     TRUE,
-                GA_TEXTEDITOR_Transparent,  TRUE,
-                TAG_DONE),
-                CHILD_MaxHeight, 80,
-
-              LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
-                TAG_DONE),
-                CHILD_WeightedHeight, 40,
-              TAG_DONE),
-              CHILD_WeightedWidth, 30,
-              CHILD_MinWidth, 200,
+            LAYOUT_AddChild, gadgets[GID_RIGHT_SIDEBAR_PAGES] = objects[OID_RIGHT_SIDEBAR_PAGES],
+            CHILD_WeightedWidth, 30,
+            CHILD_MinWidth, 200,
             // END - Right Sidebar
 
          TAG_DONE),
@@ -529,7 +470,6 @@ static Object *buildRadioTrendPage(void)
 
 void getLeftSidebarContent(void)
 {
-
   IExec->NewList(&leftSidebarList);
 
   struct Node *node;
@@ -567,4 +507,255 @@ void getLeftSidebarContent(void)
   {
     IExec->AddTail( &leftSidebarList, node );
   }
+
+  node = IListBrowser->AllocListBrowserNode(1,
+    LBNA_Generation,    1,
+    LBNA_Column,        0,
+      LBNCA_CopyText,   TRUE,
+      LBNCA_Text,       "Podcast",
+    TAG_DONE);
+  if (node)
+  {
+    IExec->AddTail( &leftSidebarList, node );
+  }
+}
+
+static Object *buildPodcastSearchPage(void)
+{
+  return IIntuition->NewObject(LayoutClass, NULL,
+        LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+
+        // START - Top Filter Section
+        LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+          LAYOUT_BevelStyle,      BVS_GROUP,
+          LAYOUT_Label,           "Search Podcasts by",
+
+          // Top filter section with the Name Text Box with Label
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+            LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+            
+            LAYOUT_AddImage, IIntuition->NewObject(LabelClass, NULL,
+              //LABEL_DrawInfo, drInfo,
+              LABEL_Text, "_Title",
+              TAG_END),
+
+            LAYOUT_AddChild, gadgets[GID_PODCAST_FILTERS_NAME] = IIntuition->NewObject(StringClass, NULL,
+              GA_ID,                GID_PODCAST_FILTERS_NAME,
+              GA_RelVerify,         TRUE,
+              GA_TabCycle,          TRUE,
+              GA_ActivateKey,       "t",
+              STRINGA_MinVisible,   10,
+              STRINGA_MaxChars,     40,
+              TAG_DONE),
+
+            // Filters Button
+            LAYOUT_AddChild, gadgets[GID_PODCAST_FILTER_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,              GID_PODCAST_FILTER_BUTTON,
+              GA_Text,            "_Discover",
+              GA_TabCycle,        TRUE,
+              GA_RelVerify,       TRUE,
+              GA_ActivateKey,     "d",
+              TAG_DONE),
+
+            TAG_DONE),
+          TAG_DONE),
+          CHILD_WeightedHeight, 0,
+        // END - Top Filter Section
+
+        // START - Bottom List Section
+        LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+          
+          LAYOUT_AddChild, gadgets[GID_PODCAST_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+            GA_ID,                      GID_PODCAST_LISTBROWSER,
+            GA_RelVerify,               TRUE,
+            GA_TabCycle,                TRUE,
+            LISTBROWSER_ColumnTitles,   TRUE,
+            LISTBROWSER_HorizontalProp, TRUE,
+            LISTBROWSER_Separators,     TRUE,
+            LISTBROWSER_ShowSelected,   TRUE,
+            LISTBROWSER_Striping,       LBS_ROWS,
+            LISTBROWSER_SortColumn,     0,
+            LISTBROWSER_TitleClickable, TRUE,
+            TAG_DONE),
+          TAG_DONE),
+          CHILD_MinHeight,  300,
+          // END - Bottom List Section
+        
+        TAG_DONE);
+}
+
+static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *renderhook)
+{
+  objects[OID_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        GA_ID,              OID_AVATAR_IMAGE,
+        IA_Scalable,        FALSE,
+        BITMAP_Screen,      screen,
+        BITMAP_SourceFile,  LOGO_IMAGE,
+        BITMAP_Masking,     TRUE,
+        TAG_END);
+
+  if (renderhook && objects[OID_AVATAR_IMAGE])
+  {
+    renderhook->img  = objects[OID_AVATAR_IMAGE];
+    renderhook->w    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Width;
+    renderhook->h    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Height;
+    renderhook->fill = FALSE;
+  }
+
+  return IIntuition->NewObject(LayoutClass, NULL,
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+
+          LAYOUT_AddChild, gadgets[GID_INFO_AVATAR] = IIntuition->NewObject(SpaceClass, NULL,
+            GA_ID,                      GID_INFO_AVATAR,
+            SPACE_MinWidth,             128,
+            SPACE_MinHeight,            128,
+            SPACE_RenderHook,           renderhook,
+            GA_Image,                   objects[OID_AVATAR_IMAGE],
+            TAG_DONE),
+            CHILD_WeightedHeight, 30,
+
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+            LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 30,
+
+            LAYOUT_AddChild, gadgets[GID_INFO_PLAY_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,                      GID_INFO_PLAY_BUTTON,
+              GA_Disabled,                TRUE,
+              BUTTON_Transparent,         TRUE,
+              BUTTON_AutoButton,          0,
+              BUTTON_BevelStyle,          BVS_NONE,
+              BUTTON_Justification,       1,
+              BUTTON_RenderImage, objects[OID_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+                BITMAP_SourceFile,            "tbimages:td_tn_play",
+                BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",
+                BITMAP_SelectSourceFile,      "tbimages:td_tn_play_s",
+                BITMAP_Screen,                screen,
+                BITMAP_Precision,             PRECISION_EXACT,
+                BITMAP_Masking,               TRUE,
+                TAG_END),
+              TAG_DONE),
+              CHILD_MaxHeight, 60,
+              CHILD_WeightedWidth, 40,
+
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 30,
+            TAG_DONE),
+            CHILD_MaxHeight, 60,
+
+          LAYOUT_AddChild, gadgets[GID_INFO_RADIO_DATA] = IIntuition->NewObject(TextEditorClass, NULL,
+            GA_ID,                      GID_INFO_RADIO_DATA,
+            GA_RelVerify,               TRUE,
+            GA_TEXTEDITOR_BevelStyle,   BVS_NONE,
+            GA_TEXTEDITOR_Contents,     VERS,
+            GA_TEXTEDITOR_CursorX,      0,
+            GA_TEXTEDITOR_CursorY,      0,
+            GA_TEXTEDITOR_Flow,         GV_TEXTEDITOR_Flow_Center,
+            GA_TEXTEDITOR_ReadOnly,     TRUE,
+            GA_TEXTEDITOR_Transparent,  TRUE,
+            TAG_DONE),
+            CHILD_WeightedHeight, 18,
+
+          LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+            TAG_DONE),
+            CHILD_WeightedHeight, 40,
+
+          TAG_DONE);
+}
+
+static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook *renderhook)
+{
+  objects[OID_PODCAST_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        GA_ID,              OID_PODCAST_AVATAR_IMAGE,
+        IA_Scalable,        FALSE,
+        BITMAP_Screen,      screen,
+        BITMAP_SourceFile,  LOGO_IMAGE,
+        BITMAP_Masking,     TRUE,
+        TAG_END);
+
+  if (renderhook && objects[OID_PODCAST_AVATAR_IMAGE])
+  {
+    renderhook->img  = objects[OID_PODCAST_AVATAR_IMAGE];
+    renderhook->w    = ((struct Image *)objects[OID_PODCAST_AVATAR_IMAGE])->Width;
+    renderhook->h    = ((struct Image *)objects[OID_PODCAST_AVATAR_IMAGE])->Height;
+    renderhook->fill = FALSE;
+  }
+
+  return IIntuition->NewObject(LayoutClass, NULL,
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+
+          LAYOUT_AddChild, gadgets[GID_PODCAST_INFO_AVATAR] = IIntuition->NewObject(SpaceClass, NULL,
+            GA_ID,                      GID_PODCAST_INFO_AVATAR,
+            SPACE_MinWidth,             128,
+            SPACE_MinHeight,            128,
+            SPACE_RenderHook,           renderhook,
+            GA_Image,                   objects[OID_PODCAST_AVATAR_IMAGE],
+            TAG_DONE),
+            CHILD_WeightedHeight, 30,
+
+         LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+            LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 30,
+
+            LAYOUT_AddChild, gadgets[GID_PODCAST_PLAY_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,                      GID_PODCAST_PLAY_BUTTON,
+              GA_Disabled,                TRUE,
+              BUTTON_Transparent,         TRUE,
+              BUTTON_AutoButton,          0,
+              BUTTON_BevelStyle,          BVS_NONE,
+              BUTTON_Justification,       1,
+              BUTTON_RenderImage, objects[OID_PODCAST_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+                BITMAP_SourceFile,            "tbimages:td_tn_play",
+                BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",
+                BITMAP_SelectSourceFile,      "tbimages:td_tn_play_s",
+                BITMAP_Screen,                screen,
+                BITMAP_Precision,             PRECISION_EXACT,
+                BITMAP_Masking,               TRUE,
+                TAG_END),
+              TAG_DONE),
+              CHILD_MaxHeight, 60,
+              CHILD_WeightedWidth, 40,
+
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 30,
+            TAG_DONE),
+            CHILD_MaxHeight, 60,
+
+          LAYOUT_AddChild, gadgets[GID_PODCAST_INFO_DATA] = IIntuition->NewObject(TextEditorClass, NULL,
+            GA_ID,                      GID_PODCAST_INFO_DATA,
+            GA_RelVerify,               TRUE,
+            GA_TEXTEDITOR_BevelStyle,   BVS_NONE,
+            GA_TEXTEDITOR_Contents,     VERS,
+            GA_TEXTEDITOR_CursorX,      0,
+            GA_TEXTEDITOR_CursorY,      0,
+            GA_TEXTEDITOR_Flow,         GV_TEXTEDITOR_Flow_Center,
+            GA_TEXTEDITOR_ReadOnly,     TRUE,
+            GA_TEXTEDITOR_Transparent,  TRUE,
+            TAG_DONE),
+            CHILD_WeightedHeight, 18,
+          
+          LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+            TAG_DONE),
+            CHILD_WeightedHeight, 2,
+
+          LAYOUT_AddChild, gadgets[GID_PODCAST_EPISODES_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+            GA_ID,                      GID_PODCAST_EPISODES_LISTBROWSER,
+            GA_RelVerify,               TRUE,
+            GA_TabCycle,                TRUE,
+            LISTBROWSER_ColumnTitles,   TRUE,
+            LISTBROWSER_HorizontalProp, TRUE,
+            LISTBROWSER_Separators,     TRUE,
+            LISTBROWSER_ShowSelected,   TRUE,
+            LISTBROWSER_Striping,       LBS_ROWS,
+            TAG_DONE),
+            CHILD_WeightedHeight, 40,
+
+          TAG_DONE);
 }

@@ -24,7 +24,7 @@
 #endif
 
 #ifndef REVISION
-#define REVISION 3
+#define REVISION 4
 #endif
 
 #ifndef PATCH

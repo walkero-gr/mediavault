@@ -27,24 +27,24 @@
 #include "podcastfuncs.h"
 #include "httpfuncs.h"
 
-static struct ColumnInfo *columnInfo, *leftSidebarCI;
+struct ColumnInfo *columnInfo, *leftSidebarCI,
+            *podcastColInfo, *podcastEpisodeColInfo;
 struct List radioList,
             radioPopularList,
             radioTrendList,
-            leftSidebarList;
+            leftSidebarList,
+            podcastList,
+            podcastEpisodeList;
 
-struct filters lastFilters, prevFilters,
-               lastPodcastFilters;
+struct filters  lastFilters,
+                prevFilters;
+
 struct RenderHook *renderhook;
+struct RenderHook *podcastImageRenderHook;
 
 static void fillLeftSidebar(void);
-static void fillRadioList(BOOL);
-static void fillRadioPopularList(void);
-static void fillRadioTrendList(void);
 static BOOL checkFiltersChanged(void);
-static void changeDiscoverButton(BOOL);
 
-extern uint8 maxRadioResults;
 extern struct memory response;
 
 void showGUI(void)
@@ -83,6 +83,7 @@ void showGUI(void)
                   selectedMenu = MID_LAST;
           uint16 code = 0;
           BOOL done = FALSE;
+          struct filters lastPodcastFilters;
 
           fillLeftSidebar();
 
@@ -108,6 +109,34 @@ void showGUI(void)
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
                 LBCIA_Weight,               10,
+              TAG_DONE);
+
+          podcastColInfo = IListBrowser->AllocLBColumnInfo( 2,
+              LBCIA_Column,                 0,
+                LBCIA_Title,                " Title",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               80,
+              LBCIA_Column,                 1,
+                LBCIA_Title,                " Language",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               20,
+              TAG_DONE);
+
+          podcastEpisodeColInfo = IListBrowser->AllocLBColumnInfo( 2,
+              LBCIA_Column,                 0,
+                LBCIA_Title,                " Title",
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Weight,               80,
+              LBCIA_Column,                 1,
+                LBCIA_Title,                " Released",
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Weight,               20,
               TAG_DONE);
 
           //## Register MediaVault as an application
@@ -257,19 +286,17 @@ void showGUI(void)
                     switch (result & WMHI_GADGETMASK)
                     {
                       case GID_FILTER_BUTTON:
-                        IUtility->Strlcpy(lastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastFilters.name));
-
-                        windowBlocking(objects[OID_MAIN], TRUE);
-                        if(checkFiltersChanged())
                         {
-                          changeDiscoverButton(FALSE);
-                          fillRadioList(TRUE);
+                          BOOL filtersChanged = checkFiltersChanged();
+                          IUtility->Strlcpy(lastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastFilters.name));
+
+                          windowBlocking(objects[OID_MAIN], TRUE);
+
+                          changeDiscoverButton(!filtersChanged);
+                          fillRadioList(lastFilters, filtersChanged);
+                          
+                          windowBlocking(objects[OID_MAIN], FALSE);
                         }
-                        else {
-                          changeDiscoverButton(TRUE);
-                          fillRadioList(FALSE);
-                        }
-                        windowBlocking(objects[OID_MAIN], FALSE);
                         break;
 
                       case GID_FILTERS_NAME:
@@ -338,7 +365,11 @@ void showGUI(void)
                         IIntuition->GetAttr(LISTBROWSER_Selected, gadgets[GID_LEFT_SIDEBAR], &lsbNodeIdx);
                         switch (lsbNodeIdx)
                         {
+                          case 0:
+                            switchRightSidebar(PAGE_RADIO_INFO);
+                            break;
                           case 1:
+                            switchRightSidebar(PAGE_RADIO_INFO);
                             if(listCount(&radioPopularList) == 0)
                             {
                               windowBlocking(objects[OID_MAIN], TRUE);
@@ -347,6 +378,7 @@ void showGUI(void)
                             }
                             break;
                           case 2:
+                            switchRightSidebar(PAGE_RADIO_INFO);
                             if(listCount(&radioTrendList) == 0)
                             {
                               windowBlocking(objects[OID_MAIN], TRUE);
@@ -354,6 +386,76 @@ void showGUI(void)
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                             break;
+                          case 3:
+                            switchRightSidebar(PAGE_PODCAST_INFO);
+                            break;
+                        }
+                        break;
+
+                      case GID_PODCAST_FILTER_BUTTON:
+                        // TODO: Add check if the name has a value
+                        IUtility->Strlcpy(lastPodcastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastPodcastFilters.name));
+                        if (IUtility->Stricmp(lastPodcastFilters.name, ""))
+                        {
+                          windowBlocking(objects[OID_MAIN], TRUE);
+                          fillPodcastList(lastPodcastFilters);
+                          windowBlocking(objects[OID_MAIN], FALSE);
+                        }
+                        else
+                        {
+                          char notFoundMsg[] = "Please, add the podcast title you want to search!";
+                          showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (char *)notFoundMsg, 0, NULL, 0);
+                        }
+                        break;
+
+                      case GID_PODCAST_LISTBROWSER:
+                        {
+                          Object *lb = NULL;
+
+                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_LISTBROWSER)
+                          {
+                            lb = gadgets[GID_PODCAST_LISTBROWSER];
+
+                            IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+                            if (res_value == LBRE_NORMAL)
+                            {                     
+                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+
+                              windowBlocking(objects[OID_MAIN], TRUE);
+                              showPodcastInfo((struct Node *)res_node);
+                              windowBlocking(objects[OID_MAIN], FALSE);
+                            }
+                          }
+                        }
+                        break;
+
+                      case GID_PODCAST_EPISODES_LISTBROWSER:
+                        {
+                          Object *lb = NULL;
+
+                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_EPISODES_LISTBROWSER)
+                          {
+                            lb = gadgets[GID_PODCAST_EPISODES_LISTBROWSER];
+
+                            IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+                            if (res_value == LBRE_NORMAL)
+                            {
+                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+
+                              windowBlocking(objects[OID_MAIN], TRUE);
+                              showPodcastEpisodeInfo((struct Node *)res_node);
+                              windowBlocking(objects[OID_MAIN], FALSE);
+                            }
+                          }
+                        }
+                        break;
+                      case GID_PODCAST_PLAY_BUTTON:
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          if (res_node)
+                          {
+                            playPodcast((struct Node *)res_node);
+                          }
                         }
                         break;
                     }
@@ -393,29 +495,43 @@ void showGUI(void)
           IListBrowser->FreeLBColumnInfo(columnInfo);
           if(listCount(&radioList))
           {
-            freeList(&radioList, freeStationInfo);
+            freeList(&radioList, STRUCT_STATION_INFO);
           }
 
           if(listCount(&radioPopularList))
           {
-            freeList(&radioPopularList, freeStationInfo);
+            freeList(&radioPopularList, STRUCT_STATION_INFO);
           }
 
           if(listCount(&radioTrendList))
           {
-            freeList(&radioTrendList, freeStationInfo);
+            freeList(&radioTrendList, STRUCT_STATION_INFO);
           }
 
           IListBrowser->FreeLBColumnInfo(leftSidebarCI);
           IListBrowser->FreeListBrowserList(&leftSidebarList);
 
+          IListBrowser->FreeLBColumnInfo(podcastColInfo);
+          if(listCount(&podcastList))
+          {
+            freeList(&podcastList, STRUCT_PODCAST_INFO);
+          }
+          IListBrowser->FreeLBColumnInfo(podcastEpisodeColInfo);
+          if(listCount(&podcastEpisodeList))
+          {
+            freeList(&podcastEpisodeList, STRUCT_PODCAST_EPISODE_INFO);
+          }
+
           IIntuition->DisposeObject(objects[OID_ABOUT]);
           IIntuition->DisposeObject(objects[OID_MAIN]);
 
           IExec->FreeSysObject(ASOT_HOOK, renderhook);
+          IExec->FreeSysObject(ASOT_HOOK, podcastImageRenderHook);
           IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_PODCAST_AVATAR_IMAGE]);
 
           IIntuition->DisposeObject(objects[OID_PLAY_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_PODCAST_PLAY_IMAGE]);
 
           IIntuition->DisposeObject(menus[MID_PROJECT]);
         }
@@ -428,90 +544,6 @@ void showGUI(void)
 
   if (appID) IApplication->UnregisterApplicationA(appID, NULL);
   IExec->FreeSysObject(ASOT_PORT, appPort);
-}
-
-static BOOL listStations(
-  struct Gadget *listbrowser,
-  struct List *list,
-  int offset,
-  char *notFoundMsg,
-  void (*maxResultCallback)(BOOL)
-) {
-  size_t stationsCnt = 0;
-  BOOL success = FALSE;
-
-  stationsCnt = getRadioList(list, offset);
-
-  if (stationsCnt == ~0UL)
-  {
-    char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
-    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
-  }
-  else if (stationsCnt == 0)
-  {
-    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
-  }
-  else if (stationsCnt == maxRadioResults)
-  {
-    if (maxResultCallback)
-    {
-      maxResultCallback(TRUE);
-    }
-  }
-
-  if ((stationsCnt != ~0UL) && (stationsCnt > 0))
-  {
-    // Detach list before modify it
-    IIntuition->SetAttrs(listbrowser,
-        LISTBROWSER_Labels, NULL,
-        TAG_DONE);
-
-    IIntuition->SetGadgetAttrs(listbrowser, windows[WID_MAIN], NULL,
-        LISTBROWSER_Labels,         list,
-        LISTBROWSER_SortColumn,     0,
-        LISTBROWSER_Selected,       -1,
-        LISTBROWSER_ColumnInfo,     columnInfo,
-        TAG_DONE);
-
-    success = TRUE;
-  }
-
-  return success;
-}
-
-static void fillRadioList(BOOL newSearch)
-{
-  static int offset;
-  char notFoundMsg[128];
-  IUtility->Strlcpy(notFoundMsg, "No more Radio Stations found!", sizeof(notFoundMsg));
-
-  if (newSearch)
-  {
-    offset = 0;
-    IUtility->Strlcpy(notFoundMsg, "No Radio Stations found with these criteria!\nChange them and try again!", sizeof(notFoundMsg));
-  }
-
-  if (getRadioStations(lastFilters, offset))
-  {
-    if (listStations((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], &radioList, offset, (char *)notFoundMsg, changeDiscoverButton))
-    {
-      offset++;
-    }
-  }
-}
-
-static void fillRadioPopularList(void)
-{
-  char notFoundMsg[] = "No Popular Radio Stations found!";
-  getRadioPopularStations();
-  listStations((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER], &radioPopularList, 0, (char *)notFoundMsg, NULL);
-}
-
-static void fillRadioTrendList(void)
-{
-  char notFoundMsg[] = "No Trending Radio Stations found!";
-  getRadioTrendStations();
-  listStations((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], &radioTrendList, 0, (char *)notFoundMsg, NULL);
 }
 
 static BOOL checkFiltersChanged(void)
@@ -547,7 +579,7 @@ static BOOL checkFiltersChanged(void)
   return changed;
 }
 
-static void changeDiscoverButton(BOOL isMore)
+void changeDiscoverButton(BOOL isMore)
 {
   char buttonText[16] = "_Discover";
   if (isMore)

@@ -1,25 +1,31 @@
-/*
-
-************************************************************
-**
-** Created by: codebench 0.55 (19.10.2017)
-**
-** Project: MediaVault
-**
-** File: stringfuncs.c
-**
-** Date: 23-05-2021 13:48:03
-**
-************************************************************
-
-*/
+ /**
+  * File:    stringfuncs.c
+  *
+  *   Copyright (c) 2021, Georgios Sokianos
+  *
+  *   This file is part of MediaVault
+  *
+  * Author:   Georgios Sokianos (walkero@gmail.com)
+  * Date:     May 2021
+  *
+  * Summary of File:
+  *
+  *   This file contains code that manipulate strings
+  *   and dates, like conversion or clearance.
+  *
+  */
 
 #include <iconv.h>
+#include <openssl/sha.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
 
 #include "globals.h"
+#include "libshandler.h"
 #include "stringfuncs.h"
 
 #define ICONV_BUFFER 256
+#define UNIX_AMIGA_EPOCH_DIFF ((365 * 8 + 2) * 24 * 60 * 60)
 
 static STRPTR useIconv(iconv_t, CONST_STRPTR);
 static char rfc3986[256] = {0},
@@ -110,6 +116,152 @@ STRPTR urlEncode(STRPTR value)
 
   rfcTablesInit();
   encode((unsigned char*)value, buf, html5);
+
+  return buf;
+}
+
+
+ /**
+  *
+  * ULONG now(void)
+  *
+  * Summary:
+  *
+  *    This function get the system time and returns
+  *    the seconds
+  *
+  * Parameters   :
+  *
+  * Return Value : pointer to the string in memory
+  *
+  * Description:
+  *
+  *     This function uses the timer.device to get the
+  *     current system date and time in epoch seconds
+  *
+  */
+ULONG now(void)
+{
+  struct TimeVal tv;
+  ITimer->GetSysTime(&tv);
+
+  return tv.Seconds;
+}
+
+ /**
+  *
+  * ULONG nowUnix(ULONG)
+  *
+  * Summary:
+  *
+  *     This function add the Unix epoch diff to the
+  *     given seconds
+  *
+  * Parameters   : seconds: contains the seconds
+  *
+  * Return Value : the given seconds + the unix epoch
+  *                difference
+  *
+  * Description:
+  *
+  *     Because the epoch of Amiga starts at 1/1/1978
+  *     but the UNIX one starts at 1/1/1970, there is
+  *     a difference of 8 years, that needs to be added
+  *     at the result.
+  *
+  */
+ULONG nowUnix(ULONG seconds)
+{
+  return seconds + UNIX_AMIGA_EPOCH_DIFF;
+}
+
+ /**
+  *
+  * int32 getOffsetUTC(void)
+  *
+  * Summary:
+  *
+  *     This function gets the system UTC offset in
+  *     minutes, based on the timezone
+  *
+  * Parameters   :
+  *
+  * Return Value : the UTC offset in seconds
+  *
+  * Description:
+  *
+  *     This function uses the timezone.library
+  *     to get the system timezone and get the
+  *     UTC offset in minutes, and returns it in
+  *     seconds
+  *
+  */
+int32 getOffsetUTC(void)
+{
+  int32 utcOffset = 0;
+  ITimezone->GetTimezoneAttrs(NULL, TZA_UTCOffset, &utcOffset, TAG_END);
+
+  return utcOffset * 60;
+}
+
+
+ /**
+  *
+  * STRPTR SHA1Encrypt(STRPTR string, uint32 stringLen)
+  *
+  * Summary:
+  *
+  *    This function encrypts with SHA1 a sting and
+  *    and returns the description
+  *
+  * Parameters  : string: contains the string to be encrypted
+  *
+  * Return Value: pointer to the string in memory
+  *
+  * Description:
+  *
+  *     This function uses EVP methods from openssl
+  *     package to encrypt the given string with SHA1.
+  *     The EVP result is hex string which needs to be
+  *     converted to chars and then returns the result
+  *     with a pointer to memory
+  *
+  */
+STRPTR SHA1Encrypt(STRPTR string)
+{
+  char tmp[8] = "";
+  unsigned int stringLen = 70;
+
+  STRPTR buf = IExec->AllocVecTags(sizeof(char) * stringLen,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+
+  EVP_MD_CTX *mdctx;
+  const EVP_MD *md = EVP_get_digestbyname("SHA1");
+  unsigned char md_value[EVP_MAX_MD_SIZE];
+  unsigned int md_len, i;
+
+  mdctx = EVP_MD_CTX_new();
+  EVP_DigestInit_ex(mdctx, md, NULL);
+  EVP_DigestUpdate(mdctx, string, stringLen);
+  EVP_DigestFinal_ex(mdctx, md_value, &md_len);
+  EVP_MD_CTX_free(mdctx);
+
+  for (i = 0; i < md_len; i++)
+  {
+    sprintf(tmp, "%02x", md_value[i]);
+
+    if (i == 0)
+    {
+      IUtility->Strlcpy(buf, tmp, stringLen);
+    }
+    else
+    {
+      IUtility->Strlcat(buf, tmp, stringLen);
+    }
+
+  }
 
   return buf;
 }

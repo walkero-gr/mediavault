@@ -23,12 +23,16 @@
 #include "stringfuncs.h"
 #include "guifuncs.h"
 
-uint8 maxRadioResults = 100;
-
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";
 static char url[255];
+static uint8 maxRadioResults = 100;
 
 extern struct memory response;
+extern struct RenderHook *renderhook;
+extern struct ColumnInfo *columnInfo;
+extern struct List radioList,
+                radioPopularList,
+                radioTrendList;
 
 static void setBaseSearchUrl(void)
 {
@@ -292,7 +296,7 @@ void showRadioInfo(struct Node *res_node)
 
     IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n", stationData->name, stationData->country);
 
-    showAvatarImage(stationData->uuid, stationData->favicon);
+    showAvatarImage(stationData->uuid, stationData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE], renderhook);
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,
@@ -304,10 +308,86 @@ void showRadioInfo(struct Node *res_node)
   }
 }
 
-void freeStationInfo(struct stationInfo *stationData)
-{
-  if(stationData)
+static BOOL listStations(
+  struct Gadget *listbrowser,
+  struct List *list,
+  int offset,
+  char *notFoundMsg,
+  void (*maxResultCallback)(BOOL)
+) {
+  size_t stationsCnt = 0;
+  BOOL success = FALSE;
+
+  stationsCnt = getRadioList(list, offset);
+
+  if (stationsCnt == ~0UL)
   {
-    IExec->FreeVec(stationData);
+    char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
   }
+  else if (stationsCnt == 0)
+  {
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", notFoundMsg, 0, NULL, 0);
+  }
+  else if (stationsCnt == maxRadioResults)
+  {
+    if (maxResultCallback)
+    {
+      maxResultCallback(TRUE);
+    }
+  }
+
+  if ((stationsCnt != ~0UL) && (stationsCnt > 0))
+  {
+    // Detach list before modify it
+    IIntuition->SetAttrs(listbrowser,
+        LISTBROWSER_Labels, NULL,
+        TAG_DONE);
+
+    IIntuition->SetGadgetAttrs(listbrowser, windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         list,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     columnInfo,
+        TAG_DONE);
+
+    success = TRUE;
+  }
+
+  return success;
+}
+
+void fillRadioList(struct filters lastFilters, BOOL newSearch)
+{
+  static int offset;
+  char notFoundMsg[128];
+  IUtility->Strlcpy(notFoundMsg, "No more Radio Stations found!", sizeof(notFoundMsg));
+
+  if (newSearch)
+  {
+    offset = 0;
+    IUtility->Strlcpy(notFoundMsg, "No Radio Stations found with these criteria!\nChange them and try again!", sizeof(notFoundMsg));
+  }
+
+  if (getRadioStations(lastFilters, offset))
+  {
+    if (listStations((struct Gadget*)gadgets[GID_RADIO_LISTBROWSER], &radioList, offset, (char *)notFoundMsg, changeDiscoverButton))
+    {
+      offset++;
+    }
+  }
+}
+
+void fillRadioPopularList(void)
+{
+  char notFoundMsg[] = "No Popular Radio Stations found!";
+  getRadioPopularStations();
+  listStations((struct Gadget*)gadgets[GID_RADIO_POPULAR_LISTBROWSER], &radioPopularList, 0, (char *)notFoundMsg, NULL);
+}
+
+void fillRadioTrendList(void)
+{
+  char notFoundMsg[] = "No Trending Radio Stations found!";
+  getRadioTrendStations();
+  listStations((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], &radioTrendList, 0, (char *)notFoundMsg, NULL);
 }

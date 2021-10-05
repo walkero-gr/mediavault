@@ -22,5 +22,9 @@
 STRPTR charConv(CONST_STRPTR);
 STRPTR urlEncode(STRPTR);
 ULONG convertVersionToInt(STRPTR);
+ULONG now(void);
+ULONG nowUnix(ULONG);
+int32 getOffsetUTC(void);
+STRPTR SHA1Encrypt(STRPTR);
 
 #endif

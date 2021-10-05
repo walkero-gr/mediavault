@@ -24,7 +24,11 @@
 #include <proto/icon.h>
 #include <proto/intuition.h>
 #include <proto/layers.h>
+#include <proto/timer.h>
+#include <proto/timezone.h>
 #include <proto/utility.h>
+
+#include <devices/timer.h>
 
 #include <string.h>
 #include <ctype.h>
@@ -64,5 +68,32 @@ struct stationInfo
   ULONG votes;
 };
 
+struct podcastInfo
+{
+  ULONG id;
+  char title[128];
+  char description[512];
+  char author[64];
+  char language[8];
+  char url[255];
+  char originalUrl[255];
+  char image[255];
+};
+
+struct podcastEpisodeInfo
+{
+  ULONG id;
+  char  title[128];
+  char  description[512];
+  ULONG datePublished;
+  char  datePublishedPretty[32];
+  char  enclosureUrl[255];
+  char  enclosureType[11];
+  ULONG duration;
+  uint8 episode;
+  uint8 season;
+  ULONG feedId;
+  char image[255];
+};
 
 #endif

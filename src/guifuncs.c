@@ -39,7 +39,6 @@ struct releaseInfo {
   char changes[1024];
 };
 static struct releaseInfo *release = NULL;
-extern struct RenderHook *renderhook;
 
 uint32 cacheFilenameSize = 128;
 
@@ -215,19 +214,42 @@ struct Window *appUnhide(uint32 appID, Object *winObj)
   return window;
 }
 
-void freeList(
-  struct List *listBrowser,
-  void (*freeUserDataCallback)(struct stationInfo *)
-)
+void freeList(struct List *listBrowser, int structID)
 {
   struct Node *node;
   while((node = IExec->RemHead( listBrowser )))
   {
-    struct stationInfo *stationData = NULL;
-    IListBrowser->GetListBrowserNodeAttrs( node,
-          LBNA_UserData, &stationData,
-          TAG_DONE);
-    freeUserDataCallback(stationData);
+    switch(structID)
+    {
+      case 0:
+        {
+          struct stationInfo *structData = NULL;
+          IListBrowser->GetListBrowserNodeAttrs( node,
+                LBNA_UserData, &structData,
+                TAG_DONE);
+          IExec->FreeVec(structData);
+        }
+        break;
+      case 1:
+        {
+          struct podcastInfo *structData = NULL;
+          IListBrowser->GetListBrowserNodeAttrs( node,
+                LBNA_UserData, &structData,
+                TAG_DONE);
+          IExec->FreeVec(structData);
+        }
+        break;
+      case 2:
+        {
+          struct podcastEpisodeInfo *structData = NULL;
+          IListBrowser->GetListBrowserNodeAttrs( node,
+                LBNA_UserData, &structData,
+                TAG_DONE);
+          IExec->FreeVec(structData);
+        }
+        break;
+    }
+
     IListBrowser->FreeListBrowserNode(node);
   }
   //IExec->FreeSysObject(ASOT_LIST, listBrowser);     // TODO: Find the reason why this freeze the machine
@@ -265,7 +287,7 @@ static STRPTR getCachedImageIfExists(STRPTR uuid)
   return NULL;
 }
 
-void showAvatarImage(STRPTR uuid, STRPTR url)
+void showAvatarImage(STRPTR uuid, STRPTR url, Object *avatarWrapperGadget, Object *avatarImageObject, struct RenderHook *renderhook)
 {
   struct Screen *screen = NULL;
 
@@ -287,34 +309,29 @@ void showAvatarImage(STRPTR uuid, STRPTR url)
     if((screen = IIntuition->LockPubScreen(NULL)))
     {
       // Clean previous image shown
-      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
+      IIntuition->SetGadgetAttrs((struct Gadget*)avatarWrapperGadget, windows[WID_MAIN], NULL,
           GA_Image, NULL,
           TAG_END );
-      IIntuition->DisposeObject(objects[OID_AVATAR_IMAGE]);
+      IIntuition->DisposeObject(avatarImageObject);
 
       // Create a new object for the image
-      objects[OID_AVATAR_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+      avatarImageObject = IIntuition->NewObject(BitMapClass, NULL,
           IA_Scalable,        TRUE,
           BITMAP_Screen,      screen,
           BITMAP_SourceFile,  avatarImage,
           BITMAP_Masking,     TRUE,
           TAG_END);
 
-      renderhook = (struct RenderHook *) IExec->AllocSysObjectTags(ASOT_HOOK,
-            ASOHOOK_Size,  sizeof(struct RenderHook),
-            ASOHOOK_Entry, (HOOKFUNC)renderfunct,
-            TAG_END);
-
-      if (renderhook && objects[OID_AVATAR_IMAGE])
+      if (renderhook && avatarImageObject)
       {
-        renderhook->img  = objects[OID_AVATAR_IMAGE];
-        renderhook->w    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Width;
-        renderhook->h    = ((struct Image *)objects[OID_AVATAR_IMAGE])->Height;
+        renderhook->img  = avatarImageObject;
+        renderhook->w    = ((struct Image *)avatarImageObject)->Width;
+        renderhook->h    = ((struct Image *)avatarImageObject)->Height;
         renderhook->fill = FALSE;
 
-        IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_AVATAR], windows[WID_MAIN], NULL,
+        IIntuition->SetGadgetAttrs((struct Gadget*)avatarWrapperGadget, windows[WID_MAIN], NULL,
             SPACE_RenderHook,   renderhook,
-            GA_Image,           objects[OID_AVATAR_IMAGE],
+            GA_Image,           avatarImageObject,
             TAG_END );
 
         IIntuition->IDoMethod( objects[OID_MAIN], WM_RETHINK );
@@ -424,6 +441,7 @@ static BOOL getGithubLatestData(void)
           TAG_DONE);
 
   char url[] = "https://api.github.com/repos/walkero-gr/mediavault/releases/latest";
+
   doHTTPRequest(url);
 
   if (getResponseCode() != 200)
@@ -570,4 +588,39 @@ void workOnUpdate(void)
     }
   }
   IExec->FreeVec(infoMsg);
+}
+
+ /**
+  *
+  * void switchRightSidebar(ULONG)
+  *
+  * Summary:
+  *
+  *     This function switches the pages at the right sidebar
+  *     depending the selected section from the left sidebar
+  *
+  * Parameters   : page: the page number
+  *
+  * Return Value :
+  *
+  * Description:
+  *
+  *     This function checks the current visible page at the
+  *     right sidebar, and if it needs switches to the one
+  *     that reflects the choice at the left sidebar
+  *
+  */
+void switchRightSidebar(ULONG page)
+{
+  ULONG currentRightSidebarPage;
+  IIntuition->GetAttr(PAGE_Current, objects[OID_RIGHT_SIDEBAR_PAGES], &currentRightSidebarPage);
+
+  if (currentRightSidebarPage != page)
+  {
+    IIntuition->SetAttrs(objects[OID_RIGHT_SIDEBAR_PAGES],
+        PAGE_Current, page,
+        TAG_END);
+
+    IIntuition->IDoMethod( objects[OID_MAIN], WM_RETHINK );
+  }
 }

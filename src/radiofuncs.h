@@ -17,14 +17,15 @@
 #ifndef _RADIOFUNCS_H
 #define _RADIOFUNCS_H
 
-BOOL getRadioStations(struct filters, int);
-void getRadioTrendStations(void);
-void getRadioPopularStations(void);
-size_t getRadioList(struct List *, int);
+//BOOL getRadioStations(struct filters, int);
+//void getRadioTrendStations(void);
+//void getRadioPopularStations(void);
+//size_t getRadioList(struct List *, int);
 void playRadio(struct Node *);
 void showRadioInfo(struct Node *);
-void freeStationInfo(struct stationInfo *);
-      
+void fillRadioList(struct filters, BOOL);
+void fillRadioPopularList(void);
+void fillRadioTrendList(void);
 
 
 #endif

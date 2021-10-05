@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 11-09-2021 19:18:02
+# Created on: 14-09-2021 22:32:26
 #
 #
 
@@ -123,7 +123,7 @@ src/radiofuncs.o: src/radiofuncs.c src/globals.h src/version.h \
 	 src/stringfuncs.h
 
 src/stringfuncs.o: src/stringfuncs.c src/globals.h src/version.h \
-	
+	 src/libshandler.h
 
 
 ###################################################################

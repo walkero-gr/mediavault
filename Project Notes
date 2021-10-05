@@ -14,7 +14,6 @@ DONE - Update the Makefile.docker to compile
 DONE - Create first window
 DONE - Create about window
 - Connect filetypes with players
-- Make preferences window
 - Show metadata in the window
 - Add images on lists (optional)
 DONE - Create Project menu
@@ -25,14 +24,15 @@ DONE - HTTP encode of the request URL (convert spaces to %20 etc)
 DONE - Make fixes on listbrowser column sizes and sorting
 - Check and fix unfreed memory
 - Notifications support
-- Add AmiUpdate support or create self-update process
+- Add AmiUpdate support
 DONE - Add icon when iconified
 DONE - Add a message window/requester
 - Check if player exists and show a message if not
 - Create documentation in amigaguide format
 - Add status bar at the bottom of the window for info
 DONE - Added Unicode conversion to system charset on radio station names
-- Find a way to use different codesets and charsets based on station language on Unicode conversion
+- Find a way to use different codesets and charsets based on station language
+  on Unicode conversion (charset.library ???)
 DONE - Application registration
 DONE - Window can jump screen
 DONE - Window size and position can be saved
@@ -41,7 +41,7 @@ DONE - [v1.3] Download avatar images in cache folder
 DONE - [v1.3] Add play button at the right sidebar menu and replace double click
 DONE - [v1.3] Selfupdate process
 DONE - [v1.3] Add libcurl support
-- Simplify downloadFile() to make one http request
+DONE - Simplify downloadFile() to make one http request
 - Add progress window at the Selfupdate process
 DONE - [v1.3] Add new icons in the archive, the ones that IconDesigner created
 DONE - [v1.3] Fix icons' positions
@@ -49,9 +49,12 @@ DONE - [v1.3] Create automated release packaging in Makefile
 DONE - [v1.3] Fixed the version string to include the application name
 DONE - [v1.3] Add COPYING/LICENSE files for the used libs
 - Include in the package all the necessary AISS icons
+- Add more comments in sources for every function and file
+- Add icons at the left sidebar based on the item
 
 ## Radio
-DONE - Add Radio filter section with fields at the top of the window (Genre, Language, Country, Name)
+DONE - Add Radio filter section with fields at the top of the window (Genre,
+        Language, Country, Name)
 DONE - Make request based on info at the search fields
 DONE - Parse JSON response
 DONE - Break getRadioStations() to smaller methods
@@ -77,15 +80,48 @@ DONE - Show avatar images at the right sidebar
 - Add a call to the API when a user selects a radio station to listen to
 
 ## Podcasts
+DONE - [v1.4] Add Podcasts page at the left sidebar
+DONE - [v1.4] Add first fields to search for a podcast, which should be a name
+              field and a discover button
+DONE - [v1.4] Add the browserlist for the podcasts
+DONE - [v1.4] Use the Podcasts online service and get the first data
+DONE - [v1.4] Parse the Podcasts JSON data and fill up the browserlist
+DONE - [v1.4] Add a new browserlist for the podcast episodes
+DONE - [v1.4] When the user clicks on a podcast title, the right sidebar should
+              be updated and the episodes browserlist should get filled up with
+              the latest episodes
+DONE - [v1.4] When the user clicks on an episode add info at the right sidebar
+              and enable the play button
+DONE - [v1.4] When the play button is clicked AmigaAmp3 should start playing
+              the episode
+- When a podcast episodes list is filled but the user selects an other podcast that has no episodes, the list should be cleared.
+DONE - [v1.4] Add a check if the podcast name is empty when Discover button is
+              pressed
+- Mark podcasts as favorites
+- Download podcast episodes
+- Add more filters, like categories, language etc.
 
 ## UPnP
-DONE - Create a unique list of the UPnP servers
-DONE - Move UPnP functions to separate source file
-- Get the server metadata for each UPnP server and add them at the UPnP server list
+- Create a unique list of the UPnP servers
+- Get the server metadata for each UPnP server and add them at the UPnP server
+  list
 - Make a SOAP request function
 - Create the first browse request
 - Create server list
 - Click on window server list and make Browse SOAP request
+
+## Settings window
+- Create the Preferences window
+
+- Add Radio Station page
+- Add selection of the radio station online service
+- Add selection of the number of stations returned on every request
+- Add selection with the default sorting (name, country, votes etc.)
+
+- Add Podcast page
+
+
+
 
 
 //// BUGS
