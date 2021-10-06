@@ -205,31 +205,31 @@ int OpenLibs(void)
   WindowBase = IIntuition->OpenClass( "window.class", 53, &WindowClass );
   if (!WindowBase) return CleanExit("Can't open Window Class");
 
-  LayoutBase = IIntuition->OpenClass( "layout.gadget", 53, &LayoutClass );
+  LayoutBase = IIntuition->OpenClass( "gadgets/layout.gadget", 53, &LayoutClass );
   if (!LayoutBase) return CleanExit("Can't open Layout Gadget");
 
-  LabelBase = IIntuition->OpenClass( "label.image", 53, &LabelClass );
+  LabelBase = IIntuition->OpenClass( "images/label.image", 53, &LabelClass );
   if (!LabelBase) return CleanExit("Can't open Label Image");
 
-  ChooserBase = IIntuition->OpenClass( "chooser.gadget", 53, &ChooserClass );
+  ChooserBase = IIntuition->OpenClass( "gadgets/chooser.gadget", 53, &ChooserClass );
   if (!ChooserBase) CleanExit("Can't open Chooser Gadget");
 
-  ButtonBase = IIntuition->OpenClass( "button.gadget", 53, &ButtonClass );
+  ButtonBase = IIntuition->OpenClass( "gadgets/button.gadget", 53, &ButtonClass );
   if (!ButtonBase) return CleanExit("Can't open Button Gadget");
 
-  StringBase = IIntuition->OpenClass( "string.gadget", 53, &StringClass );
+  StringBase = IIntuition->OpenClass( "gadgets/string.gadget", 53, &StringClass );
   if (!StringBase) return CleanExit("Can't open String Gadget");
 
-  SpaceBase = IIntuition->OpenClass( "space.gadget", 53, &SpaceClass );
+  SpaceBase = IIntuition->OpenClass( "gadgets/space.gadget", 53, &SpaceClass );
   if (!SpaceBase) return CleanExit("Can't open Space Gadget");
 
-  ScrollerBase = IIntuition->OpenClass( "scroller.gadget", 53, &ScrollerClass );
+  ScrollerBase = IIntuition->OpenClass( "gadgets/scroller.gadget", 53, &ScrollerClass );
   if (!ScrollerBase) return CleanExit("Can't open Scroller Gadget");
 
-  TextEditorBase = IIntuition->OpenClass( "texteditor.gadget", 53, &TextEditorClass );
+  TextEditorBase = IIntuition->OpenClass( "gadgets/texteditor.gadget", 53, &TextEditorClass );
   if (!TextEditorBase) return CleanExit("Can't open TextEditor Gadget");
 
-  BitMapBase = IIntuition->OpenClass( "bitmap.image", 53, &BitMapClass );
+  BitMapBase = IIntuition->OpenClass( "images/bitmap.image", 53, &BitMapClass );
   if (!BitMapBase) return CleanExit("Can't open BitMap Image");
 
   RequesterBase = IIntuition->OpenClass( "requester.class", 53, &RequesterClass );

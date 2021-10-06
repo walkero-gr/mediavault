@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.1] - future
+### Fixed
+- Fixed the error of not finding the texteditor.gadget on start
+
 ## [1.4.0] - 2021-10-05
 ### Added
 - You can now search for podcasts based on their title, see info
