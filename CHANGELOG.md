@@ -2,8 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [1.4.1] - future
+### Added
+- Added an error message when podcast response is not 200
+
 ### Fixed
 - Fixed the error of not finding the texteditor.gadget on start
+
 
 ## [1.4.0] - 2021-10-05
 ### Added

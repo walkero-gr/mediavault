@@ -497,6 +497,10 @@ static void addListItems(struct Gadget *listbrowser, struct List *list, struct C
 
 void fillPodcastList(struct filters lastFilters)
 {
+  char jsonErrorMsg[] = "There was an error with the returned data.\n" \
+      "Please try again. If the problem remains,\n" \
+      "please, check your network and that\n"
+      "your system time is synced.";
   
   if (getPodcasts(lastFilters, 0))
   {
@@ -504,7 +508,6 @@ void fillPodcastList(struct filters lastFilters)
 
     if (itemsCnt == ~0UL)
     {
-      char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
     }
     else if (itemsCnt == 0)
@@ -518,17 +521,22 @@ void fillPodcastList(struct filters lastFilters)
       addListItems((struct Gadget*)gadgets[GID_PODCAST_LISTBROWSER], &podcastList, podcastColInfo);
     }
   }
+  else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
 }
 
 static void fillEpisodesList(ULONG feedID)
 {
+  char jsonErrorMsg[] = "There was an error with the returned data.\n" \
+      "Please try again. If the problem remains,\n" \
+      "please, check your network and that\n"
+      "your system time is synced.";
+
   if (getEpisodesByID(feedID))
   {
     size_t itemsCnt = getPodcastEpisodeList(&podcastEpisodeList, 0);
 
     if (itemsCnt == ~0UL)
     {
-      char jsonErrorMsg[] = "There was an error with the returned data.\nPlease try again or check your network.";
       showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
     }
     else if (itemsCnt == 0)
@@ -542,6 +550,7 @@ static void fillEpisodesList(ULONG feedID)
       addListItems((struct Gadget*)gadgets[GID_PODCAST_EPISODES_LISTBROWSER], &podcastEpisodeList, podcastEpisodeColInfo);
     }
   }
+  else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
 }
 
 void playPodcast(struct Node *res_node)
