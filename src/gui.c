@@ -34,6 +34,7 @@ struct List radioList,
             radioTrendList,
             leftSidebarList,
             podcastList,
+            trendingPodcastList,
             podcastEpisodeList;
 
 struct filters  lastFilters,
@@ -389,11 +390,31 @@ void showGUI(void)
                           case 3:
                             switchRightSidebar(PAGE_PODCAST_INFO);
                             break;
+                          case 4:
+                            switchRightSidebar(PAGE_PODCAST_INFO);
+                            break;
                         }
                         break;
 
+                      case GID_PODCAST_TRENDING_CHOOSER_GENRES:
+                        //changeDiscoverButton(FALSE);
+                        if (code > 0)
+                        {
+                          IUtility->Strlcpy(lastPodcastFilters.genre, getChooserText(GID_PODCAST_TRENDING_CHOOSER_GENRES, code), sizeof(lastPodcastFilters.genre));
+                        }
+                        else IUtility->Strlcpy(lastPodcastFilters.genre, "", sizeof(lastPodcastFilters.genre));
+                        break;
+
+                      case GID_PODCAST_TRENDING_CHOOSER_LANGUAGES:
+                        //changeDiscoverButton(FALSE);
+                        if (code > 0)
+                        {
+                          IUtility->Strlcpy(lastPodcastFilters.language, getChooserText(GID_PODCAST_TRENDING_CHOOSER_LANGUAGES, code), sizeof(lastPodcastFilters.language));
+                        }
+                        else IUtility->Strlcpy(lastPodcastFilters.language, "", sizeof(lastPodcastFilters.language));
+                        break;
+
                       case GID_PODCAST_FILTER_BUTTON:
-                        // TODO: Add check if the name has a value
                         IUtility->Strlcpy(lastPodcastFilters.name, ((struct StringInfo *)(((struct Gadget *)gadgets[GID_PODCAST_FILTERS_NAME])->SpecialInfo))->Buffer, sizeof(lastPodcastFilters.name));
                         if (IUtility->Stricmp(lastPodcastFilters.name, ""))
                         {
@@ -408,6 +429,12 @@ void showGUI(void)
                         }
                         break;
 
+                      case GID_PODCAST_TRENDING_FILTER_BUTTON:
+                        windowBlocking(objects[OID_MAIN], TRUE);
+                        fillPodcastTrendingList(lastPodcastFilters);
+                        windowBlocking(objects[OID_MAIN], FALSE);
+                        break;
+
                       case GID_PODCAST_LISTBROWSER:
                         {
                           Object *lb = NULL;
@@ -419,6 +446,27 @@ void showGUI(void)
                             IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                             if (res_value == LBRE_NORMAL)
                             {                     
+                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+
+                              windowBlocking(objects[OID_MAIN], TRUE);
+                              showPodcastInfo((struct Node *)res_node);
+                              windowBlocking(objects[OID_MAIN], FALSE);
+                            }
+                          }
+                        }
+                        break;
+
+                      case GID_PODCAST_TRENDING_LISTBROWSER:
+                        {
+                          Object *lb = NULL;
+
+                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_TRENDING_LISTBROWSER)
+                          {
+                            lb = gadgets[GID_PODCAST_TRENDING_LISTBROWSER];
+
+                            IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+                            if (res_value == LBRE_NORMAL)
+                            {
                               IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
 
                               windowBlocking(objects[OID_MAIN], TRUE);
@@ -515,6 +563,10 @@ void showGUI(void)
           if(listCount(&podcastList))
           {
             freeList(&podcastList, STRUCT_PODCAST_INFO);
+          }
+          if(listCount(&trendingPodcastList))
+          {
+            freeList(&trendingPodcastList, STRUCT_PODCAST_INFO);
           }
           IListBrowser->FreeLBColumnInfo(podcastEpisodeColInfo);
           if(listCount(&podcastEpisodeList))

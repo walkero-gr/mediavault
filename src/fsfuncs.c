@@ -1,5 +1,19 @@
-
-
+ /**
+  * File:    fsfuncs.c
+  *
+  *   Copyright (c) 2021, Georgios Sokianos
+  *
+  *   This file is part of MediaVault
+  *
+  * Author:   Georgios Sokianos (walkero@gmail.com)
+  * Date:     May 2021
+  *
+  * Summary of File:
+  *
+  *   This file contains code that has to do with
+  *   file system paths and files.
+  *
+  */
 
 
 #include "globals.h"
@@ -15,8 +29,10 @@ STRPTR getFilePath(STRPTR filename)
   BPTR fileLock = IDOS->Lock(filename, SHARED_LOCK);
   if (fileLock)
   {
-    IDOS->NameFromLock(fileLock, appPath, sizeof(char) * 255);
+    BPTR folderLock = IDOS->ParentDir(fileLock);
+    IDOS->NameFromLock(folderLock, appPath, sizeof(char) * 255);
 
+    IDOS->UnLock(folderLock);
     IDOS->UnLock(fileLock);
     //IExec->FreeVec(appPath);
     return appPath;

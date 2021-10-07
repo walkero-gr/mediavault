@@ -22,6 +22,7 @@
 #include "httpfuncs.h"
 #include "stringfuncs.h"
 #include "guifuncs.h"
+#include "fsfuncs.h"
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";
 static char url[255];
@@ -268,7 +269,8 @@ void playRadio(struct Node *res_node)
           LBNA_UserData, &stationData,
           TAG_DONE);
 
-    STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", stationData->url_resolved);
+    //STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", stationData->url_resolved);
+    STRPTR cmd = IUtility->ASPrintf("%s/scripts/start_player \"%s\" ", getFilePath((STRPTR)"PROGDIR:MediaVault"), stationData->url_resolved);
     IDOS->SystemTags( cmd,
         SYS_Input,    ZERO,
         SYS_Output,   NULL,

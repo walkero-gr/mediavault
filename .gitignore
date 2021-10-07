@@ -5,3 +5,5 @@ MediaVault
 debug/
 cache/*
 src/secrets.h
+scripts/start_player
+scripts/start_player.info

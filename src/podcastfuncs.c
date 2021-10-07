@@ -23,6 +23,7 @@
 #include "stringfuncs.h"
 #include "guifuncs.h"
 #include "secrets.h"
+#include "fsfuncs.h"
 
 static CONST_STRPTR podcastAPIUrl = "https://api.podcastindex.org/api/1.0";
 static uint8 maxResults = 100;
@@ -33,7 +34,7 @@ static void fillEpisodesList(ULONG);
 extern struct memory response;
 extern struct RenderHook *podcastImageRenderHook;
 extern struct ColumnInfo *podcastColInfo, *podcastEpisodeColInfo;
-extern struct List podcastList, podcastEpisodeList;
+extern struct List podcastList, trendingPodcastList, podcastEpisodeList;
 
 static void addRequestHeaders(void)
 {
@@ -86,6 +87,35 @@ static BOOL getPodcasts(struct filters lastFilters, int offset)
     IUtility->Strlcat(url, "&q=", sizeof(url));
     IUtility->Strlcat(url, encSelName, sizeof(url));
     IExec->FreeVec(encSelName);
+  }
+
+  addRequestHeaders();
+  doHTTPRequest(url);
+  if (getResponseCode() == 200)
+    success = TRUE;
+
+  return success;
+}
+
+static BOOL getTrendingPodcasts(struct filters lastFilters, int offset)
+{
+  BOOL success = FALSE;
+  char url[255];
+
+  IUtility->SNPrintf(url, sizeof(url), "%s/podcasts/trending?max=%ld&pretty=", podcastAPIUrl, maxResults);
+
+  // TODO: Check if there is offset in podcast API and use it here
+  if (offset > 0)
+    offset = 0;
+
+  if (IUtility->Stricmp(lastFilters.genre, ""))
+  {
+    IUtility->SNPrintf(url, sizeof(url), "%s&cat=%s", url, urlEncode(lastFilters.genre));
+  }
+
+  if (IUtility->Stricmp(lastFilters.language, NULL))
+  {
+    IUtility->SNPrintf(url, sizeof(url), "%s&lang=%s", url, urlEncode(lastFilters.language));
   }
 
   addRequestHeaders();
@@ -193,12 +223,13 @@ size_t getPodcastList(struct List *itemsList, int offset)
       IUtility->Strlcpy(itemData->url, IJansson->json_string_value(buf), sizeof(itemData->url));
 
       buf = IJansson->json_object_get(data, "originalUrl");
-      if(!json_is_string(buf))
+      if(json_is_string(buf))
       {
-        IJansson->json_decref(jsonRoot);
-        return ~0UL;
+        //IJansson->json_decref(jsonRoot);
+        //return ~0UL;
+        IUtility->Strlcpy(itemData->originalUrl, IJansson->json_string_value(buf), sizeof(itemData->originalUrl));
       }
-      IUtility->Strlcpy(itemData->originalUrl, IJansson->json_string_value(buf), sizeof(itemData->originalUrl));
+      //IUtility->Strlcpy(itemData->originalUrl, IJansson->json_string_value(buf), sizeof(itemData->originalUrl));
 
       buf = IJansson->json_object_get(data, "image");
       if(!json_is_string(buf))
@@ -524,6 +555,35 @@ void fillPodcastList(struct filters lastFilters)
   else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
 }
 
+void fillPodcastTrendingList(struct filters lastFilters)
+{
+  char jsonErrorMsg[] = "There was an error with the returned data.\n" \
+      "Please try again. If the problem remains,\n" \
+      "please, check your network and that\n"
+      "your system time is synced.";
+
+  if (getTrendingPodcasts(lastFilters, 0))
+  {
+    size_t itemsCnt = getPodcastList(&trendingPodcastList, 0);
+
+    if (itemsCnt == ~0UL)
+    {
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
+    }
+    else if (itemsCnt == 0)
+    {
+      char notFoundMsg[] = "No podcasts found based on your search criteria!";
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (char *)notFoundMsg, 0, NULL, 0);
+    }
+
+    if ((itemsCnt != ~0UL) && (itemsCnt > 0))
+    {
+      addListItems((struct Gadget*)gadgets[GID_PODCAST_TRENDING_LISTBROWSER], &trendingPodcastList, podcastColInfo);
+    }
+  }
+  else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
+}
+
 static void fillEpisodesList(ULONG feedID)
 {
   char jsonErrorMsg[] = "There was an error with the returned data.\n" \
@@ -567,7 +627,8 @@ void playPodcast(struct Node *res_node)
           LBNA_UserData, &itemData,
           TAG_DONE);
 
-    STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", itemData->enclosureUrl);
+    //STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:ffplay \"%s\" ", itemData->enclosureUrl);
+    STRPTR cmd = IUtility->ASPrintf("%s/scripts/start_player \"%s\" ", getFilePath((STRPTR)"PROGDIR:MediaVault"), itemData->enclosureUrl);
     IDOS->SystemTags( cmd,
         SYS_Input,    ZERO,
         SYS_Output,   NULL,

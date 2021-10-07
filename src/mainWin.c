@@ -95,6 +95,44 @@ CONST_STRPTR languages[] =
   NULL
 };
 
+CONST_STRPTR languagesISO6391[] =
+{
+  NULL,
+  (STRPTR) ~0L,
+  "ar",
+  "bg",
+  "zh",
+  "hr",
+  "cs",
+  "da",
+  "nl",
+  "en,en-us",
+  "fi",
+  "fr",
+  "de",
+  "el",
+  "hi",
+  "hu",
+  "ga",
+  "it",
+  "ja",
+  "ko",
+  "no,nn,nb",
+  "pl",
+  "pt,pt-br",
+  "ro",
+  "ru",
+  "sr",
+  "sk",
+  "sl",
+  "es",
+  "sv",
+  "th",
+  "tr",
+  "uk",
+  NULL
+};
+
 CONST_STRPTR countries[] =
 {
   "All Countries",
@@ -134,6 +172,48 @@ CONST_STRPTR countries[] =
   NULL
 };
 
+CONST_STRPTR podcastCategories[] =
+{
+  "All Categories",
+  (STRPTR) ~0L,
+  "Arts",
+  "Beauty",
+  "Books",
+  "Business",
+  "Careers",
+  "Comedy",
+  "Design",
+  "Documentary",
+  "Education",
+  "Entrepreneurship",
+  "Fashion", 
+  "Fiction",
+  "Film",
+  "Fitness",
+  "Food",
+  "Games",
+  "History",
+  "Hobbies",
+  "Interviews",
+  "Kids",
+  "Learning",
+  "Marketing", 
+  "Manga",
+  "Music",
+  "News",
+  "Pets",
+  "Philosophy",
+  "Politics",
+  "Religion",
+  "Science",
+  "Sports",
+  "Technology",
+  "Travel",
+  "TV",
+  "Video-Games",  
+  NULL
+};
+
 extern struct List leftSidebarList;
 extern struct RenderHook *renderhook;
 extern struct RenderHook *podcastImageRenderHook;
@@ -142,6 +222,7 @@ static Object *buildRadioSearchPage(void);
 static Object *buildRadioPopularPage(void);
 static Object *buildRadioTrendPage(void);
 static Object *buildPodcastSearchPage(void);
+static Object *buildPodcastTrendingPage(void);
 static Object *buildRadioRightSidebar(struct Screen *, struct RenderHook *);
 static Object *buildPodcastRightSidebar(struct Screen *, struct RenderHook *);
 
@@ -181,6 +262,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         PAGE_Add, gadgets[GID_PAGE_2] = buildRadioPopularPage(),
         PAGE_Add, gadgets[GID_PAGE_3] = buildRadioTrendPage(),
         PAGE_Add, gadgets[GID_PAGE_4] = buildPodcastSearchPage(),
+        PAGE_Add, gadgets[GID_PAGE_5] = buildPodcastTrendingPage(),
         TAG_DONE);
 
   //Object *rightSidebarPages = IIntuition->NewObject(NULL, "page.gadget",
@@ -301,6 +383,12 @@ CONST_STRPTR getChooserText(int gadgetId, uint16 code)
       break;
     case GID_CHOOSER_LANGUAGES:
       return languages[code];
+      break;
+    case GID_PODCAST_TRENDING_CHOOSER_GENRES:
+      return podcastCategories[code];
+      break;
+    case GID_PODCAST_TRENDING_CHOOSER_LANGUAGES:
+      return languagesISO6391[code];
       break;
   }
   return NULL;
@@ -510,9 +598,21 @@ void getLeftSidebarContent(void)
 
   node = IListBrowser->AllocListBrowserNode(1,
     LBNA_Generation,    1,
+    LBNA_Flags,         LBFLG_HASCHILDREN | LBFLG_SHOWCHILDREN,
     LBNA_Column,        0,
       LBNCA_CopyText,   TRUE,
       LBNCA_Text,       "Podcast",
+    TAG_DONE);
+  if (node)
+  {
+    IExec->AddTail( &leftSidebarList, node );
+  }
+
+  node = IListBrowser->AllocListBrowserNode(1,
+    LBNA_Generation,    2,
+    LBNA_Column,        0,
+      LBNCA_CopyText,   TRUE,
+      LBNCA_Text,       "Trending",
     TAG_DONE);
   if (node)
   {
@@ -583,6 +683,89 @@ static Object *buildPodcastSearchPage(void)
           CHILD_MinHeight,  300,
           // END - Bottom List Section
         
+        TAG_DONE);
+}
+
+static Object *buildPodcastTrendingPage(void)
+{
+  return IIntuition->NewObject(LayoutClass, NULL,
+        LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+
+        // START - Top Filter Section
+        LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+          LAYOUT_BevelStyle,      BVS_GROUP,
+          LAYOUT_Label,           "Trending Podcasts by",
+
+          // Top filter section with the select boxes
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+            // Genres Select Box with Label
+            LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+              LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+              LAYOUT_AddImage, IIntuition->NewObject(LabelClass, NULL,
+                LABEL_Text, "_Genre",
+                TAG_END),
+              LAYOUT_AddChild, IIntuition->NewObject(ChooserClass, NULL,
+                GA_ID,                GID_PODCAST_TRENDING_CHOOSER_GENRES,
+                GA_RelVerify,         TRUE,
+                GA_TabCycle,          TRUE,
+                GA_ActivateKey,       "g",
+                CHOOSER_LabelArray,   podcastCategories,
+                CHOOSER_MaxLabels,    40,
+                CHOOSER_Selected,     0,
+                TAG_DONE),
+              TAG_DONE),
+
+            // Languages Select Box with Label
+            LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+              LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+              LAYOUT_AddImage, IIntuition->NewObject(LabelClass, NULL,
+                LABEL_Text, "_Language",
+                TAG_END),
+              LAYOUT_AddChild, IIntuition->NewObject(ChooserClass, NULL,
+                GA_ID,                GID_PODCAST_TRENDING_CHOOSER_LANGUAGES,
+                GA_RelVerify,         TRUE,
+                GA_TabCycle,          TRUE,
+                GA_ActivateKey,       "l",
+                CHOOSER_LabelArray,   languages,
+                CHOOSER_MaxLabels,    33,
+                CHOOSER_Selected,     0,
+                TAG_DONE),
+              TAG_DONE),
+            TAG_DONE),
+
+            // Filters Button
+            LAYOUT_AddChild, gadgets[GID_PODCAST_TRENDING_FILTER_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,              GID_PODCAST_TRENDING_FILTER_BUTTON,
+              GA_Text,            "_Discover",
+              GA_TabCycle,        TRUE,
+              GA_RelVerify,       TRUE,
+              GA_ActivateKey,     "d",
+              TAG_DONE),
+          TAG_DONE),
+          CHILD_WeightedHeight, 0,
+        // END - Top Filter Section
+
+        // START - Bottom List Section
+        LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+          LAYOUT_Orientation,     LAYOUT_ORIENT_VERT,
+
+          LAYOUT_AddChild, gadgets[GID_PODCAST_TRENDING_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+            GA_ID,                      GID_PODCAST_TRENDING_LISTBROWSER,
+            GA_RelVerify,               TRUE,
+            GA_TabCycle,                TRUE,
+            LISTBROWSER_ColumnTitles,   TRUE,
+            LISTBROWSER_HorizontalProp, TRUE,
+            LISTBROWSER_Separators,     TRUE,
+            LISTBROWSER_ShowSelected,   TRUE,
+            LISTBROWSER_Striping,       LBS_ROWS,
+            LISTBROWSER_SortColumn,     0,
+            LISTBROWSER_TitleClickable, TRUE,
+            TAG_DONE),
+          TAG_DONE),
+          CHILD_MinHeight,  300,
+          // END - Bottom List Section
+
         TAG_DONE);
 }
 

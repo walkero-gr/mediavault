@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 ## [1.4.1] - future
 ### Added
 - Added an error message when podcast response is not 200
+- Added scripts/start_player.sample script. This can be used to set the
+  preferred player. This needs to be renamed as start_player to be used.
+  The reason the file is named like that is to avoid replacements in
+  future updates.
+  The file includes configuration for different supported players, but
+  more can be added.
+- Added Trending Podcasts search based on category and/or language
 
 ### Fixed
 - Fixed the error of not finding the texteditor.gadget on start

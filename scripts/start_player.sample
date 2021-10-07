@@ -1,0 +1,40 @@
+;
+; File:    stringfuncs.c
+;
+;   Copyright (c) 2021, Georgios Sokianos
+;
+;   This file is part of MediaVault
+;
+; Author:   Georgios Sokianos (walkero@gmail.com)
+; Date:     October 2021
+;
+; Summary of File:
+;
+;   This file contains code that is used to start
+;   user's preferred player. So, instead using a
+;   default player, MediaVault now executes this
+;   script, passing the URL of the source. User is
+;   able to change this script and make it work
+;   on his system as he wants.
+;
+;   This file is a sample, and you have to rename
+;   it to: start_player
+;
+
+.KEY url/A
+.BRA {
+.KET }
+
+If NOT "{url}" EQ ""
+  ;If EXISTS APPDIR:AmigaAmp3
+  ;  Run <>NIL: APPDIR:AmigaAmp3 "{url}"
+  ;EndIf
+  ;If EXISTS APPDIR:ffplay
+  ;  Run <>NIL: APPDIR:ffplay "{url}"
+  ;EndIf
+  If EXISTS APPDIR:emotion
+    Run <>NIL: APPDIR:emotion "{url}"
+  EndIf
+Else
+  Echo "An argument is missing"
+EndIf
