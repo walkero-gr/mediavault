@@ -91,3 +91,15 @@ int32 unarcFile(STRPTR filename, STRPTR targetFolder)
 
   return -2;
 }
+
+BOOL fileExists(STRPTR file)
+{
+  BPTR fileLock = IDOS->Lock(file, SHARED_LOCK);
+  if (fileLock)
+  {
+    IDOS->UnLock(fileLock);
+    return TRUE;
+  }
+
+  return FALSE;
+}

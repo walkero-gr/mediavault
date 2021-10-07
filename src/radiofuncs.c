@@ -259,18 +259,28 @@ void playRadio(struct Node *res_node)
 {
   if (res_node)
   {
-    struct stationInfo *stationData = NULL;
-    stationData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+    char startPlayerPath[128];
+    STRPTR cmd = NULL;
+    struct stationInfo *itemData = NULL;
+    itemData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
           AVT_Type,            MEMF_PRIVATE,
           AVT_ClearWithValue,  "\0",
           TAG_DONE);
 
     IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-          LBNA_UserData, &stationData,
+          LBNA_UserData, &itemData,
           TAG_DONE);
 
-    //STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", stationData->url_resolved);
-    STRPTR cmd = IUtility->ASPrintf("%s/scripts/start_player \"%s\" ", getFilePath((STRPTR)"PROGDIR:MediaVault"), stationData->url_resolved);
+    IUtility->SNPrintf(startPlayerPath, sizeof(startPlayerPath), "%s/scripts/start_player", getFilePath((STRPTR)"PROGDIR:MediaVault"));
+    if (fileExists(startPlayerPath))
+    {
+      cmd = IUtility->ASPrintf("%s \"%s\" ", startPlayerPath, itemData->url_resolved);
+    }
+    else
+    {
+      cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", itemData->url_resolved);
+    }
+
     IDOS->SystemTags( cmd,
         SYS_Input,    ZERO,
         SYS_Output,   NULL,
@@ -278,6 +288,8 @@ void playRadio(struct Node *res_node)
         SYS_Asynch,   TRUE,
         TAG_DONE);
   }
+
+  // TODO: Free itemData
 }
 
 void showRadioInfo(struct Node *res_node)
@@ -285,20 +297,19 @@ void showRadioInfo(struct Node *res_node)
   if (res_node)
   {
     char radioInfo[512];
-
-    struct stationInfo *stationData = NULL;
-    stationData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+    struct stationInfo *itemData = NULL;
+    itemData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
           AVT_Type,            MEMF_PRIVATE,
           AVT_ClearWithValue,  "\0",
           TAG_DONE);
 
     IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-          LBNA_UserData, &stationData,
+          LBNA_UserData, &itemData,
           TAG_DONE);
 
-    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n", stationData->name, stationData->country);
+    showAvatarImage(itemData->uuid, itemData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE], renderhook);
 
-    showAvatarImage(stationData->uuid, stationData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE], renderhook);
+    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n", itemData->name, itemData->country);
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,
@@ -307,9 +318,12 @@ void showRadioInfo(struct Node *res_node)
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_PLAY_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,   FALSE,
           TAG_DONE);
+
+    // TODO: Free itemData
   }
 }
 
+// TODO: Change like the one I did on podcasts funcs
 static BOOL listStations(
   struct Gadget *listbrowser,
   struct List *list,

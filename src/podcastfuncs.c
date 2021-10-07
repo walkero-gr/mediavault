@@ -439,7 +439,6 @@ void showPodcastInfo(struct Node *res_node)
     fillEpisodesList(podcastData->id);
 
     IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", podcastData->id);
-
     if (IUtility->Stricmp(itemUID, ""))
     {
       showAvatarImage(
@@ -448,6 +447,9 @@ void showPodcastInfo(struct Node *res_node)
         podcastImageRenderHook
       );
     }
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_PLAY_BUTTON], windows[WID_MAIN], NULL,
+        GA_Disabled,   TRUE,
+        TAG_DONE);
   }
 }
 
@@ -617,6 +619,8 @@ void playPodcast(struct Node *res_node)
 {
   if (res_node)
   {
+    char startPlayerPath[128];
+    STRPTR cmd = NULL;
     struct podcastEpisodeInfo *itemData = NULL;
     itemData = (struct podcastEpisodeInfo *)IExec->AllocVecTags(sizeof(struct podcastEpisodeInfo),
           AVT_Type,            MEMF_PRIVATE,
@@ -627,13 +631,24 @@ void playPodcast(struct Node *res_node)
           LBNA_UserData, &itemData,
           TAG_DONE);
 
-    //STRPTR cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:ffplay \"%s\" ", itemData->enclosureUrl);
-    STRPTR cmd = IUtility->ASPrintf("%s/scripts/start_player \"%s\" ", getFilePath((STRPTR)"PROGDIR:MediaVault"), itemData->enclosureUrl);
+
+    IUtility->SNPrintf(startPlayerPath, sizeof(startPlayerPath), "%s/scripts/start_player", getFilePath((STRPTR)"PROGDIR:MediaVault"));
+    if (fileExists(startPlayerPath))
+    {
+      cmd = IUtility->ASPrintf("%s \"%s\" ", startPlayerPath, itemData->enclosureUrl);
+    }
+    else
+    {
+      cmd = IUtility->ASPrintf("Run <>NIL: APPDIR:AmigaAmp3 \"%s\" ", itemData->enclosureUrl);
+    }
+    
     IDOS->SystemTags( cmd,
         SYS_Input,    ZERO,
         SYS_Output,   NULL,
         SYS_Error,    ZERO,
         SYS_Asynch,   TRUE,
         TAG_DONE);
+
+    // TODO: Free itemData
   }
 }

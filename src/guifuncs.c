@@ -271,6 +271,7 @@ static STRPTR getCachedImageIfExists(STRPTR uuid)
     IUtility->Strlcpy(buf, avatarBase, sizeof(buf));
     IUtility->Strlcat(buf, ext[i], sizeof(buf));
 
+    // TODO: Change below code with fileExists()
     imgLock = IDOS->Lock(buf, SHARED_LOCK);
     if (imgLock)
     {

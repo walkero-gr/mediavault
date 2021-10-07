@@ -22,5 +22,6 @@ STRPTR getFilePath(STRPTR);
 STRPTR getParentPath(STRPTR);
 BOOL downloadLatestUpdate(STRPTR);
 int32 unarcFile(STRPTR, STRPTR);
+BOOL fileExists(STRPTR);
 
 #endif
