@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 14-09-2021 22:32:26
+# Created on: 07-10-2021 23:11:09
 #
 #
 
@@ -110,7 +110,8 @@ src/guifuncs.o: src/guifuncs.c src/globals.h src/version.h \
 
 src/podcastfuncs.o: src/podcastfuncs.c src/globals.h src/version.h \
 	 src/gui.h src/libshandler.h src/httpfuncs.h \
-	 src/stringfuncs.h src/guifuncs.h
+	 src/stringfuncs.h src/guifuncs.h src/secrets.h \
+	
 
 src/mainWin.o: src/mainWin.c src/globals.h src/version.h \
 	 src/gui.h src/mainWin.h
@@ -120,7 +121,7 @@ src/aboutWin.o: src/aboutWin.c src/globals.h src/version.h \
 
 src/radiofuncs.o: src/radiofuncs.c src/globals.h src/version.h \
 	 src/gui.h src/libshandler.h src/httpfuncs.h \
-	 src/stringfuncs.h
+	 src/stringfuncs.h src/guifuncs.h
 
 src/stringfuncs.o: src/stringfuncs.c src/globals.h src/version.h \
 	 src/libshandler.h
@@ -135,6 +136,7 @@ src/stringfuncs.o: src/stringfuncs.c src/globals.h src/version.h \
 release:
 	mkdir -p release/MediaVault/libs
 	mkdir -p release/MediaVault/cache
+	mkdir -p release/MediaVault/scripts
 	cp release_files/* release/MediaVault/ -r
 	cp MediaVault release/MediaVault/
 	strip release/MediaVault/MediaVault
@@ -143,6 +145,7 @@ release:
 	cp LICENSE release/MediaVault/
 	cp COPYING release/MediaVault/
 	cp images release/MediaVault/ -r
+	cp scripts/*.sample* release/MediaVault/scripts/
 	cp Libs:jansson.library release/MediaVault/libs/
 	cp release_files/Icons/IconDesigner.info release/MediaVault.info
 	lha -aeqr3 a MediaVault.lha release/
