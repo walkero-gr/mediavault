@@ -63,8 +63,8 @@ struct stationInfo
   char language[64];
   char homepage[255];
   char favicon[255];
-  char codec[12];
-  char bitrate[6];
+  char codec[6];
+  uint8 bitrate;
   ULONG votes;
 };
 

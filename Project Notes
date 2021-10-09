@@ -14,7 +14,6 @@ DONE - Update the Makefile.docker to compile
 DONE - Create first window
 DONE - Create about window
 - Connect filetypes with players
-- Show metadata in the window
 - Add images on lists (optional)
 DONE - Create Project menu
 DONE - Make Iconify menu item to work
@@ -61,7 +60,6 @@ DONE - Break getRadioStations() to smaller methods
 DONE - Load results into a linked list
 DONE - List radio stations
 DONE - Double click on a station to play on player
-- Use ToolTypes to set the player and the arguments (optional)
 DONE - Click on a station and show it's info at the side, with logo
 - Mark stations as favorites
 DONE - Add more tags
@@ -71,9 +69,8 @@ DONE - Add station votes in the list
 DONE - Block main window when user sent a request
 DONE - Add Trending list of radio stations at the left sidebar
 DONE - Add Popular list of radio stations at the left sidebar
-- Add a recent search selection at the left sidebar
 - Add a favorites list of radio stations at the left sidebar
-- Let list bring most voted first
+- Let list bring most voted first (set in preferences)
 DONE - Set list to hide the broken stations
 DONE - Download radio avatar images
 DONE - Show avatar images at the right sidebar

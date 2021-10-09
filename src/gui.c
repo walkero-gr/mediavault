@@ -88,14 +88,14 @@ void showGUI(void)
 
           fillLeftSidebar();
 
-          columnInfo = IListBrowser->AllocLBColumnInfo( 3,
+          columnInfo = IListBrowser->AllocLBColumnInfo( 4,
               LBCIA_Column,                 0,
                 LBCIA_Title,                " Station",
                 LBCIA_AutoSort,             TRUE,
                 LBCIA_DraggableSeparator,   TRUE,
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               60,
+                LBCIA_Weight,               50,
               LBCIA_Column,                 1,
                 LBCIA_Title,                " Country",
                 LBCIA_AutoSort,             TRUE,
@@ -104,12 +104,19 @@ void showGUI(void)
                 LBCIA_SortArrow,            TRUE,
                 LBCIA_Weight,               30,
               LBCIA_Column,                 2,
+                LBCIA_Title,                " Bitrate",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               15,
+              LBCIA_Column,                 3,
                 LBCIA_Title,                " Votes",
                 LBCIA_AutoSort,             TRUE,
                 LBCIA_DraggableSeparator,   TRUE,
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               10,
+                LBCIA_Weight,               5,
               TAG_DONE);
 
           podcastColInfo = IListBrowser->AllocLBColumnInfo( 2,

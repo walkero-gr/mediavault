@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
   The file includes configuration for different supported players, but
   more can be added.
 - Added Trending Podcasts search based on category and/or language
+- Added radio station bitrate and codec information in results list
+  and at the right sidebar.
 
 ### Fixed
 - Fixed the error of not finding the texteditor.gadget on start

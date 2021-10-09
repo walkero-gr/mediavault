@@ -115,12 +115,10 @@ void getRadioPopularStations(void)
 size_t getRadioList(struct List *stationList, int offset)
 {
   LONG  responseCode = getResponseCode();
-
   if (responseCode != 200)
     return ~0UL;
 
   STRPTR responseBody = getResponseBody();
-
   if (responseBody == NULL)
     return ~0UL;
 
@@ -224,6 +222,21 @@ size_t getRadioList(struct List *stationList, int offset)
     }
     IUtility->Strlcpy(stationData->favicon, IJansson->json_string_value(buf), sizeof(stationData->favicon));
 
+    buf = IJansson->json_object_get(data, "codec");
+    if(!json_is_string(buf))
+    {
+      IJansson->json_decref(jsonRoot);
+      return ~0UL;
+    }
+    IUtility->Strlcpy(stationData->codec, IJansson->json_string_value(buf), sizeof(stationData->codec));
+
+    buf = IJansson->json_object_get(data, "bitrate");
+    if(json_is_integer(buf))
+    {
+      stationData->bitrate = (uint8)IJansson->json_integer_value(buf);
+    }
+    else stationData->bitrate = 0;
+
     buf = IJansson->json_object_get(data, "votes");
     if(!json_is_integer(buf))
     {
@@ -232,7 +245,10 @@ size_t getRadioList(struct List *stationList, int offset)
     }
     stationData->votes = (ULONG)IJansson->json_integer_value(buf);
 
-    stationNode = IListBrowser->AllocListBrowserNode( 4,
+    char codecBitrate[15];
+    IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%ld kbps %s", stationData->bitrate, stationData->codec);
+
+    stationNode = IListBrowser->AllocListBrowserNode( 5,
         LBNA_UserData,          stationData,
         LBNA_Column,            0,
           LBNCA_CopyText,       TRUE,
@@ -241,6 +257,9 @@ size_t getRadioList(struct List *stationList, int offset)
           LBNCA_CopyText,       TRUE,
           LBNCA_Text,           stationData->country,
         LBNA_Column,            2,
+          LBNCA_CopyText,       TRUE,
+          LBNCA_Text,           codecBitrate,
+        LBNA_Column,            3,
           LBNCA_CopyInteger,    TRUE,
           LBNCA_Integer,        &stationData->votes,
           LBNCA_Justification,  LCJ_RIGHT,
@@ -309,7 +328,8 @@ void showRadioInfo(struct Node *res_node)
 
     showAvatarImage(itemData->uuid, itemData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE], renderhook);
 
-    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n", itemData->name, itemData->country);
+    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n%ld kbps %s\n",
+          itemData->name, itemData->country, itemData->bitrate, itemData->codec);
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,
