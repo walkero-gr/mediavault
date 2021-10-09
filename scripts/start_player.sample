@@ -1,5 +1,5 @@
 ;
-; File:    stringfuncs.c
+; File:    start_player
 ;
 ;   Copyright (c) 2021, Georgios Sokianos
 ;
@@ -33,9 +33,17 @@ If NOT "{url}" EQ ""
     Run <>NIL: APPDIR:AmigaAmp3 "{url}"
   EndIf
   ;If EXISTS APPDIR:ffplay
+  ;  Set ffplayPID `Status COM=APPDIR:ffplay`
+  ;  If VAL $ffplayPID GT 0
+  ;    Break $ffplayPID
+  ;  EndIf
   ;  Run <>NIL: APPDIR:ffplay "{url}"
   ;EndIf
   ;If EXISTS APPDIR:emotion
+  ;  Set emotionPID `Status COM=APPDIR:emotion`
+  ;  If VAL $emotionPID GT 0
+  ;    Break $emotionPID
+  ;  EndIf
   ;  Run <>NIL: APPDIR:emotion "{url}"
   ;EndIf
 Else
