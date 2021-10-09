@@ -246,7 +246,7 @@ size_t getRadioList(struct List *stationList, int offset)
     stationData->votes = (ULONG)IJansson->json_integer_value(buf);
 
     char codecBitrate[15];
-    IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%ld kbps %s", stationData->bitrate, stationData->codec);
+    IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%ld kbit/s %s", stationData->bitrate, stationData->codec);
 
     stationNode = IListBrowser->AllocListBrowserNode( 5,
         LBNA_UserData,          stationData,
@@ -328,7 +328,7 @@ void showRadioInfo(struct Node *res_node)
 
     showAvatarImage(itemData->uuid, itemData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE], renderhook);
 
-    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n%ld kbps %s\n",
+    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n%ld kbit/s %s\n",
           itemData->name, itemData->country, itemData->bitrate, itemData->codec);
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
