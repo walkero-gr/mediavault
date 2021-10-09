@@ -274,7 +274,7 @@ void playRadio(struct Node *res_node)
     IUtility->SNPrintf(startPlayerPath, sizeof(startPlayerPath), "%s/scripts/start_player", getFilePath((STRPTR)"PROGDIR:MediaVault"));
     if (fileExists(startPlayerPath))
     {
-      cmd = IUtility->ASPrintf("%s \"%s\" ", startPlayerPath, itemData->url_resolved);
+      cmd = IUtility->ASPrintf("execute %s \"%s\" ", startPlayerPath, itemData->url_resolved);
     }
     else
     {

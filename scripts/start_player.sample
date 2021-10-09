@@ -16,9 +16,12 @@
 ;   script, passing the URL of the source. User is
 ;   able to change this script and make it work
 ;   on his system as he wants.
+;   Remove semicolons at the start of the line of
+;   the player you would like to enable.
 ;
-;   This file is a sample, and you have to rename
-;   it to: start_player
+;   This file is a sample and not used by
+;   MediaVault.
+;   You have to copy/rename it to: start_player
 ;
 
 .KEY url/A
@@ -26,15 +29,15 @@
 .KET }
 
 If NOT "{url}" EQ ""
-  ;If EXISTS APPDIR:AmigaAmp3
-  ;  Run <>NIL: APPDIR:AmigaAmp3 "{url}"
-  ;EndIf
+  If EXISTS APPDIR:AmigaAmp3
+    Run <>NIL: APPDIR:AmigaAmp3 "{url}"
+  EndIf
   ;If EXISTS APPDIR:ffplay
   ;  Run <>NIL: APPDIR:ffplay "{url}"
   ;EndIf
-  If EXISTS APPDIR:emotion
-    Run <>NIL: APPDIR:emotion "{url}"
-  EndIf
+  ;If EXISTS APPDIR:emotion
+  ;  Run <>NIL: APPDIR:emotion "{url}"
+  ;EndIf
 Else
   Echo "An argument is missing"
 EndIf

@@ -35,7 +35,7 @@
 #define RELEASE_DATE "5.10.2021"
 #endif
 
-#define APPNAME     "MediaVault BETA"
+#define APPNAME     "MediaVault"
 #define VERS        APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH)
 #define VSTRING     APPNAME " " STR(VERSION) "." STR(REVISION) "." STR(PATCH) " (" RELEASE_DATE ")"
 #define VERSTAG     "\0$VER: " VSTRING
