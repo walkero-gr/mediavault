@@ -23,6 +23,7 @@ struct Library *TimezoneBase;     struct TimezoneIFace      *ITimezone;
 struct ClassLibrary *BitMapBase;
 struct ClassLibrary *ButtonBase;
 struct ClassLibrary *ChooserBase;
+struct ClassLibrary *ClickTabBase;
 struct ClassLibrary *LabelBase;
 struct ClassLibrary *LayoutBase;
 struct ClassLibrary *ListBrowserBase;  struct ListBrowserIFace *IListBrowser;
@@ -36,6 +37,7 @@ struct ClassLibrary *WindowBase;
 Class *BitMapClass;
 Class *ButtonClass;
 Class *ChooserClass;
+Class *ClickTabClass;
 Class *LabelClass;
 Class *LayoutClass;
 Class *ListBrowserClass;
@@ -56,6 +58,7 @@ int CleanExit(const char *str)
   if(SpaceBase)         IIntuition->CloseClass(SpaceBase);
   if(StringBase)        IIntuition->CloseClass(StringBase);
   if(ButtonBase)        IIntuition->CloseClass(ButtonBase);
+  if(ClickTabBase)      IIntuition->CloseClass(ClickTabBase);
   if(ChooserBase)       IIntuition->CloseClass(ChooserBase);
   if(LabelBase)         IIntuition->CloseClass(LabelBase);
   if(LayoutBase)        IIntuition->CloseClass(LayoutBase);
@@ -213,6 +216,9 @@ int OpenLibs(void)
 
   ChooserBase = IIntuition->OpenClass( "gadgets/chooser.gadget", 53, &ChooserClass );
   if (!ChooserBase) CleanExit("Can't open Chooser Gadget");
+
+  ClickTabBase = IIntuition->OpenClass( "gadgets/clicktab.gadget", 53, &ClickTabClass );
+  if (!ClickTabBase) return CleanExit("Can't open ClickTab Gadget");
 
   ButtonBase = IIntuition->OpenClass( "gadgets/button.gadget", 53, &ButtonClass );
   if (!ButtonBase) return CleanExit("Can't open Button Gadget");

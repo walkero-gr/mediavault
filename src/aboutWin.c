@@ -14,7 +14,6 @@
 
 */
 
-
 #include "globals.h"
 #include "gui.h"
 #include "aboutWin.h"
@@ -33,8 +32,13 @@ const uint32 scrollerToText[] = {
     TAG_END
 };
 
+static Object *buildAboutPage(void);
+static Object *buildSupportersPage(void);
+static Object *buildCreditsPage(void);
+
 extern Class *BitMapClass;
 extern Class *ButtonClass;
+extern Class *ClickTabClass;
 extern Class *LayoutClass;
 extern Class *ScrollerClass;
 extern Class *TextEditorClass;
@@ -42,39 +46,12 @@ extern Class *WindowClass;
 
 Object *buildAboutWindow(struct MsgPort *appPort, struct Screen *screen)
 {
-  CONST_STRPTR aboutText = VSTRING "\n" \
-    "Copyright (c) 2021 George Sokianos\n\n"
-    "MediaVault is a media frontend for different sources.\n\n" \
-    "My plan for MediaVault is to create an app where people can discover and listen to online " \
-    "radio stations, podcasts and even to support UPnP servers to listen to music or watch movies.\n\n" \
-    "Developed by George Sokianos\n" \
-    "Contact email: walkero@gmail.com\n" \
-    "Report bugs at:\nhttps://github.com/walkero-gr/mediavault/issues/\n\n"
-    "Dedicated to my beloved family, who have supported me all these years\nAris, Nefeli and Marily!\n\n" \
-    "Distributed without warranty under the terms of the GNU General Public License.";
-    
-  Object *textBox = IIntuition->NewObject(TextEditorClass, NULL,
-      GA_ID,                    GID_ABOUT_TEXT,
-      GA_RelVerify,             TRUE,
-      GA_TEXTEDITOR_Contents,   aboutText,
-      GA_TEXTEDITOR_CursorX,    0,
-      GA_TEXTEDITOR_CursorY,    0,
-      GA_TEXTEDITOR_Flow,       0,
-      TAG_DONE);
-  
-  Object *textBoxScroller = IIntuition->NewObject(ScrollerClass, NULL,
-      GA_ID,                  GID_ABOUT_TEXT_SCROLLER,
-      SCROLLER_Orientation,   SORIENT_VERT,
-      SCROLLER_Arrows,        FALSE,
-      ICA_TARGET,             textBox,
-      ICA_MAP,                scrollerToText,
-      TAG_DONE);
-        
-  IIntuition->SetAttrs(textBox, 
-      ICA_TARGET,   textBoxScroller,
-      ICA_MAP,      textToScroller,
-      TAG_END);   
-
+  CONST_STRPTR tabLabels[] = {
+    "_About",
+    "_Supporters",
+    "_Credits",
+    NULL
+  };
 
   return IIntuition->NewObject(WindowClass, NULL,
     WA_ScreenTitle,         VSTRING,
@@ -105,7 +82,6 @@ Object *buildAboutWindow(struct MsgPort *appPort, struct Screen *screen)
         LAYOUT_HorizAlignment,  LALIGN_CENTER,
         LAYOUT_BevelStyle,      BVS_NONE,
         LAYOUT_BevelState,      IDS_SELECTED,
-        LAYOUT_BackFill,        LAYERS_NOBACKFILL,
 
         LAYOUT_AddImage, IIntuition->NewObject(BitMapClass, NULL,
           IA_Scalable,        FALSE,
@@ -116,8 +92,19 @@ Object *buildAboutWindow(struct MsgPort *appPort, struct Screen *screen)
         CHILD_WeightedWidth, 30,
         CHILD_MaxHeight, 128,
 
-        LAYOUT_AddChild, textBox,
-        LAYOUT_AddChild, textBoxScroller,
+        LAYOUT_AddChild,  IIntuition->NewObject(ClickTabClass, NULL,
+          GA_ID,          GID_ABOUT_CLICKTAB,
+          GA_RelVerify,   TRUE,
+          GA_Text,        tabLabels,
+
+          CLICKTAB_PageGroup, IIntuition->NewObject(NULL, "page.gadget",
+            LAYOUT_DeferLayout,   TRUE,
+            PAGE_Add,             buildAboutPage(),
+            PAGE_Add,             buildSupportersPage(),
+            PAGE_Add,             buildCreditsPage(),
+            TAG_DONE),
+          
+          TAG_DONE),
 
       TAG_DONE),
       CHILD_MinWidth,   520,
@@ -133,3 +120,119 @@ Object *buildAboutWindow(struct MsgPort *appPort, struct Screen *screen)
     TAG_DONE),
   TAG_DONE);
 }
+
+static Object *buildAboutPage(void)
+{
+  CONST_STRPTR aboutText = VSTRING "\n" \
+    "Copyright (c) 2021 George Sokianos\n\n"
+    "MediaVault is an open source desktop application for AmigaOS 4, which can be used to discover online audio and video content.\n\n" \
+    "Dedicated to my beloved family, who have supported me all these years\nAris, Nefeli and Marily!\n\n" \
+    "Contact me at: walkero@gmail.com\n\n" \
+    "Report bugs or request features at:\nhttps://github.com/walkero-gr/mediavault/issues/\n\n" \
+    "Distributed without warranty under the terms of the GNU General Public License.";
+
+  Object *textBox = IIntuition->NewObject(TextEditorClass, NULL,
+      GA_ID,                      GID_ABOUT_TEXT,
+      GA_RelVerify,               TRUE,
+      GA_TEXTEDITOR_Contents,     aboutText,
+      GA_TEXTEDITOR_CursorX,      0,
+      GA_TEXTEDITOR_CursorY,      0,
+      GA_TEXTEDITOR_Flow,         GV_TEXTEDITOR_Flow_Left,
+      GA_TEXTEDITOR_ReadOnly,     TRUE,
+      TAG_DONE);
+
+  Object *textBoxScroller = IIntuition->NewObject(ScrollerClass, NULL,
+      GA_ID,                  GID_ABOUT_TEXT_SCROLLER,
+      SCROLLER_Orientation,   SORIENT_VERT,
+      SCROLLER_Arrows,        FALSE,
+      ICA_TARGET,             textBox,
+      ICA_MAP,                scrollerToText,
+      TAG_DONE);
+
+  IIntuition->SetAttrs(textBox,
+      ICA_TARGET,   textBoxScroller,
+      ICA_MAP,      textToScroller,
+      TAG_END);
+
+  return IIntuition->NewObject(LayoutClass, NULL,
+      LAYOUT_AddChild, textBox,
+      LAYOUT_AddChild, textBoxScroller,
+      TAG_DONE);
+}
+
+static Object *buildSupportersPage(void)
+{
+  CONST_STRPTR text =
+    "If you would like to support MediaVault's development, and be part of the list below, please visit: https://ko-fi.com/walkero\n\n" \
+    "* AmigaPals supporters\n" \
+    "\tlevellord\n\tRoman Kargin\n\n" \
+    "* Supporters\n" \
+    "\tarisamiga\n\tDaniel \"trixie\" Jedlicka\n\tjabierdlr\n\tktadd\n\tMike Brantley\n" \
+    "\tscottcampbell\n\tSkateman\n\tSoLiD-SNaKe\n\tThomas Kolsch\n\tTim Grooms";
+
+  Object *textBox = IIntuition->NewObject(TextEditorClass, NULL,
+      GA_ID,                      GID_ABOUT_SUPPORTERS_TEXT,
+      GA_RelVerify,               TRUE,
+      GA_TEXTEDITOR_Contents,     text,
+      GA_TEXTEDITOR_CursorX,      0,
+      GA_TEXTEDITOR_CursorY,      0,
+      GA_TEXTEDITOR_Flow,         GV_TEXTEDITOR_Flow_Left,
+      GA_TEXTEDITOR_ReadOnly,     TRUE,
+      GA_TEXTEDITOR_TabSize,      2,
+      TAG_DONE);
+
+  Object *textBoxScroller = IIntuition->NewObject(ScrollerClass, NULL,
+      GA_ID,                  GID_ABOUT_SUPPORTERS_TEXT_SCROLLER,
+      SCROLLER_Orientation,   SORIENT_VERT,
+      SCROLLER_Arrows,        FALSE,
+      ICA_TARGET,             textBox,
+      ICA_MAP,                scrollerToText,
+      TAG_DONE);
+
+  IIntuition->SetAttrs(textBox,
+      ICA_TARGET,   textBoxScroller,
+      ICA_MAP,      textToScroller,
+      TAG_END);
+
+  return IIntuition->NewObject(LayoutClass, NULL,
+      LAYOUT_AddChild, textBox,
+      LAYOUT_AddChild, textBoxScroller,
+      TAG_DONE);
+}
+
+static Object *buildCreditsPage(void)
+{
+  CONST_STRPTR text =
+    "Developed by George Sokianos\n" \
+    "Icons by:\n\tMartin (Mason) Merz\n\tIconDesigner";
+
+  Object *textBox = IIntuition->NewObject(TextEditorClass, NULL,
+      GA_ID,                      GID_ABOUT_CREDITS_TEXT,
+      GA_RelVerify,               TRUE,
+      GA_TEXTEDITOR_Contents,     text,
+      GA_TEXTEDITOR_CursorX,      0,
+      GA_TEXTEDITOR_CursorY,      0,
+      GA_TEXTEDITOR_Flow,         GV_TEXTEDITOR_Flow_Left,
+      GA_TEXTEDITOR_ReadOnly,     TRUE,
+      GA_TEXTEDITOR_TabSize,      2,
+      TAG_DONE);
+
+  Object *textBoxScroller = IIntuition->NewObject(ScrollerClass, NULL,
+      GA_ID,                  GID_ABOUT_CREDITS_TEXT_SCROLLER,
+      SCROLLER_Orientation,   SORIENT_VERT,
+      SCROLLER_Arrows,        FALSE,
+      ICA_TARGET,             textBox,
+      ICA_MAP,                scrollerToText,
+      TAG_DONE);
+
+  IIntuition->SetAttrs(textBox,
+      ICA_TARGET,   textBoxScroller,
+      ICA_MAP,      textToScroller,
+      TAG_END);
+
+  return IIntuition->NewObject(LayoutClass, NULL,
+      LAYOUT_AddChild, textBox,
+      LAYOUT_AddChild, textBoxScroller,
+      TAG_DONE);
+}
+

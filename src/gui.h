@@ -29,6 +29,7 @@
 
 #include <gadgets/button.h>
 #include <gadgets/chooser.h>
+#include <gadgets/clicktab.h>
 #include <gadgets/layout.h>
 #include <gadgets/listbrowser.h>
 #include <gadgets/scroller.h> 
@@ -64,10 +65,15 @@ enum
   GID_CHOOSER_COUNTRIES,
   GID_CHOOSER_LANGUAGES,
   GID_RADIO_LISTBROWSER,
+  GID_ABOUT_CLICKTAB,
   GID_ABOUT_LAYOUT_ROOT,
   GID_ABOUT_LAYOUT_TEXT,
   GID_ABOUT_TEXT,
+  GID_ABOUT_CREDITS_TEXT,
+  GID_ABOUT_SUPPORTERS_TEXT,
   GID_ABOUT_TEXT_SCROLLER,
+  GID_ABOUT_CREDITS_TEXT_SCROLLER,
+  GID_ABOUT_SUPPORTERS_TEXT_SCROLLER,
   GID_ABOUT_BUTTON_OK,
   GID_ABOUT_LOGO,
   GID_MSG_REQ,
