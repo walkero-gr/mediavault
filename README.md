@@ -4,19 +4,61 @@
 
 # mediavault
 
-MediaVault is an open source desktop application, for AmigaOS 4, which can be
-used to discover online radio stations. The selected radio station can be
-streamed using a player, i.e. AmigaAmp 3.
+MediaVault is an open source desktop application for AmigaOS 4, which can be
+used to discover online audio and video content.
 
-When Mediavault is started at the top of the window there are a few fields
-that can be used to discover radio station based on their name, genre, country
-and spoken language. By clicking on "Discover" button a list of relevant radio
-stations will show up.
+With MediaVault you can discover radio stations and podcasts and listen to
+them using your audio player of choice. There is different ways to searh and
+filter results, based on language, category/genre.
 
-To listen a radio station, double click on it's line, and AmigaAmp3 will
-start, playing the radio station. After that, you can close MediaVault.
+The user interface is easy to understand and use. At the left side there is
+a list about the different type of content. At the middle section there are
+filters and selections at the top, that help you find the content you are
+looking for, and the result of the search is shown at the list below. By
+selecting an item (radio station/podcast) from the lists, information show
+up at the right sidebar, where there is a play button for the radio stations
+or a second list of episodes for the podcasts. When the play button is
+enabled, it can be used for the player to start playing the selected audio.
 
 ![preview](img/mediavault_1.3.0.gif)
+
+Set your favorite player
+--------------------------
+MediaVault uses a script under the folder scripts, named start_player. To
+enable that feature, you have to rename start_player.sample file to
+start_player, otherwise it is going to be ignored by MediaVault. This is
+necessary process, so that it will not be replace by future releases. You
+have to do it only once.
+
+By default, AmigaAmp3 is set to be used, but you can edit the file and set
+your audio player of choice. In that file you will find configuration for
+other known players, like Emotion and ffplay, that were tested and it is
+known to work fine. To enable one of them you have to remove the
+semicolons (;) at the start of their lines. Also, you have to add
+semicolons at the start of their lines for the rest of the enabled players,
+so to prevent multiple of them starting at the same time. Or you can remove
+their respective lines.
+
+You can change the start_player script files as you want. You can add your
+own players, if you like.
+
+If you need help, please, do not hesitate to contact me.
+
+Podcast do not work?
+--------------------------
+If you search for a podcast but nothing comes up, then you will see a
+requester with information about possible reasons that might prevent it
+to work.
+
+The online service MediaVault uses to get information about podcasts,
+requires a timestamp for every request to be sent. This means that your
+computer has to have the right date and time set. Please, use Workbench
+Time preferences, or any other program you prefer, to sync your system
+date and time with an online NTP server.
+
+If this still doesn't work for you, please open an issue at MediaVault's
+GitHub page and write down as much information as you can for the problem
+you experience. You can find the exact url below.
 
 Vision
 --------------------------
@@ -27,7 +69,7 @@ My plan for MediaVault is to create an application which users will use to:
 - follow podcasts and get information for new episodes
 - access content (music, video etc.) from local DLNA media servers, like
   Plex, Jellyfin etc.
-- have a modern look and feel, with images and photos, where is possible
+- have a modern look and feel, with images and photos, where it is possible
 - create a clean, easy to read code, with good quality and the best practices
   for others to get inspired
 
@@ -73,6 +115,20 @@ Help me persuade my wife that what I am doing matters
 
 Changelog
 --------------------------
+v1.4.1 - 2021-10-10
+* Added an error message when podcast response is not a succesful one
+* Added scripts/start_player.sample script. This can be used to set the
+  preferred player. This needs to be renamed as start_player to be used.
+  The reason the file is named like that is to avoid replacements in
+  future updates.
+  The file includes configuration for different supported players, but
+  more can be added.
+* Added Trending Podcasts search based on category and/or language
+* Added radio station bitrate and codec information in results list
+  and at the right sidebar.
+* Changed the about window to add more information.
+* Fixed the error of not finding the texteditor.gadget on start
+
 v1.4.0 - 2021-10-05
 * You can now search for podcasts based on their title, see info and their
   avatar and a list of the latest 100 episodes

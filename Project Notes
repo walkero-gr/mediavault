@@ -97,6 +97,7 @@ DONE - [v1.4] Add a check if the podcast name is empty when Discover button is
 - Mark podcasts as favorites
 - Download podcast episodes
 DONE - [v1.4.1] Add more filters, like categories, language etc.
+- Change the language column to have the Language name than the iso code
 
 ## UPnP
 - Create a unique list of the UPnP servers

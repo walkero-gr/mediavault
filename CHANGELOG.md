@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.4.1] - future
+## [1.4.1] - 2021-10-10
 ### Added
 - Added an error message when podcast response is not 200
 - Added scripts/start_player.sample script. This can be used to set the
@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file.
 - Added Trending Podcasts search based on category and/or language
 - Added radio station bitrate and codec information in results list
   and at the right sidebar.
+
+### Changed
+- Changed the about window to add more information.
 
 ### Fixed
 - Fixed the error of not finding the texteditor.gadget on start
