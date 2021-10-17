@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 07-10-2021 23:11:09
+# Created on: 14-10-2021 23:58:06
 #
 #
 
@@ -18,7 +18,8 @@ MediaVault_OBJ := \
 	 src/mediavault.o src/libshandler.o src/gui.o \
 	 src/mainWin.o src/guifuncs.o src/aboutWin.o \
 	 src/httpfuncs.o src/radiofuncs.o src/stringfuncs.o \
-	 src/fsfuncs.o src/podcastfuncs.o
+	 src/fsfuncs.o src/podcastfuncs.o src/sqldb.o \
+	
 
 
 ###################################################################
@@ -67,7 +68,7 @@ realclean:
 
 MediaVault: $(MediaVault_OBJ)
 	@echo "Linking MediaVault"
-	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) -lcurl -lrtmp -lssl -lcrypto -lz -lpthread
+	@gcc:bin/gcc -o MediaVault $(MediaVault_OBJ) -lsqlite3 -lcurl -lrtmp -lssl -lcrypto -lz -lpthread
 	@echo "Removing stale debug target: MediaVault"
 	@rm -f MediaVault.debug
 
@@ -85,8 +86,9 @@ MediaVault: $(MediaVault_OBJ)
 	@echo "Compiling $<"
 	@$(CC) -c $< -o $*.o $(CFLAGS)
 
-src/mediavault.o: src/mediavault.c src/mediavault.h src/globals.h \
-	 src/version.h src/libshandler.h
+src/mediavault.o: src/mediavault.c src/libshandler.h src/gui.h \
+	 src/sqldb.h src/mediavault.h src/globals.h \
+	
 
 src/libshandler.o: src/libshandler.c src/globals.h src/version.h \
 	
@@ -103,6 +105,8 @@ src/httpfuncs.o: src/httpfuncs.c src/version.h
 
 src/fsfuncs.o: src/fsfuncs.c src/globals.h src/version.h \
 	
+
+src/sqldb.o: src/sqldb.c src/version.h
 
 src/guifuncs.o: src/guifuncs.c src/globals.h src/version.h \
 	 src/gui.h src/guifuncs.h src/radiofuncs.h \

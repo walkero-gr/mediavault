@@ -778,6 +778,15 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
         BITMAP_SourceFile,  LOGO_IMAGE,
         BITMAP_Masking,     TRUE,
         TAG_END);
+  
+  objects[OID_RADIO_FAVOURITES_ADD_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        BITMAP_SourceFile,            "tbimages:favouritesadd",
+        BITMAP_DisabledSourceFile,    "tbimages:favouritesadd_g",
+        BITMAP_SelectSourceFile,      "tbimages:favouritesadd_s",
+        BITMAP_Screen,                screen,
+        BITMAP_Precision,             PRECISION_EXACT,
+        BITMAP_Masking,               TRUE,
+        TAG_END);
 
   if (renderhook && objects[OID_AVATAR_IMAGE])
   {
@@ -795,12 +804,40 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
             SPACE_MinWidth,             128,
             SPACE_MinHeight,            128,
             SPACE_RenderHook,           renderhook,
+            //SPACE_BevelStyle,           BVS_GROUP,
             GA_Image,                   objects[OID_AVATAR_IMAGE],
             TAG_DONE),
             CHILD_WeightedHeight, 30,
 
           LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
             LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
+            //LAYOUT_BevelStyle,      BVS_GROUP,
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 70,
+
+            LAYOUT_AddChild, gadgets[GID_RADIO_FAVOURITES_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,                      GID_RADIO_FAVOURITES_BUTTON,
+              GA_Disabled,                FALSE,
+              BUTTON_Transparent,         TRUE,
+              BUTTON_AutoButton,          0,
+              BUTTON_BevelStyle,          BVS_NONE,
+              BUTTON_Justification,       1,
+              BUTTON_RenderImage,         objects[OID_RADIO_FAVOURITES_ADD_IMAGE],
+              TAG_DONE),
+              //CHILD_MaxHeight, 40,
+              CHILD_WeightedWidth, 10,
+
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 20,
+            TAG_DONE),
+            //CHILD_MaxHeight, 30,
+            CHILD_WeightedHeight, 5,
+
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+            LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
+            //LAYOUT_BevelStyle,      BVS_GROUP,
             LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
               TAG_DONE),
               CHILD_WeightedWidth, 30,
@@ -826,9 +863,10 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
 
             LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
               TAG_DONE),
-              CHILD_WeightedWidth, 30,
+              CHILD_WeightedWidth, 25,
             TAG_DONE),
-            CHILD_MaxHeight, 60,
+            //CHILD_MaxHeight, 60,
+            CHILD_WeightedHeight, 10,
 
           LAYOUT_AddChild, gadgets[GID_INFO_RADIO_DATA] = IIntuition->NewObject(TextEditorClass, NULL,
             GA_ID,                      GID_INFO_RADIO_DATA,
@@ -841,11 +879,12 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
             GA_TEXTEDITOR_ReadOnly,     TRUE,
             GA_TEXTEDITOR_Transparent,  TRUE,
             TAG_DONE),
-            CHILD_WeightedHeight, 18,
+            CHILD_WeightedHeight, 25,
 
           LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+            //SPACE_BevelStyle,           BVS_GROUP,
             TAG_DONE),
-            CHILD_WeightedHeight, 40,
+            CHILD_WeightedHeight, 30,
 
           TAG_DONE);
 }

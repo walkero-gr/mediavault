@@ -6,16 +6,19 @@
 **
 ** Project: MediaVault
 **
-** File: mediavault.h
+** File: sqldb.h
 **
-** Date: 28-11-2020 14:15:00
+** Date: 14-10-2021 16:39:23
 **
 ************************************************************
 
 */
-#ifndef _MEDIAVAULT_H
-#define _MEDIAVAULT_H
 
 
+#ifndef _SQLDB_H
+#define _SQLDB_H
+
+void printSqliteVer(void); 
+BOOL createDB(void);
 
 #endif

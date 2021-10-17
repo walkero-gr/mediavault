@@ -118,8 +118,11 @@ DONE - [v1.4.1] Add more filters, like categories, language etc.
 
 - Add Podcast page
 
-
-
+## Favorites DB
+- Check if DB file exists
+- Initialize the DB file
+- Add a method to check the DB version
+- 
 
 
 //// BUGS

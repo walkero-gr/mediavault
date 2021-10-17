@@ -1,89 +1,92 @@
 <?xml version="1.0" ?>
-<CodeBench_Project name="MediaVault" path="Applications:Programming/workspace/MyProjects/mediavault/MediaVault.cbp" created="1353847454" lastmodified="1381187465">
-	<plugin name="PROGDIR:Plugins/AmigaOS4SDK.CCPlugin" flags="0" />
-	<target run="MediaVault" />
-	<homedir name="Applications:Programming/workspace/MyProjects/mediavault" />
-	<includedir name="Applications:Programming/workspace/MyProjects/mediavault/src" />
-	<compiler name="gcc:bin/gcc" switches="-Wall -Werror -Wwrite-strings -Wextra -O3" stack="131072" />
-	<linker switches="-lauto" />
-	<debugger name="SDK:c/gdb"/>
-	<builder name="SDK:c/make -f" />
-	<environment tabsize="2" />
+<CodeBench_Project name="MediaVault" path="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;MediaVault.cbp" created="1353847454" lastmodified="1381795500">
+	<plugin name="PROGDIR:Plugins&#047;AmigaOS4SDK.CCPlugin" flags="0"/>
+	<target run="MediaVault"/>
+	<homedir name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault"/>
+	<includedir name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src"/>
+	<compiler name="gcc:bin&#047;gcc" switches="-Wall -Werror -Wwrite-strings -Wextra -O3" stack="131072"/>
+	<linker switches="-lauto"/>
+	<debugger name="SDK:c&#047;gdb"/>
+	<builder name="SDK:c&#047;make -f"/>
+	<environment tabsize="2"/>
 	<headers>
-		<file name="Applications:Programming/workspace/MyProjects/mediavault/src/libshandler.h" open="0" />
-		<file name="Applications:Programming/workspace/MyProjects/mediavault/src/mediavault.h" open="0" />
-		<file name="src/globals.h" open="1" top="0" left="0" line="24" row="28" />
-		<file name="src/upnpfuncs.h" open="0" />
-		<file name="Applications:Programming/workspace/MyProjects/mediavault/src/guifuncs.h" open="0" />
-		<file name="Applications:Programming/workspace/MyProjects/mediavault/src/version.h" open="1" top="0" left="0" line="38" row="36" />
-		<file name="Applications:Programming/workspace/MyProjects/mediavault/src/podcastfuncs.h" open="0" />
-		<file name="Applications:Programming/workspace/MyProjects/mediavault/src/httpfuncs.h" open="0" />
-		<file name="Applications:Programming/workspace/MyProjects/mediavault/src/secrets.h" open="0" />
-		<file name="src/gui.h" open="1" current="1" top="17" left="0" line="38" row="0" />
-		<file name="src/mainWin.h" open="0" />
-		<file name="Applications:Programming/workspace/MyProjects/mediavault/src/fsfuncs.h" open="0" />
-		<file name="src/aboutWin.h" open="0" />
-		<file name="src/radiofuncs.h" open="0" />
-		<file name="src/stringfuncs.h" open="1" top="0" left="0" line="22" row="28" />
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;libshandler.h" open="0"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;mediavault.h" open="1" top="0" left="0" line="35" row="0"/>
+		<file name="src&#047;globals.h" open="1" top="0" left="0" line="24" row="28"/>
+		<file name="src&#047;upnpfuncs.h" open="0"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;guifuncs.h" open="0"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;version.h" open="1" top="0" left="0" line="38" row="36"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;podcastfuncs.h" open="0"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;httpfuncs.h" open="0"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;secrets.h" open="0"/>
+		<file name="src&#047;gui.h" open="1" top="17" left="0" line="38" row="0"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;sqldb.h" open="1" top="0" left="0" line="21" row="25"/>
+		<file name="src&#047;mainWin.h" open="0"/>
+		<file name="Applications:Programming&#047;workspace&#047;MyProjects&#047;mediavault&#047;src&#047;fsfuncs.h" open="0"/>
+		<file name="src&#047;aboutWin.h" open="0"/>
+		<file name="src&#047;radiofuncs.h" open="0"/>
+		<file name="src&#047;stringfuncs.h" open="1" top="0" left="0" line="22" row="28"/>
 	</headers>
 	<sources>
-		<file name="src/mediavault.c" open="0" />
-		<file name="src/libshandler.c" open="1" top="58" left="0" line="88" row="24" />
-		<file name="src/upnpfuncs.c" open="0" />
-		<file name="src/gui.c" open="1" top="0" left="0" line="110" row="0" />
-		<file name="src/httpfuncs.c" open="0" />
-		<file name="src/fsfuncs.c" open="1" top="0" left="0" line="32" row="0" />
-		<file name="src/guifuncs.c" open="1" top="520" left="0" line="532" row="8" />
-		<file name="src/podcastfuncs.c" open="0" />
-		<file name="src/mainWin.c" open="0" />
-		<file name="src/aboutWin.c" open="0" />
-		<file name="src/radiofuncs.c" open="0" />
-		<file name="src/stringfuncs.c" open="1" top="127" left="0" line="162" row="35" />
+		<file name="src&#047;mediavault.c" open="1" current="1" top="0" left="0" line="24" row="19"/>
+		<file name="src&#047;libshandler.c" open="1" top="58" left="0" line="88" row="24"/>
+		<file name="src&#047;upnpfuncs.c" open="0"/>
+		<file name="src&#047;gui.c" open="1" top="0" left="0" line="110" row="0"/>
+		<file name="src&#047;httpfuncs.c" open="0"/>
+		<file name="src&#047;fsfuncs.c" open="1" top="0" left="0" line="32" row="0"/>
+		<file name="src&#047;sqldb.c" open="1" top="0" left="0" line="25" row="26"/>
+		<file name="src&#047;guifuncs.c" open="1" top="520" left="0" line="532" row="8"/>
+		<file name="src&#047;podcastfuncs.c" open="0"/>
+		<file name="src&#047;mainWin.c" open="0"/>
+		<file name="src&#047;aboutWin.c" open="0"/>
+		<file name="src&#047;radiofuncs.c" open="0"/>
+		<file name="src&#047;stringfuncs.c" open="1" top="127" left="0" line="162" row="35"/>
 	</sources>
 	<others>
-		<file name="CHANGELOG.md" open="0" />
-		<file name="README.md" open="0" />
-		<file name="os4depot.readme" open="0" />
-		<file name=".gitignore" open="0" />
+		<file name="CHANGELOG.md" open="0"/>
+		<file name="README.md" open="0"/>
+		<file name="os4depot.readme" open="0"/>
+		<file name=".gitignore" open="0"/>
 	</others>
-	<flags value="0x0000000000068005" />
-	<buildscript name="Makefile" depth="3" open="0" />
-	<projectnotes open="0" />
-	<buildwindow open="1" />
+	<flags value="0x0000000000068005"/>
+	<buildscript name="Makefile" depth="3" open="0"/>
+	<projectnotes open="0"/>
+	<buildwindow open="1"/>
 	<targets>
-		<target name="MediaVault" linker="gcc:bin/gcc" switches="-lcurl -lrtmp -lssl -lcrypto -lz -lpthread" flags="0x00000002" >
-			<file name="src/mediavault.c" />
-			<file name="src/libshandler.c" />
-			<file name="src/gui.c" />
-			<file name="src/mainWin.c" />
-			<file name="src/guifuncs.c" />
-			<file name="src/aboutWin.c" />
-			<file name="src/httpfuncs.c" />
-			<file name="src/radiofuncs.c" />
-			<file name="src/stringfuncs.c" />
-			<file name="src/fsfuncs.c" />
-			<file name="src/podcastfuncs.c" />
+		<target name="MediaVault" linker="gcc:bin&#047;gcc" switches="-lsqlite3 -lcurl -lrtmp -lssl -lcrypto -lz -lpthread" flags="0x00000002">
+			<file name="src&#047;mediavault.c"/>
+			<file name="src&#047;libshandler.c"/>
+			<file name="src&#047;gui.c"/>
+			<file name="src&#047;mainWin.c"/>
+			<file name="src&#047;guifuncs.c"/>
+			<file name="src&#047;aboutWin.c"/>
+			<file name="src&#047;httpfuncs.c"/>
+			<file name="src&#047;radiofuncs.c"/>
+			<file name="src&#047;stringfuncs.c"/>
+			<file name="src&#047;fsfuncs.c"/>
+			<file name="src&#047;podcastfuncs.c"/>
+			<file name="src&#047;sqldb.c"/>
 		</target>
 	</targets>
-	<logfile name="RAM Disk:Build.log" />
+	<logfile name="RAM Disk:Build.log"/>
 	<search lastsearch="unicode" sensecase="1" replace_state="0"/>
 	<customrules>
 		<rule name="release" add="2">
-			<command>mkdir -p release&#047;MediaVault&#047;libs</command>
-			<command>mkdir -p release&#047;MediaVault&#047;cache</command>
-			<command>mkdir -p release&#047;MediaVault&#047;scripts</command>
-			<command>cp release_files&#047;* release&#047;MediaVault&#047; -r</command>
-			<command>cp MediaVault release&#047;MediaVault&#047;</command>
-			<command>strip release&#047;MediaVault&#047;MediaVault</command>
-			<command>cp CHANGELOG.md release&#047;MediaVault&#047;</command>
-			<command>cp README.md release&#047;MediaVault&#047;</command>
-			<command>cp LICENSE release&#047;MediaVault&#047;</command>
-			<command>cp COPYING release&#047;MediaVault&#047;</command>
-			<command>cp images release&#047;MediaVault&#047; -r</command>
-			<command>cp scripts&#047;*.sample* release&#047;MediaVault&#047;scripts&#047;</command>
-			<command>cp Libs:jansson.library release&#047;MediaVault&#047;libs&#047;</command>
-			<command>cp release_files&#047;Icons&#047;IconDesigner.info release&#047;MediaVault.info</command>
-			<command>lha -aeqr3 a MediaVault.lha release&#047;</command>
+			<command>mkdir -p release/MediaVault/libs</command>
+			<command>mkdir -p release/MediaVault/cache</command>
+			<command>mkdir -p release/MediaVault/scripts</command>
+			<command>cp release_files/* release/MediaVault/ -r</command>
+			<command>cp MediaVault release/MediaVault/</command>
+			<command>strip release/MediaVault/MediaVault</command>
+			<command>cp CHANGELOG.md release/MediaVault/</command>
+			<command>cp README.md release/MediaVault/</command>
+			<command>cp LICENSE release/MediaVault/</command>
+			<command>cp COPYING release/MediaVault/</command>
+			<command>cp images release/MediaVault/ -r</command>
+			<command>cp scripts/*.sample* release/MediaVault/scripts/</command>
+			<command>cp Libs:jansson.library release/MediaVault/libs/</command>
+			<command>cp release_files/Icons/IconDesigner.info release/MediaVault.info</command>
+			<command>lha -aeqr3 a MediaVault.lha release/</command>
 		</rule>
 	</customrules>
 </CodeBench_Project>

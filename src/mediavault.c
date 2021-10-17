@@ -1,4 +1,12 @@
 
+/* ANSI C */
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "libshandler.h"
+#include "gui.h"
+#include "sqldb.h"
+#include "fsfuncs.h"
 #include "mediavault.h"
 
 void die(const char *s)
@@ -17,12 +25,16 @@ int main(void)
     return libsOpened;
   }
 
+  if (!fileExists((STRPTR)"PROGDIR:data1.db"))
+  {
+    // TODO: Check if this was succesful and show an error message or disable the db features
+    createDB();
+  }
+
   showGUI();
   //discoverUPnPServers();
   //freeUpnpServers();
   //getMetadata((char *)"dummy");
 
   return CleanExit("JustExit");
-
-  //return 0;
 }
