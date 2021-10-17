@@ -68,6 +68,8 @@ BOOL getRadioStations(struct filters lastFilters, int offset)
   if (IUtility->Stricmp(lastFilters.genre, ""))
   {
     STRPTR encSelGenre = urlEncode(lastFilters.genre);
+    stringToLower(encSelGenre);
+
     IUtility->Strlcat(url, "&tag=", sizeof(url));
     IUtility->Strlcat(url, encSelGenre, sizeof(url));
     IExec->FreeVec(encSelGenre);
@@ -75,6 +77,8 @@ BOOL getRadioStations(struct filters lastFilters, int offset)
   if (IUtility->Stricmp(lastFilters.language, ""))
   {
     STRPTR encSelLanguage = urlEncode(lastFilters.language);
+    stringToLower(encSelLanguage);
+
     IUtility->Strlcat(url, "&language=", sizeof(url));
     IUtility->Strlcat(url, encSelLanguage, sizeof(url));
     IExec->FreeVec(encSelLanguage);
@@ -82,6 +86,8 @@ BOOL getRadioStations(struct filters lastFilters, int offset)
   if (IUtility->Stricmp(lastFilters.country, ""))
   {
     STRPTR encSelCountry = urlEncode(lastFilters.country);
+    stringToLower(encSelCountry);
+    
     IUtility->Strlcat(url, "&country=", sizeof(url));
     IUtility->Strlcat(url, encSelCountry, sizeof(url));
     IExec->FreeVec(encSelCountry);

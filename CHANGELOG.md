@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.2] - 2021-10-17
+### Fixed
+- The online radio stations api changed and broke the searching of
+  online radio stations. This is a fix for that.
+
 ## [1.4.1] - 2021-10-10
 ### Added
 - Added an error message when podcast response is not 200

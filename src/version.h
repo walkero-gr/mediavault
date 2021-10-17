@@ -28,11 +28,11 @@
 #endif
 
 #ifndef PATCH
-#define PATCH 1
+#define PATCH 2
 #endif
 
 #ifndef RELEASE_DATE
-#define RELEASE_DATE "10.10.2021"
+#define RELEASE_DATE "17.10.2021"
 #endif
 
 #define APPNAME     "MediaVault"
