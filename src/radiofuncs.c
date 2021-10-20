@@ -338,6 +338,8 @@ void showRadioInfo(struct Node *res_node)
     IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n%ld kbit/s %s\n",
           itemData->name, itemData->country, itemData->bitrate, itemData->codec);
 
+    IDOS->Printf("DBG: %s\n", itemData->url_resolved);
+
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,
           TAG_DONE);
@@ -346,7 +348,7 @@ void showRadioInfo(struct Node *res_node)
           GA_Disabled,   FALSE,
           TAG_DONE);
 
-    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITES_BUTTON], windows[WID_MAIN], NULL,
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,   FALSE,
           TAG_DONE);
 

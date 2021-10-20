@@ -30,6 +30,7 @@
 struct ColumnInfo *columnInfo, *leftSidebarCI,
             *podcastColInfo, *podcastEpisodeColInfo;
 struct List radioList,
+            radioFavouriteList,
             radioPopularList,
             radioTrendList,
             leftSidebarList,
@@ -372,7 +373,7 @@ void showGUI(void)
                         }
                         break;
 
-                      case GID_RADIO_FAVOURITES_BUTTON:
+                      case GID_RADIO_FAVOURITE_BUTTON:
                         IDOS->Printf("DBG: Favourite Radio button clicked\n");
                         if (res_value == LBRE_NORMAL)
                         {
@@ -396,6 +397,18 @@ void showGUI(void)
                             break;
                           case 1:
                             switchRightSidebar(PAGE_RADIO_INFO);
+                            //fillRadioFavouriteList();
+                            /*
+                            if(listCount(&radioFavouriteList) == 0)
+                            {
+                              windowBlocking(objects[OID_MAIN], TRUE);
+                              fillRadioPopularList();
+                              windowBlocking(objects[OID_MAIN], FALSE);
+                            }
+                            */
+                            break;
+                          case 2:
+                            switchRightSidebar(PAGE_RADIO_INFO);
                             if(listCount(&radioPopularList) == 0)
                             {
                               windowBlocking(objects[OID_MAIN], TRUE);
@@ -403,7 +416,7 @@ void showGUI(void)
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                             break;
-                          case 2:
+                          case 3:
                             switchRightSidebar(PAGE_RADIO_INFO);
                             if(listCount(&radioTrendList) == 0)
                             {
@@ -412,10 +425,10 @@ void showGUI(void)
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                             break;
-                          case 3:
+                          case 4:
                             switchRightSidebar(PAGE_PODCAST_INFO);
                             break;
-                          case 4:
+                          case 5:
                             switchRightSidebar(PAGE_PODCAST_INFO);
                             break;
                         }
@@ -570,6 +583,11 @@ void showGUI(void)
           if(listCount(&radioList))
           {
             freeList(&radioList, STRUCT_STATION_INFO);
+          }
+
+          if(listCount(&radioFavouriteList))
+          {
+            freeList(&radioFavouriteList, STRUCT_STATION_INFO);
           }
 
           if(listCount(&radioPopularList))

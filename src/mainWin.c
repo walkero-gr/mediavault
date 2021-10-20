@@ -19,206 +19,16 @@
 
 #include "globals.h"
 #include "gui.h"
+#include "lists.h"
 #include "mainWin.h"
 #include "guifuncs.h"
-
-CONST_STRPTR genres[] =
-{
-  "All Genres",
-  (STRPTR) ~0L,
-  "Alternative",
-  "Blues",
-  "Classical",
-  "Country",
-  "Dance",
-  "Disco",
-  "Drum and bass",
-  "Electronic",
-  "Folk",
-  "Jazz",
-  "Latin",
-  "Love",
-  "Metal",
-  "New Age",
-  "News",
-  "Oldies",
-  "Pop",
-  "Rap",
-  "Rock",
-  "Reggae",
-  "Religion",
-  "RnB",
-  "Punk",
-  "Soul",
-  "Sports",
-  "Talk",
-  "Techno",
-  "Trance",
-  NULL
-};
-
-CONST_STRPTR languages[] =
-{
-  "All Languages",
-  (STRPTR) ~0L,
-  "Arabic",
-  "Bulgarian",
-  "Chinese",
-  "Croatian",
-  "Czech",
-  "Danish",
-  "Dutch",
-  "English",
-  "Finnish",
-  "French",
-  "German",
-  "Greek",
-  "Hindi",
-  "Hungarian",
-  "Irish",
-  "Italian",
-  "Japanese",
-  "Korean",
-  "Norwegian",
-  "Polish",
-  "Portuguese",
-  "Romanian",
-  "Russian",
-  "Serbian",
-  "Slovak",
-  "Slovenian",
-  "Spanish",
-  "Swedish",
-  "Thai",
-  "Turkish",
-  "Ukrainian",
-  NULL
-};
-
-CONST_STRPTR languagesISO6391[] =
-{
-  NULL,
-  (STRPTR) ~0L,
-  "ar",
-  "bg",
-  "zh",
-  "hr",
-  "cs",
-  "da",
-  "nl",
-  "en,en-us",
-  "fi",
-  "fr",
-  "de",
-  "el",
-  "hi",
-  "hu",
-  "ga",
-  "it",
-  "ja",
-  "ko",
-  "no,nn,nb",
-  "pl",
-  "pt,pt-br",
-  "ro",
-  "ru",
-  "sr",
-  "sk",
-  "sl",
-  "es",
-  "sv",
-  "th",
-  "tr",
-  "uk",
-  NULL
-};
-
-CONST_STRPTR countries[] =
-{
-  "All Countries",
-  (STRPTR) ~0L,
-  "Argentina",
-  "Australia",
-  "Austria",
-  "Belgium",
-  "Brazil",
-  "Canada",
-  "Chile",
-  "China",
-  "Colombia",
-  "Croatia",
-  "Czechia",
-  "France",
-  "Germany",
-  "Greece",
-  "Hungary",
-  "India",
-  "Ireland",
-  "Italy",
-  "Mexico",
-  "Peru",
-  "Poland",
-  "Portugal",
-  "Romania",
-  "Russia",
-  "Spain",
-  "Switzerland",
-  "The Netherlands",
-  "The Russian Federation",
-  "The United Kingdom",
-  "The United States Of America",
-  "Turkey",
-  "Ukraine",
-  NULL
-};
-
-CONST_STRPTR podcastCategories[] =
-{
-  "All Categories",
-  (STRPTR) ~0L,
-  "Arts",
-  "Beauty",
-  "Books",
-  "Business",
-  "Careers",
-  "Comedy",
-  "Design",
-  "Documentary",
-  "Education",
-  "Entrepreneurship",
-  "Fashion", 
-  "Fiction",
-  "Film",
-  "Fitness",
-  "Food",
-  "Games",
-  "History",
-  "Hobbies",
-  "Interviews",
-  "Kids",
-  "Learning",
-  "Marketing", 
-  "Manga",
-  "Music",
-  "News",
-  "Pets",
-  "Philosophy",
-  "Politics",
-  "Religion",
-  "Science",
-  "Sports",
-  "Technology",
-  "Travel",
-  "TV",
-  "Video-Games",  
-  NULL
-};
 
 extern struct List leftSidebarList;
 extern struct RenderHook *renderhook;
 extern struct RenderHook *podcastImageRenderHook;
 
 static Object *buildRadioSearchPage(void);
+static Object *buildRadioFavouritePage(void);
 static Object *buildRadioPopularPage(void);
 static Object *buildRadioTrendPage(void);
 static Object *buildPodcastSearchPage(void);
@@ -268,10 +78,11 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
   Object *radioPages = IIntuition->NewObject(NULL, "page.gadget",
         LAYOUT_DeferLayout, TRUE,
         PAGE_Add, gadgets[GID_PAGE_1] = buildRadioSearchPage(),
-        PAGE_Add, gadgets[GID_PAGE_2] = buildRadioPopularPage(),
-        PAGE_Add, gadgets[GID_PAGE_3] = buildRadioTrendPage(),
-        PAGE_Add, gadgets[GID_PAGE_4] = buildPodcastSearchPage(),
-        PAGE_Add, gadgets[GID_PAGE_5] = buildPodcastTrendingPage(),
+        PAGE_Add, gadgets[GID_PAGE_2] = buildRadioFavouritePage(),
+        PAGE_Add, gadgets[GID_PAGE_3] = buildRadioPopularPage(),
+        PAGE_Add, gadgets[GID_PAGE_4] = buildRadioTrendPage(),
+        PAGE_Add, gadgets[GID_PAGE_5] = buildPodcastSearchPage(),
+        PAGE_Add, gadgets[GID_PAGE_6] = buildPodcastTrendingPage(),
         TAG_DONE);
 
   //Object *rightSidebarPages = IIntuition->NewObject(NULL, "page.gadget",
@@ -521,6 +332,28 @@ static Object *buildRadioSearchPage(void)
         TAG_DONE);
 }
 
+static Object *buildRadioFavouritePage(void)
+{
+  return IIntuition->NewObject(LayoutClass, NULL,
+      LAYOUT_BevelStyle,      BVS_GROUP,
+      LAYOUT_Label,           "Favourite Radio Stations",
+
+        LAYOUT_AddChild, gadgets[GID_RADIO_FAVOURITE_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+          GA_ID,                      GID_RADIO_FAVOURITE_LISTBROWSER,
+          GA_RelVerify,               TRUE,
+          GA_TabCycle,                TRUE,
+          LISTBROWSER_ColumnTitles,   TRUE,
+          LISTBROWSER_HorizontalProp, TRUE,
+          LISTBROWSER_Separators,     TRUE,
+          LISTBROWSER_ShowSelected,   TRUE,
+          LISTBROWSER_Striping,       LBS_ROWS,
+          LISTBROWSER_SortColumn,     0,
+          LISTBROWSER_TitleClickable, TRUE,
+          TAG_DONE),
+
+        TAG_DONE);
+}
+
 static Object *buildRadioPopularPage(void)
 {
   return IIntuition->NewObject(LayoutClass, NULL,
@@ -577,6 +410,17 @@ void getLeftSidebarContent(void)
     LBNA_Column,        0,
       LBNCA_CopyText,   TRUE,
       LBNCA_Text,       "Radio",
+    TAG_DONE);
+  if (node)
+  {
+    IExec->AddTail( &leftSidebarList, node );
+  }
+
+  node = IListBrowser->AllocListBrowserNode(1,
+    LBNA_Generation,    2,
+    LBNA_Column,        0,
+      LBNCA_CopyText,   TRUE,
+      LBNCA_Text,       "Favorites",
     TAG_DONE);
   if (node)
   {
@@ -816,8 +660,8 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
               TAG_DONE),
               CHILD_WeightedWidth, 70,
 
-            LAYOUT_AddChild, gadgets[GID_RADIO_FAVOURITES_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
-              GA_ID,                      GID_RADIO_FAVOURITES_BUTTON,
+            LAYOUT_AddChild, gadgets[GID_RADIO_FAVOURITE_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,                      GID_RADIO_FAVOURITE_BUTTON,
               GA_Disabled,                TRUE,
               BUTTON_Transparent,         TRUE,
               BUTTON_AutoButton,          0,
