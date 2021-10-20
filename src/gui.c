@@ -397,7 +397,7 @@ void showGUI(void)
                             break;
                           case 1:
                             switchRightSidebar(PAGE_RADIO_INFO);
-                            //fillRadioFavouriteList();
+                            fillRadioFavouriteList();
                             /*
                             if(listCount(&radioFavouriteList) == 0)
                             {

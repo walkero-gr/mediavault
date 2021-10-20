@@ -32,9 +32,10 @@ static uint8 maxRadioResults = 100;
 extern struct memory response;
 extern struct RenderHook *renderhook;
 extern struct ColumnInfo *columnInfo;
-extern struct List radioList,
-                radioPopularList,
-                radioTrendList;
+extern struct List  radioList,
+                    radioFavouriteList,
+                    radioPopularList,
+                    radioTrendList;
 
 static void setBaseSearchUrl(void)
 {
@@ -425,6 +426,19 @@ void fillRadioList(struct filters lastFilters, BOOL newSearch)
       offset++;
     }
   }
+}
+
+static void getRadioFavouriteStations(void)
+{
+
+
+}
+
+void fillRadioFavouriteList(void)
+{
+  //char notFoundMsg[] = "No Favourite Radio Stations found!";
+  getRadioFavouriteStations();
+  //listStations((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER], &radioFavouriteList, 0, (char *)notFoundMsg, NULL);
 }
 
 void fillRadioPopularList(void)

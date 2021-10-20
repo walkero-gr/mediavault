@@ -116,3 +116,45 @@ BOOL sqlAddFavouriteRadio(
 
   return TRUE;
 }
+
+BOOL sqlGetFavourites(STRPTR type)
+{
+  sqlite3 *db;
+  char *err_msg = 0;
+  int sqlSize = 512;
+
+  int rc = sqlite3_open(dbFileName, &db);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  STRPTR sql = IExec->AllocVecTags(sizeof(char) * sqlSize,
+          AVT_Type,            MEMF_SHARED,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+
+  snprintf(sql, sqlSize,
+    "INSERT INTO favourites " \
+    "(uuid, title, added, type) " \
+    "VALUES " \
+    "('%s', '%s', '%ld', 'radio');",
+    uuid, title, now()
+  );
+  IDOS->Printf("DBG: addFavouriteRadio\n%s\n", sql);
+
+  rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+  IExec->FreeVec(sql);
+
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "SQL error: %s\n", err_msg);
+    sqlite3_free(err_msg);
+    sqlite3_close(db);
+    return FALSE;
+  }
+  sqlite3_close(db);
+
+  return TRUE;
+}
