@@ -115,6 +115,10 @@ Help me persuade my wife that what I am doing matters
 
 Changelog
 --------------------------
+v1.4.2 - 2021-10-17
+* The online radio stations api changed and broke the searching of
+  online radio stations. This is a fix for that.
+
 v1.4.1 - 2021-10-10
 * Added an error message when podcast response is not a succesful one
 * Added scripts/start_player.sample script. This can be used to set the

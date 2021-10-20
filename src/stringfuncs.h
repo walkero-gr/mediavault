@@ -26,5 +26,6 @@ ULONG now(void);
 ULONG nowUnix(ULONG);
 int32 getOffsetUTC(void);
 STRPTR SHA1Encrypt(STRPTR);
+void stringToLower(STRPTR string);
 
 #endif

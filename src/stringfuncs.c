@@ -266,3 +266,21 @@ STRPTR SHA1Encrypt(STRPTR string)
   return buf;
 }
 
+ /**
+  *
+  * void stringToLower(STRPTR string)
+  *
+  * Summary:
+  *
+  *    This function converts a string to lower case
+  *
+  * Parameters  : string: contains the string to convert
+  *
+  * Return Value: pointer to the string in memory
+  *
+  */
+void stringToLower(STRPTR string)
+{
+  for (size_t i = 0; i <= strlen(string) - 1; i++)
+    string[i] = IUtility->ToLower(string[i]);
+}
