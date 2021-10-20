@@ -20,5 +20,6 @@
 
 void printSqliteVer(void); 
 BOOL createDB(void);
+BOOL sqlAddFavouriteRadio(STRPTR, STRPTR);
 
 #endif

@@ -353,6 +353,9 @@ void showGUI(void)
                           {
                             IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
                             windowBlocking(objects[OID_MAIN], TRUE);
+
+                            // TODO: Check if the station is in favorites
+
                             showRadioInfo((struct Node *)res_node);
                             windowBlocking(objects[OID_MAIN], FALSE);
                           }
@@ -365,6 +368,21 @@ void showGUI(void)
                           if (res_node)
                           {
                             playRadio((struct Node *)res_node);
+                          }
+                        }
+                        break;
+
+                      case GID_RADIO_FAVOURITES_BUTTON:
+                        IDOS->Printf("DBG: Favourite Radio button clicked\n");
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          if (res_node)
+                          {
+
+                            // TODO: Add station to favourites
+                            addFavouriteRadio((struct Node *)res_node);
+
+                            // TODO: Disable the button and show favourites remove button
                           }
                         }
                         break;
@@ -504,6 +522,7 @@ void showGUI(void)
                           }
                         }
                         break;
+
                       case GID_PODCAST_PLAY_BUTTON:
                         if (res_value == LBRE_NORMAL)
                         {
@@ -512,7 +531,7 @@ void showGUI(void)
                             playPodcast((struct Node *)res_node);
                           }
                         }
-                        break;
+                        break;  
                     }
                     break;
                 }
@@ -591,6 +610,7 @@ void showGUI(void)
 
           IIntuition->DisposeObject(objects[OID_PLAY_IMAGE]);
           IIntuition->DisposeObject(objects[OID_PODCAST_PLAY_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_FAVOURITES_ADD_IMAGE]);
 
           IIntuition->DisposeObject(menus[MID_PROJECT]);
         }

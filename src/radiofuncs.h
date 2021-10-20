@@ -26,6 +26,7 @@ void showRadioInfo(struct Node *);
 void fillRadioList(struct filters, BOOL);
 void fillRadioPopularList(void);
 void fillRadioTrendList(void);
+void addFavouriteRadio(struct Node *);
 
 
 #endif

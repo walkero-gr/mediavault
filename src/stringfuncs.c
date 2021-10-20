@@ -120,7 +120,6 @@ STRPTR urlEncode(STRPTR value)
   return buf;
 }
 
-
  /**
   *
   * ULONG now(void)

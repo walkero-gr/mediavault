@@ -48,7 +48,7 @@ DONE - [v1.3] Create automated release packaging in Makefile
 DONE - [v1.3] Fixed the version string to include the application name
 DONE - [v1.3] Add COPYING/LICENSE files for the used libs
 - Include in the package all the necessary AISS icons
-- Add more comments in sources for every function and file
+- Add more comments in sources for every method and file
 - Add icons at the left sidebar based on the item
 
 ## Radio
@@ -61,7 +61,7 @@ DONE - Load results into a linked list
 DONE - List radio stations
 DONE - Double click on a station to play on player
 DONE - Click on a station and show it's info at the side, with logo
-- Mark stations as favorites
+DONE - [1.5] Mark stations as favorites
 DONE - Add more tags
 DONE - Add more countries and languages
 DONE - Empty list if invalid/empty JSON returns
@@ -118,11 +118,11 @@ DONE - [v1.4.1] Add more filters, like categories, language etc.
 
 - Add Podcast page
 
-## Favorites DB
-- Check if DB file exists
-- Initialize the DB file
+## Favourites DB
+DONE - [1.5] Check if DB file exists
+DONE - [1.5] Initialize the DB file
 - Add a method to check the DB version
-- 
+
 
 
 //// BUGS

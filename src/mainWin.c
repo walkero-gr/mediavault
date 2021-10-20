@@ -245,6 +245,15 @@ extern Class *WindowClass;
 
 Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen *screen)
 {                                           
+  objects[OID_FAVOURITES_ADD_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        BITMAP_SourceFile,            "tbimages:favouritesadd",
+        BITMAP_DisabledSourceFile,    "tbimages:favouritesadd_g",
+        BITMAP_SelectSourceFile,      "tbimages:favouritesadd_s",
+        BITMAP_Screen,                screen,
+        BITMAP_Precision,             PRECISION_EXACT,
+        BITMAP_Masking,               TRUE,
+        TAG_END);
+  
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
   renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
         ASOHOOK_Size,  sizeof(struct RenderHook),
@@ -778,15 +787,6 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
         BITMAP_SourceFile,  LOGO_IMAGE,
         BITMAP_Masking,     TRUE,
         TAG_END);
-  
-  objects[OID_RADIO_FAVOURITES_ADD_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        BITMAP_SourceFile,            "tbimages:favouritesadd",
-        BITMAP_DisabledSourceFile,    "tbimages:favouritesadd_g",
-        BITMAP_SelectSourceFile,      "tbimages:favouritesadd_s",
-        BITMAP_Screen,                screen,
-        BITMAP_Precision,             PRECISION_EXACT,
-        BITMAP_Masking,               TRUE,
-        TAG_END);
 
   if (renderhook && objects[OID_AVATAR_IMAGE])
   {
@@ -818,12 +818,12 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
 
             LAYOUT_AddChild, gadgets[GID_RADIO_FAVOURITES_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
               GA_ID,                      GID_RADIO_FAVOURITES_BUTTON,
-              GA_Disabled,                FALSE,
+              GA_Disabled,                TRUE,
               BUTTON_Transparent,         TRUE,
               BUTTON_AutoButton,          0,
               BUTTON_BevelStyle,          BVS_NONE,
-              BUTTON_Justification,       1,
-              BUTTON_RenderImage,         objects[OID_RADIO_FAVOURITES_ADD_IMAGE],
+              BUTTON_Justification,       BCJ_CENTER,
+              BUTTON_RenderImage,         objects[OID_FAVOURITES_ADD_IMAGE],
               TAG_DONE),
               //CHILD_MaxHeight, 40,
               CHILD_WeightedWidth, 10,
@@ -848,7 +848,7 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
               BUTTON_Transparent,         TRUE,
               BUTTON_AutoButton,          0,
               BUTTON_BevelStyle,          BVS_NONE,
-              BUTTON_Justification,       1,
+              BUTTON_Justification,       BCJ_CENTER,
               BUTTON_RenderImage, objects[OID_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
                 BITMAP_SourceFile,            "tbimages:td_tn_play",
                 BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",
@@ -931,7 +931,7 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
               BUTTON_Transparent,         TRUE,
               BUTTON_AutoButton,          0,
               BUTTON_BevelStyle,          BVS_NONE,
-              BUTTON_Justification,       1,
+              BUTTON_Justification,       BCJ_CENTER,
               BUTTON_RenderImage, objects[OID_PODCAST_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
                 BITMAP_SourceFile,            "tbimages:td_tn_play",
                 BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",

@@ -22,6 +22,7 @@
 #include "httpfuncs.h"
 #include "stringfuncs.h"
 #include "guifuncs.h"
+#include "sqldb.h"
 #include "fsfuncs.h"
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";
@@ -345,6 +346,10 @@ void showRadioInfo(struct Node *res_node)
           GA_Disabled,   FALSE,
           TAG_DONE);
 
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITES_BUTTON], windows[WID_MAIN], NULL,
+          GA_Disabled,   FALSE,
+          TAG_DONE);
+
     // TODO: Free itemData
   }
 }
@@ -432,4 +437,23 @@ void fillRadioTrendList(void)
   char notFoundMsg[] = "No Trending Radio Stations found!";
   getRadioTrendStations();
   listStations((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], &radioTrendList, 0, (char *)notFoundMsg, NULL);
+}
+
+void addFavouriteRadio(struct Node *res_node)
+{
+    struct stationInfo *itemData = NULL;
+    itemData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+          AVT_Type,            MEMF_PRIVATE,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+
+    IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+          LBNA_UserData, &itemData,
+          TAG_DONE);
+
+
+    IDOS->Printf("DBG: addFavouriteRadio %s\n", itemData->name);
+
+    sqlAddFavouriteRadio(itemData->uuid, itemData->name);
+
 }
