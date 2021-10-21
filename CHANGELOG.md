@@ -1,7 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.4.3] - future
+## [1.4.3] - 2021-10-21
+### Changed
+- Compiled with openssl to 1.1.1l
+
 ### Fixed
 - Fixed the search of trending podcasts when the user didn't select
   any category and language

@@ -116,6 +116,7 @@ Help me persuade my wife that what I am doing matters
 Changelog
 --------------------------
 v1.4.3 - 2021-10-21
+* Compiled with openssl to 1.1.1l
 * Fixed the search of trending podcasts when the user didn't select
   any category and language
 * Fixed the search of radio station when the user selected only the
