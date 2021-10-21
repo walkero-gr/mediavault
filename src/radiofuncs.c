@@ -86,8 +86,6 @@ BOOL getRadioStations(struct filters lastFilters, int offset)
   if (IUtility->Stricmp(lastFilters.country, ""))
   {
     STRPTR encSelCountry = urlEncode(lastFilters.country);
-    stringToLower(encSelCountry);
-    
     IUtility->Strlcat(url, "&country=", sizeof(url));
     IUtility->Strlcat(url, encSelCountry, sizeof(url));
     IExec->FreeVec(encSelCountry);
@@ -299,7 +297,7 @@ void playRadio(struct Node *res_node)
     IUtility->SNPrintf(startPlayerPath, sizeof(startPlayerPath), "%s/scripts/start_player", getFilePath((STRPTR)"PROGDIR:MediaVault"));
     if (fileExists(startPlayerPath))
     {
-      cmd = IUtility->ASPrintf("execute %s \"%s\" ", startPlayerPath, itemData->url_resolved);
+      cmd = IUtility->ASPrintf("execute \"%s\" \"%s\" ", startPlayerPath, itemData->url_resolved);
     }
     else
     {

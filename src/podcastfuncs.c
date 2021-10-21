@@ -635,7 +635,7 @@ void playPodcast(struct Node *res_node)
     IUtility->SNPrintf(startPlayerPath, sizeof(startPlayerPath), "%s/scripts/start_player", getFilePath((STRPTR)"PROGDIR:MediaVault"));
     if (fileExists(startPlayerPath))
     {
-      cmd = IUtility->ASPrintf("execute %s \"%s\" ", startPlayerPath, itemData->enclosureUrl);
+      cmd = IUtility->ASPrintf("execute \"%s\" \"%s\" ", startPlayerPath, itemData->enclosureUrl);
     }
     else
     {

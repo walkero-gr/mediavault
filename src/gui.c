@@ -37,8 +37,8 @@ struct List radioList,
             trendingPodcastList,
             podcastEpisodeList;
 
-struct filters  lastFilters,
-                prevFilters;
+struct filters  lastFilters = {0},
+                prevFilters = {0};
 
 struct RenderHook *renderhook;
 struct RenderHook *podcastImageRenderHook;
@@ -84,7 +84,7 @@ void showGUI(void)
                   selectedMenu = MID_LAST;
           uint16 code = 0;
           BOOL done = FALSE;
-          struct filters lastPodcastFilters;
+          struct filters lastPodcastFilters = {0};
 
           fillLeftSidebar();
 

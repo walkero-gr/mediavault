@@ -115,6 +115,14 @@ Help me persuade my wife that what I am doing matters
 
 Changelog
 --------------------------
+v1.4.3 - 2021-10-21
+* Fixed the search of trending podcasts when the user didn't select
+  any category and language
+* Fixed the search of radio station when the user selected only the
+  country and nothing else
+* Fixed the script "start_player" execution when the MediaVault
+  path contains spaces
+
 v1.4.2 - 2021-10-17
 * The online radio stations api changed and broke the searching of
   online radio stations. This is a fix for that.
