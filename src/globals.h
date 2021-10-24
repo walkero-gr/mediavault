@@ -57,7 +57,7 @@ struct filters
 struct stationInfo
 {
   char uuid[42];
-  char name[64];
+  char name[128];
   char url_resolved[255];
   char country[64];
   char language[64];

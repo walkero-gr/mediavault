@@ -420,7 +420,7 @@ void getLeftSidebarContent(void)
     LBNA_Generation,    2,
     LBNA_Column,        0,
       LBNCA_CopyText,   TRUE,
-      LBNCA_Text,       "Favorites",
+      LBNCA_Text,       "Favourite",
     TAG_DONE);
   if (node)
   {

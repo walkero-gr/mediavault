@@ -21,6 +21,7 @@
 #include <proto/dos.h>
 
 #include "globals.h"
+#include "radiofuncs.h"
 #include "stringfuncs.h"
 #include "sqldb.h"
 
@@ -31,7 +32,18 @@ void printSqliteVer(void)
 {    
   printf("%s\n", sqlite3_libversion());
 }
-
+/*
+static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
+  if (NotUsed)
+    NotUsed = 0;
+  
+  for (int i = 0; i < argc; i++) {
+    printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+  }
+  printf("\n");
+  return 0;
+}
+*/
 BOOL createDB(void)
 {
   sqlite3 *db;
@@ -72,10 +84,7 @@ BOOL createDB(void)
   return TRUE;
 }
 
-BOOL sqlAddFavouriteRadio(
-  STRPTR uuid,
-  STRPTR title
-)
+BOOL sqlAddFavouriteRadio(STRPTR uuid, STRPTR title)
 {
   sqlite3 *db;
   char *err_msg = 0;
@@ -117,11 +126,67 @@ BOOL sqlAddFavouriteRadio(
   return TRUE;
 }
 
-BOOL sqlGetFavourites(STRPTR type)
+BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
+{
+  BOOL result = FALSE;
+  sqlite3 *db;
+  //char *err_msg = 0;
+  sqlite3_stmt *res;
+  //int sqlSize = 128;
+
+  int rc = sqlite3_open(dbFileName, &db);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+  /*
+  STRPTR sql = IExec->AllocVecTags(sizeof(char) * sqlSize,
+          AVT_Type,            MEMF_SHARED,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+  */
+  
+  CONST_STRPTR sql = "SELECT COUNT(*) AS cnt " \
+        "FROM favourites " \
+        "WHERE uuid = :uuid AND type = :type " \
+        "LIMIT 1";
+
+  rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    //sqlite3_free(err_msg);
+    sqlite3_close(db);
+    return FALSE;
+  }
+    
+  int uuidIdx = sqlite3_bind_parameter_index(res, ":uuid");
+  int typeIdx = sqlite3_bind_parameter_index(res, ":type");
+  // sqlite3_bind_text(sqlite3_stmt*, int, const char*, int n, void(*)(void*));
+  sqlite3_bind_text(res, uuidIdx, uuid, -1, 0);
+  sqlite3_bind_text(res, typeIdx, type, -1, 0);
+  
+  int step = sqlite3_step(res);
+  if (step == SQLITE_ROW) {
+    if(sqlite3_column_int(res, 0) == 1)
+    {
+      result = TRUE;
+    }
+    printf("%d: \n", sqlite3_column_int(res, 0));
+    //printf("%s: ", sqlite3_column_text(res, 0));
+    //printf("%s\n", sqlite3_column_text(res, 1));
+  }
+  sqlite3_finalize(res);
+  sqlite3_close(db);
+
+  return result;
+}
+
+BOOL sqlGetFavourites(STRPTR type, int (*resultCallback)(void *, int, char **, char **))
 {
   sqlite3 *db;
   char *err_msg = 0;
-  int sqlSize = 512;
+  int sqlSize = 64;
 
   int rc = sqlite3_open(dbFileName, &db);
   if (rc != SQLITE_OK) {
@@ -136,15 +201,12 @@ BOOL sqlGetFavourites(STRPTR type)
           TAG_DONE);
 
   snprintf(sql, sqlSize,
-    "INSERT INTO favourites " \
-    "(uuid, title, added, type) " \
-    "VALUES " \
-    "('%s', '%s', '%ld', 'radio');",
-    uuid, title, now()
+    "SELECT * FROM favourites " \
+    "WHERE type = '%s';", type
   );
-  IDOS->Printf("DBG: addFavouriteRadio\n%s\n", sql);
+  IDOS->Printf("DBG: sqlGetFavourites\n%s\n", sql);
 
-  rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+  rc = sqlite3_exec(db, sql, resultCallback, 0, &err_msg);
 
   IExec->FreeVec(sql);
 

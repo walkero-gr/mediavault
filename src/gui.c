@@ -27,7 +27,7 @@
 #include "podcastfuncs.h"
 #include "httpfuncs.h"
 
-struct ColumnInfo *columnInfo, *leftSidebarCI,
+struct ColumnInfo *columnInfo, *radioFavouritesColInfo, *leftSidebarCI,
             *podcastColInfo, *podcastEpisodeColInfo;
 struct List radioList,
             radioFavouriteList,
@@ -118,6 +118,16 @@ void showGUI(void)
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
                 LBCIA_Weight,               5,
+              TAG_DONE);
+
+          radioFavouritesColInfo = IListBrowser->AllocLBColumnInfo( 1,
+              LBCIA_Column,                 0,
+                LBCIA_Title,                " Title",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               100,
               TAG_DONE);
 
           podcastColInfo = IListBrowser->AllocLBColumnInfo( 2,
@@ -585,6 +595,7 @@ void showGUI(void)
             freeList(&radioList, STRUCT_STATION_INFO);
           }
 
+          IListBrowser->FreeLBColumnInfo(radioFavouritesColInfo);
           if(listCount(&radioFavouriteList))
           {
             freeList(&radioFavouriteList, STRUCT_STATION_INFO);

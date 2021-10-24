@@ -31,7 +31,7 @@ static uint8 maxRadioResults = 100;
 
 extern struct memory response;
 extern struct RenderHook *renderhook;
-extern struct ColumnInfo *columnInfo;
+extern struct ColumnInfo *columnInfo, *radioFavouritesColInfo;
 extern struct List  radioList,
                     radioFavouriteList,
                     radioPopularList,
@@ -282,6 +282,41 @@ size_t getRadioList(struct List *stationList, int offset)
   return cnt;
 }
 
+int getRadioFavouriteStations(void *unused, int cntCols, char **fields, char **colNames)
+{
+  struct Node *itemNode;
+  struct stationInfo *itemData = {0};
+
+  itemData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+      AVT_Type,            MEMF_PRIVATE,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+
+  IUtility->Strlcpy(itemData->uuid, fields[0], sizeof(itemData->uuid));
+  IUtility->Strlcpy(itemData->name, fields[4], sizeof(itemData->name));
+  IUtility->Strlcpy(itemData->url_resolved, fields[5], sizeof(itemData->url_resolved));
+
+  itemNode = IListBrowser->AllocListBrowserNode( 2,
+      LBNA_UserData,          itemData,
+      LBNA_Column,            0,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           fields[4],
+      TAG_DONE);
+
+  if(itemNode)
+  {
+    IExec->AddTail(&radioFavouriteList, itemNode);
+  }
+
+  // Dummy variable usage for gcc happiness
+  if (unused) unused = 0;
+  if (cntCols) cntCols = 0;
+  if (colNames) colNames = NULL;
+
+  return 0;
+}
+
+
 void playRadio(struct Node *res_node)
 {
   if (res_node)
@@ -428,16 +463,31 @@ void fillRadioList(struct filters lastFilters, BOOL newSearch)
   }
 }
 
-static void getRadioFavouriteStations(void)
-{
-
-
-}
-
 void fillRadioFavouriteList(void)
 {
+  IExec->NewList(&radioFavouriteList);
+  sqlGetFavourites((STRPTR)"radio", getRadioFavouriteStations);
+
+  if (listCount(&radioFavouriteList) == 0)
+  {
+
+  }
+
+  if (listCount(&radioFavouriteList) > 0)
+  {
+    IIntuition->SetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER],
+      LISTBROWSER_Labels, NULL,
+      TAG_DONE);
+
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER], windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         &radioFavouriteList,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     radioFavouritesColInfo,
+        TAG_DONE);
+  }
   //char notFoundMsg[] = "No Favourite Radio Stations found!";
-  getRadioFavouriteStations();
+  //getRadioFavouriteStations();
   //listStations((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER], &radioFavouriteList, 0, (char *)notFoundMsg, NULL);
 }
 
@@ -467,9 +517,9 @@ void addFavouriteRadio(struct Node *res_node)
           LBNA_UserData, &itemData,
           TAG_DONE);
 
-
-    IDOS->Printf("DBG: addFavouriteRadio %s\n", itemData->name);
-
-    sqlAddFavouriteRadio(itemData->uuid, itemData->name);
-
+    if(!sqlCheckExist(itemData->uuid, "radio"))
+    {
+      sqlAddFavouriteRadio(itemData->uuid, itemData->name);
+    }
+    // TODO: Free itemData
 }
