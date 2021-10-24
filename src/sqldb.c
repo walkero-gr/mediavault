@@ -134,6 +134,40 @@ BOOL sqlAddFavouriteRadio(
   return TRUE;
 }
 
+BOOL sqlRemoveFavourite(STRPTR uuid, CONST_STRPTR type)
+{
+  sqlite3 *db;
+  sqlite3_stmt *res;
+
+  int rc = sqlite3_open(dbFileName, &db);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  CONST_STRPTR sql = "DELETE FROM favourites " \
+        "WHERE uuid = :uuid AND type = :type ";
+
+  rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  int uuidIdx = sqlite3_bind_parameter_index(res, ":uuid");
+  int typeIdx = sqlite3_bind_parameter_index(res, ":type");
+  sqlite3_bind_text(res, uuidIdx, uuid, -1, 0);
+  sqlite3_bind_text(res, typeIdx, type, -1, 0);
+
+  sqlite3_step(res);
+  sqlite3_finalize(res);
+  sqlite3_close(db);
+
+  return TRUE;
+}
+
 BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
 {
   BOOL result = FALSE;

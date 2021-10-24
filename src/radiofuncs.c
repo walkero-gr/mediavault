@@ -548,7 +548,7 @@ void addFavouriteRadio(struct Node *res_node)
     if(sqlCheckExist(itemData->uuid, "radio"))
     {
       // TODO: Remove from favourites
-
+      sqlRemoveFavourite(itemData->uuid, "radio");
       toggleFavouriteButton(FALSE);
     }
     else
