@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.3] - 2021-10-21
+### Changed
+- Compiled with openssl to 1.1.1l
+
+### Fixed
+- Fixed the search of trending podcasts when the user didn't select
+  any category and language
+- Fixed the search of radio station when the user selected only the
+  country and nothing else
+- Fixed the script "start_player" execution when the MediaVault
+  path contains spaces
+
 ## [1.4.2] - 2021-10-17
 ### Fixed
 - The online radio stations api changed and broke the searching of

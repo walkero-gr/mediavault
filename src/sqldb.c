@@ -66,6 +66,9 @@ BOOL createDB(void)
           "added TEXT, " \
           "lastepisode TEXT, " \
           "title TEXT, " \
+          "country TEXT, " \
+          "bitrate TEXT, " \
+          "codec TEXT, " \
           "url TEXT); " \
       "CREATE TABLE plays ( " \
           "uuid    Text, " \
@@ -84,11 +87,17 @@ BOOL createDB(void)
   return TRUE;
 }
 
-BOOL sqlAddFavouriteRadio(STRPTR uuid, STRPTR title)
-{
+BOOL sqlAddFavouriteRadio(
+  STRPTR uuid,
+  STRPTR title,
+  STRPTR country,
+  STRPTR bitrate,
+  STRPTR codec,
+  STRPTR url
+) {
   sqlite3 *db;
   char *err_msg = 0;
-  int sqlSize = 512;
+  int sqlSize = 1024;
 
   int rc = sqlite3_open(dbFileName, &db);
   if (rc != SQLITE_OK) {
@@ -104,12 +113,11 @@ BOOL sqlAddFavouriteRadio(STRPTR uuid, STRPTR title)
 
   snprintf(sql, sqlSize,
     "INSERT INTO favourites " \
-    "(uuid, title, added, type) " \
+    "(uuid, title, added, type, country, bitrate, codec, url) " \
     "VALUES " \
-    "('%s', '%s', '%ld', 'radio');",
-    uuid, title, now()
+    "('%s', '%s', '%ld', 'radio', '%s', '%s', '%s', '%s');",
+    uuid, title, now(), country, bitrate, codec, url
   );
-  IDOS->Printf("DBG: addFavouriteRadio\n%s\n", sql);
 
   rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
@@ -132,7 +140,6 @@ BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
   sqlite3 *db;
   //char *err_msg = 0;
   sqlite3_stmt *res;
-  //int sqlSize = 128;
 
   int rc = sqlite3_open(dbFileName, &db);
   if (rc != SQLITE_OK) {
@@ -140,12 +147,6 @@ BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
     sqlite3_close(db);
     return FALSE;
   }
-  /*
-  STRPTR sql = IExec->AllocVecTags(sizeof(char) * sqlSize,
-          AVT_Type,            MEMF_SHARED,
-          AVT_ClearWithValue,  "\0",
-          TAG_DONE);
-  */
   
   CONST_STRPTR sql = "SELECT COUNT(*) AS cnt " \
         "FROM favourites " \
@@ -162,7 +163,6 @@ BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
     
   int uuidIdx = sqlite3_bind_parameter_index(res, ":uuid");
   int typeIdx = sqlite3_bind_parameter_index(res, ":type");
-  // sqlite3_bind_text(sqlite3_stmt*, int, const char*, int n, void(*)(void*));
   sqlite3_bind_text(res, uuidIdx, uuid, -1, 0);
   sqlite3_bind_text(res, typeIdx, type, -1, 0);
   
@@ -172,9 +172,6 @@ BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
     {
       result = TRUE;
     }
-    printf("%d: \n", sqlite3_column_int(res, 0));
-    //printf("%s: ", sqlite3_column_text(res, 0));
-    //printf("%s\n", sqlite3_column_text(res, 1));
   }
   sqlite3_finalize(res);
   sqlite3_close(db);
@@ -204,7 +201,6 @@ BOOL sqlGetFavourites(STRPTR type, int (*resultCallback)(void *, int, char **, c
     "SELECT * FROM favourites " \
     "WHERE type = '%s';", type
   );
-  IDOS->Printf("DBG: sqlGetFavourites\n%s\n", sql);
 
   rc = sqlite3_exec(db, sql, resultCallback, 0, &err_msg);
 

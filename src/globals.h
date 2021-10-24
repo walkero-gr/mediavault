@@ -64,7 +64,7 @@ struct stationInfo
   char homepage[255];
   char favicon[255];
   char codec[6];
-  uint8 bitrate;
+  char bitrate[6];
   ULONG votes;
 };
 

@@ -38,8 +38,8 @@ struct List radioList,
             trendingPodcastList,
             podcastEpisodeList;
 
-struct filters  lastFilters,
-                prevFilters;
+struct filters  lastFilters = {0},
+                prevFilters = {0};
 
 struct RenderHook *renderhook;
 struct RenderHook *podcastImageRenderHook;
@@ -85,7 +85,7 @@ void showGUI(void)
                   selectedMenu = MID_LAST;
           uint16 code = 0;
           BOOL done = FALSE;
-          struct filters lastPodcastFilters;
+          struct filters lastPodcastFilters = {0};
 
           fillLeftSidebar();
 
@@ -120,14 +120,28 @@ void showGUI(void)
                 LBCIA_Weight,               5,
               TAG_DONE);
 
-          radioFavouritesColInfo = IListBrowser->AllocLBColumnInfo( 1,
+          radioFavouritesColInfo = IListBrowser->AllocLBColumnInfo( 3,
               LBCIA_Column,                 0,
                 LBCIA_Title,                " Title",
                 LBCIA_AutoSort,             TRUE,
                 LBCIA_DraggableSeparator,   TRUE,
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               100,
+                LBCIA_Weight,               50,
+              LBCIA_Column,                 1,
+                LBCIA_Title,                " Country",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               30,
+              LBCIA_Column,                 2,
+                LBCIA_Title,                " Bitrate",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               20,
               TAG_DONE);
 
           podcastColInfo = IListBrowser->AllocLBColumnInfo( 2,
@@ -352,12 +366,14 @@ void showGUI(void)
                       case GID_RADIO_LISTBROWSER:
                       case GID_RADIO_POPULAR_LISTBROWSER:
                       case GID_RADIO_TREND_LISTBROWSER:
+                      case GID_RADIO_FAVOURITE_LISTBROWSER:
                         {
                           Object *lb = NULL;
 
                           if ((result & WMHI_GADGETMASK) == GID_RADIO_LISTBROWSER) lb = gadgets[GID_RADIO_LISTBROWSER];
                           else if ((result & WMHI_GADGETMASK) == GID_RADIO_POPULAR_LISTBROWSER) lb = gadgets[GID_RADIO_POPULAR_LISTBROWSER];
-                          else lb = gadgets[GID_RADIO_TREND_LISTBROWSER];
+                          else if ((result & WMHI_GADGETMASK) == GID_RADIO_TREND_LISTBROWSER) lb = gadgets[GID_RADIO_TREND_LISTBROWSER];
+                          else lb = gadgets[GID_RADIO_FAVOURITE_LISTBROWSER];
 
                           IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                           if (res_value == LBRE_NORMAL)
@@ -384,7 +400,6 @@ void showGUI(void)
                         break;
 
                       case GID_RADIO_FAVOURITE_BUTTON:
-                        IDOS->Printf("DBG: Favourite Radio button clicked\n");
                         if (res_value == LBRE_NORMAL)
                         {
                           if (res_node)

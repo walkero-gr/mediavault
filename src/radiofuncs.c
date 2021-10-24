@@ -88,8 +88,6 @@ BOOL getRadioStations(struct filters lastFilters, int offset)
   if (IUtility->Stricmp(lastFilters.country, ""))
   {
     STRPTR encSelCountry = urlEncode(lastFilters.country);
-    stringToLower(encSelCountry);
-    
     IUtility->Strlcat(url, "&country=", sizeof(url));
     IUtility->Strlcat(url, encSelCountry, sizeof(url));
     IExec->FreeVec(encSelCountry);
@@ -241,9 +239,10 @@ size_t getRadioList(struct List *stationList, int offset)
     buf = IJansson->json_object_get(data, "bitrate");
     if(json_is_integer(buf))
     {
-      stationData->bitrate = (uint8)IJansson->json_integer_value(buf);
+      uint8 bitrate = (uint8)IJansson->json_integer_value(buf);
+      IUtility->SNPrintf(stationData->bitrate, sizeof(stationData->bitrate), "%ld", bitrate);
     }
-    else stationData->bitrate = 0;
+    else IUtility->Strlcpy(stationData->bitrate, "0", sizeof(stationData->bitrate));
 
     buf = IJansson->json_object_get(data, "votes");
     if(!json_is_integer(buf))
@@ -254,7 +253,7 @@ size_t getRadioList(struct List *stationList, int offset)
     stationData->votes = (ULONG)IJansson->json_integer_value(buf);
 
     char codecBitrate[15];
-    IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%ld kbit/s %s", stationData->bitrate, stationData->codec);
+    IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%s kbit/s %s", stationData->bitrate, stationData->codec);
 
     stationNode = IListBrowser->AllocListBrowserNode( 5,
         LBNA_UserData,          stationData,
@@ -292,15 +291,27 @@ int getRadioFavouriteStations(void *unused, int cntCols, char **fields, char **c
       AVT_ClearWithValue,  "\0",
       TAG_DONE);
 
-  IUtility->Strlcpy(itemData->uuid, fields[0], sizeof(itemData->uuid));
-  IUtility->Strlcpy(itemData->name, fields[4], sizeof(itemData->name));
-  IUtility->Strlcpy(itemData->url_resolved, fields[5], sizeof(itemData->url_resolved));
+  IUtility->Strlcpy(itemData->uuid,         fields[0], sizeof(itemData->uuid));
+  IUtility->Strlcpy(itemData->name,         fields[4], sizeof(itemData->name));
+  IUtility->Strlcpy(itemData->country,      fields[5], sizeof(itemData->country));
+  IUtility->Strlcpy(itemData->bitrate,      fields[6], sizeof(itemData->bitrate));
+  IUtility->Strlcpy(itemData->codec,        fields[7], sizeof(itemData->codec));
+  IUtility->Strlcpy(itemData->url_resolved, fields[8], sizeof(itemData->url_resolved));
 
-  itemNode = IListBrowser->AllocListBrowserNode( 2,
+  char codecBitrate[15];
+  IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%s kbit/s %s", fields[6], fields[7]);
+
+  itemNode = IListBrowser->AllocListBrowserNode( 4,
       LBNA_UserData,          itemData,
       LBNA_Column,            0,
         LBNCA_CopyText,       TRUE,
         LBNCA_Text,           fields[4],
+      LBNA_Column,            1,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           fields[5],
+      LBNA_Column,            2,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           codecBitrate,
       TAG_DONE);
 
   if(itemNode)
@@ -336,7 +347,7 @@ void playRadio(struct Node *res_node)
     IUtility->SNPrintf(startPlayerPath, sizeof(startPlayerPath), "%s/scripts/start_player", getFilePath((STRPTR)"PROGDIR:MediaVault"));
     if (fileExists(startPlayerPath))
     {
-      cmd = IUtility->ASPrintf("execute %s \"%s\" ", startPlayerPath, itemData->url_resolved);
+      cmd = IUtility->ASPrintf("execute \"%s\" \"%s\" ", startPlayerPath, itemData->url_resolved);
     }
     else
     {
@@ -371,10 +382,9 @@ void showRadioInfo(struct Node *res_node)
 
     showAvatarImage(itemData->uuid, itemData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE], renderhook);
 
-    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n%ld kbit/s %s\n",
+    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n%s kbit/s %s\n",
           itemData->name, itemData->country, itemData->bitrate, itemData->codec);
 
-    IDOS->Printf("DBG: %s\n", itemData->url_resolved);
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,
@@ -519,7 +529,13 @@ void addFavouriteRadio(struct Node *res_node)
 
     if(!sqlCheckExist(itemData->uuid, "radio"))
     {
-      sqlAddFavouriteRadio(itemData->uuid, itemData->name);
+      sqlAddFavouriteRadio(itemData->uuid,
+        itemData->name,
+        itemData->country,
+        itemData->bitrate,
+        itemData->codec,
+        itemData->url_resolved
+      );
     }
     // TODO: Free itemData
 }
