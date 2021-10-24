@@ -37,6 +37,8 @@ extern struct List  radioList,
                     radioPopularList,
                     radioTrendList;
 
+static void toggleFavouriteButton(BOOL);
+
 static void setBaseSearchUrl(void)
 {
   char maxRadioResultsStr[5];
@@ -385,7 +387,6 @@ void showRadioInfo(struct Node *res_node)
     IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n%s kbit/s %s\n",
           itemData->name, itemData->country, itemData->bitrate, itemData->codec);
 
-
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   radioInfo,
           TAG_DONE);
@@ -397,6 +398,23 @@ void showRadioInfo(struct Node *res_node)
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,   FALSE,
           TAG_DONE);
+
+    toggleFavouriteButton(sqlCheckExist(itemData->uuid, "radio"));
+
+    /*
+    if(sqlCheckExist(itemData->uuid, "radio"))
+    {
+      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
+            BUTTON_RenderImage, objects[OID_FAVOURITES_REMOVE_IMAGE],
+            TAG_DONE);
+    }
+    else
+    {
+      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
+            BUTTON_RenderImage, objects[OID_FAVOURITES_ADD_IMAGE],
+            TAG_DONE);
+    }
+  */
 
     // TODO: Free itemData
   }
@@ -527,7 +545,13 @@ void addFavouriteRadio(struct Node *res_node)
           LBNA_UserData, &itemData,
           TAG_DONE);
 
-    if(!sqlCheckExist(itemData->uuid, "radio"))
+    if(sqlCheckExist(itemData->uuid, "radio"))
+    {
+      // TODO: Remove from favourites
+
+      toggleFavouriteButton(FALSE);
+    }
+    else
     {
       sqlAddFavouriteRadio(itemData->uuid,
         itemData->name,
@@ -536,6 +560,24 @@ void addFavouriteRadio(struct Node *res_node)
         itemData->codec,
         itemData->url_resolved
       );
+      toggleFavouriteButton(TRUE);
     }
+
     // TODO: Free itemData
+}
+
+static void toggleFavouriteButton(BOOL status)
+{
+  if (status)
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
+          BUTTON_RenderImage, objects[OID_FAVOURITES_REMOVE_IMAGE],
+          TAG_DONE);
+  }
+  else
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
+          BUTTON_RenderImage, objects[OID_FAVOURITES_ADD_IMAGE],
+          TAG_DONE);
+  }
 }

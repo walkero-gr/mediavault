@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - future
+### Added
+- Added the ability to mark favourite radio stations and select one
+  of them to listen to
+
+
 ## [1.4.3] - 2021-10-21
 ### Changed
 - Compiled with openssl to 1.1.1l
@@ -13,10 +19,12 @@ All notable changes to this project will be documented in this file.
 - Fixed the script "start_player" execution when the MediaVault
   path contains spaces
 
+
 ## [1.4.2] - 2021-10-17
 ### Fixed
 - The online radio stations api changed and broke the searching of
   online radio stations. This is a fix for that.
+
 
 ## [1.4.1] - 2021-10-10
 ### Added

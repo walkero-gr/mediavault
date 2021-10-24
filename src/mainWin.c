@@ -63,6 +63,15 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         BITMAP_Precision,             PRECISION_EXACT,
         BITMAP_Masking,               TRUE,
         TAG_END);
+
+  objects[OID_FAVOURITES_REMOVE_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        BITMAP_SourceFile,            "tbimages:favouritesremove",
+        BITMAP_DisabledSourceFile,    "tbimages:favouritesremove_g",
+        BITMAP_SelectSourceFile,      "tbimages:favouritesremove_s",
+        BITMAP_Screen,                screen,
+        BITMAP_Precision,             PRECISION_EXACT,
+        BITMAP_Masking,               TRUE,
+        TAG_END);
   
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
   renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
@@ -693,6 +702,7 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
               BUTTON_AutoButton,          0,
               BUTTON_BevelStyle,          BVS_NONE,
               BUTTON_Justification,       BCJ_CENTER,
+              // TODO: Set the play button object globally, so it is not set twice
               BUTTON_RenderImage, objects[OID_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
                 BITMAP_SourceFile,            "tbimages:td_tn_play",
                 BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",
@@ -776,6 +786,7 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
               BUTTON_AutoButton,          0,
               BUTTON_BevelStyle,          BVS_NONE,
               BUTTON_Justification,       BCJ_CENTER,
+              // TODO: Set the play button object globally, so it is not set twice
               BUTTON_RenderImage, objects[OID_PODCAST_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
                 BITMAP_SourceFile,            "tbimages:td_tn_play",
                 BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",
