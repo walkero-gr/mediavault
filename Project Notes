@@ -124,9 +124,9 @@ DONE - [1.5] Initialize the DB file
 - Add a method to check the DB version
 DONE - [1.5] Mark stations as favourites
 DONE - [1.5] Add a favorites list of radio stations
-- Mark podcasts as favorites
+DONE - [1.5] Mark podcasts as favorites
 - Download Favourites radio list as .pls/.m3u playlists
-
+- Add listen later episode podcasts
 
 //// BUGS
 *********

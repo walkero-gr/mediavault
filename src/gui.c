@@ -235,7 +235,9 @@ void showGUI(void)
             {
               uint32  result = WMHI_LASTMSG,
                       res_value,
-                      res_node,
+                      radioNode,
+                      podcastNode,
+                      podcastEpisodeNode,
                       lsbNodeIdx;
 
               //## Main Window events
@@ -379,12 +381,9 @@ void showGUI(void)
                           IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                           if (res_value == LBRE_NORMAL)
                           {
-                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&radioNode);
                             windowBlocking(objects[OID_MAIN], TRUE);
-
-                            // TODO: Check if the station is in favorites
-
-                            showRadioInfo((struct Node *)res_node);
+                            showRadioInfo((struct Node *)radioNode);
                             windowBlocking(objects[OID_MAIN], FALSE);
                           }
                         }
@@ -393,9 +392,9 @@ void showGUI(void)
                       case GID_INFO_PLAY_BUTTON:
                         if (res_value == LBRE_NORMAL)
                         {
-                          if (res_node)
+                          if (radioNode)
                           {
-                            playRadio((struct Node *)res_node);
+                            playRadio((struct Node *)radioNode);
                           }
                         }
                         break;
@@ -403,9 +402,9 @@ void showGUI(void)
                       case GID_RADIO_FAVOURITE_BUTTON:
                         if (res_value == LBRE_NORMAL)
                         {
-                          if (res_node)
+                          if (radioNode)
                           {
-                            addFavouriteRadio((struct Node *)res_node);
+                            addFavouriteRadio((struct Node *)radioNode);
                           }
                         }
                         break;
@@ -502,10 +501,10 @@ void showGUI(void)
                           IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                           if (res_value == LBRE_NORMAL)
                           {
-                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&podcastNode);
 
                             windowBlocking(objects[OID_MAIN], TRUE);
-                            showPodcastInfo((struct Node *)res_node);
+                            showPodcastInfo((struct Node *)podcastNode);
                             windowBlocking(objects[OID_MAIN], FALSE);
                           }
                         }
@@ -522,10 +521,10 @@ void showGUI(void)
                             IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                             if (res_value == LBRE_NORMAL)
                             {
-                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&podcastEpisodeNode);
 
                               windowBlocking(objects[OID_MAIN], TRUE);
-                              showPodcastEpisodeInfo((struct Node *)res_node);
+                              showPodcastEpisodeInfo((struct Node *)podcastEpisodeNode);
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                           }
@@ -535,9 +534,9 @@ void showGUI(void)
                       case GID_PODCAST_PLAY_BUTTON:
                         if (res_value == LBRE_NORMAL)
                         {
-                          if (res_node)
+                          if (podcastEpisodeNode)
                           {
-                            playPodcast((struct Node *)res_node);
+                            playPodcast((struct Node *)podcastEpisodeNode);
                           }
                         }
                         break;  
@@ -545,9 +544,9 @@ void showGUI(void)
                       case GID_PODCAST_FAVOURITE_BUTTON:
                         if (res_value == LBRE_NORMAL)
                         {
-                          if (res_node)
+                          if (podcastNode)
                           {
-                            addFavouritePodcast((struct Node *)res_node);
+                            addFavouritePodcast((struct Node *)podcastNode);
                           }
                         }
                         break;
