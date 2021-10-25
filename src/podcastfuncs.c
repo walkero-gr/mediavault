@@ -20,6 +20,7 @@
 #include "gui.h"
 #include "libshandler.h"
 #include "httpfuncs.h"
+#include "sqldb.h"
 #include "stringfuncs.h"
 #include "guifuncs.h"
 #include "secrets.h"
@@ -29,12 +30,14 @@ static CONST_STRPTR podcastAPIUrl = "https://api.podcastindex.org/api/1.0";
 static uint8 maxResults = 100;
 static uint8 maxEpisodesResults = 100;
 
-static void fillEpisodesList(ULONG);
-
 extern struct memory response;
 extern struct RenderHook *podcastImageRenderHook;
 extern struct ColumnInfo *podcastColInfo, *podcastEpisodeColInfo;
-extern struct List podcastList, trendingPodcastList, podcastEpisodeList;
+extern struct List  podcastList, podcastFavouriteList,
+                    trendingPodcastList, podcastEpisodeList;
+
+static void fillEpisodesList(ULONG);
+static void toggleFavouriteButton(BOOL);
 
 static void addRequestHeaders(void)
 {
@@ -414,6 +417,47 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
   return cnt;
 }
 
+int getPodcastFavourite(void *unused, int cntCols, char **fields, char **colNames)
+{
+  char itemUID[32];
+  struct Node *itemNode;
+  struct podcastInfo *itemData = {0};
+
+  itemData = (struct podcastInfo *)IExec->AllocVecTags(sizeof(struct podcastInfo),
+      AVT_Type,            MEMF_PRIVATE,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+  
+  IUtility->Strlcpy(itemUID, strcpy(itemUID, fields[0] + 4), sizeof(itemUID));
+  itemData->id = atoi(itemUID);
+  IUtility->Strlcpy(itemData->title,        fields[4], sizeof(itemData->title));
+  IUtility->Strlcpy(itemData->language,     fields[6], sizeof(itemData->language));
+  IUtility->Strlcpy(itemData->image,        fields[10], sizeof(itemData->image));
+  IUtility->Strlcpy(itemData->description,  fields[11], sizeof(itemData->description));
+
+  itemNode = IListBrowser->AllocListBrowserNode( 3,
+      LBNA_UserData,          itemData,
+      LBNA_Column,            0,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           fields[4],
+      LBNA_Column,            1,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           fields[6],
+      TAG_DONE);
+
+  if(itemNode)
+  {
+    IExec->AddTail(&podcastFavouriteList, itemNode);
+  }
+
+  // Dummy variable usage for gcc happiness
+  if (unused) unused = 0;
+  if (cntCols) cntCols = 0;
+  if (colNames) colNames = NULL;
+
+  return 0;
+}
+
 void showPodcastInfo(struct Node *res_node)
 {
   if (res_node)
@@ -439,17 +483,17 @@ void showPodcastInfo(struct Node *res_node)
     fillEpisodesList(podcastData->id);
 
     IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", podcastData->id);
-    if (IUtility->Stricmp(itemUID, ""))
-    {
-      showAvatarImage(
-        itemUID, podcastData->image,
-        gadgets[GID_PODCAST_INFO_DATA], objects[OID_PODCAST_AVATAR_IMAGE],
-        podcastImageRenderHook
-      );
-    }
+    showAvatarImage(
+      itemUID, podcastData->image,
+      gadgets[GID_PODCAST_INFO_DATA], objects[OID_PODCAST_AVATAR_IMAGE],
+      podcastImageRenderHook
+    );
+
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_PLAY_BUTTON], windows[WID_MAIN], NULL,
         GA_Disabled,   TRUE,
         TAG_DONE);
+
+    toggleFavouriteButton(sqlCheckExist(itemUID, "podcast"));
   }
 }
 
@@ -557,6 +601,34 @@ void fillPodcastList(struct filters lastFilters)
   else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
 }
 
+void fillPodcastFavouriteList(void)
+{
+  IExec->NewList(&podcastFavouriteList);
+  sqlGetFavourites("podcast", getPodcastFavourite);
+
+  if (listCount(&podcastFavouriteList) == 0)
+  {
+    // TODO: Add a message to the user
+  }
+
+  if (listCount(&podcastFavouriteList) > 0)
+  {
+    IIntuition->SetAttrs((struct Gadget*)gadgets[GID_PODCAST_FAVOURITE_LISTBROWSER],
+      LISTBROWSER_Labels, NULL,
+      TAG_DONE);
+
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_FAVOURITE_LISTBROWSER], windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         &podcastFavouriteList,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     podcastColInfo,
+        TAG_DONE);
+  }
+  //char notFoundMsg[] = "No Favourite Radio Stations found!";
+  //getRadioFavouriteStations();
+  //listStations((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER], &radioFavouriteList, 0, (char *)notFoundMsg, NULL);
+}
+
 void fillPodcastTrendingList(struct filters lastFilters)
 {
   char jsonErrorMsg[] = "There was an error with the returned data.\n" \
@@ -650,5 +722,57 @@ void playPodcast(struct Node *res_node)
         TAG_DONE);
 
     // TODO: Free itemData
+  }
+}
+
+void addFavouritePodcast(struct Node *res_node)
+{
+  char itemUID[32];
+  struct podcastInfo *itemData = NULL;
+  itemData = (struct podcastInfo *)IExec->AllocVecTags(sizeof(struct podcastInfo),
+        AVT_Type,            MEMF_PRIVATE,
+        AVT_ClearWithValue,  "\0",
+        TAG_DONE);
+
+  IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+        LBNA_UserData, &itemData,
+        TAG_DONE);
+
+  IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", itemData->id);
+  if(sqlCheckExist(itemUID, "podcast"))
+  {
+    sqlRemoveFavourite(itemUID, "podcast");
+    toggleFavouriteButton(FALSE);
+  }
+  else
+  {
+    sqlAddFavouritePodcast(
+      itemUID,
+      itemData->title,
+      itemData->language,
+      itemData->image,
+      itemData->description
+    );
+    toggleFavouriteButton(TRUE);
+  }
+
+  // TODO: Free itemData
+}
+
+static void toggleFavouriteButton(BOOL status)
+{
+  if (status)
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
+          GA_Disabled,          FALSE,
+          BUTTON_RenderImage,   objects[OID_FAVOURITES_REMOVE_IMAGE],
+          TAG_DONE);
+  }
+  else
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
+          GA_Disabled,          FALSE,
+          BUTTON_RenderImage,   objects[OID_FAVOURITES_ADD_IMAGE],
+          TAG_DONE);
   }
 }

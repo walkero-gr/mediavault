@@ -32,6 +32,7 @@ static Object *buildRadioFavouritePage(void);
 static Object *buildRadioPopularPage(void);
 static Object *buildRadioTrendPage(void);
 static Object *buildPodcastSearchPage(void);
+static Object *buildPodcastFavouritePage(void);
 static Object *buildPodcastTrendingPage(void);
 static Object *buildRadioRightSidebar(struct Screen *, struct RenderHook *);
 static Object *buildPodcastRightSidebar(struct Screen *, struct RenderHook *);
@@ -91,7 +92,8 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         PAGE_Add, gadgets[GID_PAGE_3] = buildRadioPopularPage(),
         PAGE_Add, gadgets[GID_PAGE_4] = buildRadioTrendPage(),
         PAGE_Add, gadgets[GID_PAGE_5] = buildPodcastSearchPage(),
-        PAGE_Add, gadgets[GID_PAGE_6] = buildPodcastTrendingPage(),
+        PAGE_Add, gadgets[GID_PAGE_6] = buildPodcastFavouritePage(),
+        PAGE_Add, gadgets[GID_PAGE_7] = buildPodcastTrendingPage(),
         TAG_DONE);
 
   //Object *rightSidebarPages = IIntuition->NewObject(NULL, "page.gadget",
@@ -474,6 +476,17 @@ void getLeftSidebarContent(void)
     LBNA_Generation,    2,
     LBNA_Column,        0,
       LBNCA_CopyText,   TRUE,
+      LBNCA_Text,       "Favourite",
+    TAG_DONE);
+  if (node)
+  {
+    IExec->AddTail( &leftSidebarList, node );
+  }
+  
+  node = IListBrowser->AllocListBrowserNode(1,
+    LBNA_Generation,    2,
+    LBNA_Column,        0,
+      LBNCA_CopyText,   TRUE,
       LBNCA_Text,       "Trending",
     TAG_DONE);
   if (node)
@@ -545,6 +558,28 @@ static Object *buildPodcastSearchPage(void)
           CHILD_MinHeight,  300,
           // END - Bottom List Section
         
+        TAG_DONE);
+}
+
+static Object *buildPodcastFavouritePage(void)
+{
+  return IIntuition->NewObject(LayoutClass, NULL,
+      LAYOUT_BevelStyle,      BVS_GROUP,
+      LAYOUT_Label,           "Favourite Podcasts",
+
+        LAYOUT_AddChild, gadgets[GID_PODCAST_FAVOURITE_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+          GA_ID,                      GID_PODCAST_FAVOURITE_LISTBROWSER,
+          GA_RelVerify,               TRUE,
+          GA_TabCycle,                TRUE,
+          LISTBROWSER_ColumnTitles,   TRUE,
+          LISTBROWSER_HorizontalProp, TRUE,
+          LISTBROWSER_Separators,     TRUE,
+          LISTBROWSER_ShowSelected,   TRUE,
+          LISTBROWSER_Striping,       LBS_ROWS,
+          LISTBROWSER_SortColumn,     0,
+          LISTBROWSER_TitleClickable, TRUE,
+          TAG_DONE),
+
         TAG_DONE);
 }
 
@@ -773,6 +808,32 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
             TAG_DONE),
             CHILD_WeightedHeight, 30,
 
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+            LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
+            //LAYOUT_BevelStyle,      BVS_GROUP,
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 70,
+
+            LAYOUT_AddChild, gadgets[GID_PODCAST_FAVOURITE_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,                      GID_PODCAST_FAVOURITE_BUTTON,
+              GA_Disabled,                TRUE,
+              BUTTON_Transparent,         TRUE,
+              BUTTON_AutoButton,          0,
+              BUTTON_BevelStyle,          BVS_NONE,
+              BUTTON_Justification,       BCJ_CENTER,
+              BUTTON_RenderImage,         objects[OID_FAVOURITES_ADD_IMAGE],
+              TAG_DONE),
+              //CHILD_MaxHeight, 40,
+              CHILD_WeightedWidth, 10,
+
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 20,
+            TAG_DONE),
+            //CHILD_MaxHeight, 30,
+            CHILD_WeightedHeight, 5,
+
          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
             LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
             LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
@@ -816,7 +877,7 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
             GA_TEXTEDITOR_ReadOnly,     TRUE,
             GA_TEXTEDITOR_Transparent,  TRUE,
             TAG_DONE),
-            CHILD_WeightedHeight, 18,
+            CHILD_WeightedHeight, 13,
           
           LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
             TAG_DONE),

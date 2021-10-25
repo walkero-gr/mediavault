@@ -63,7 +63,6 @@ DONE - Load results into a linked list
 DONE - List radio stations
 DONE - Double click on a station to play on player
 DONE - Click on a station and show it's info at the side, with logo
-DONE - [1.5] Mark stations as favorites
 DONE - Add more tags
 DONE - Add more countries and languages
 DONE - Empty list if invalid/empty JSON returns
@@ -71,11 +70,10 @@ DONE - Add station votes in the list
 DONE - Block main window when user sent a request
 DONE - Add Trending list of radio stations at the left sidebar
 DONE - Add Popular list of radio stations at the left sidebar
-DONE - [1.5] Add a favorites list of radio stations
-- Let list bring most voted first (set in preferences)
 DONE - Set list to hide the broken stations
 DONE - Download radio avatar images
 DONE - Show avatar images at the right sidebar
+- Let list bring most voted first (set in preferences)
 - Add a call to the API when a user selects a radio station to listen to
 
 ## Podcasts
@@ -93,10 +91,10 @@ DONE - [1.4] When the user clicks on an episode add info at the right sidebar
               and enable the play button
 DONE - [1.4] When the play button is clicked AmigaAmp3 should start playing
               the episode
-- When a podcast episodes list is filled but the user selects an other podcast that has no episodes, the list should be cleared.
+- When a podcast episodes list is filled but the user selects
+  an other podcast that has no episodes, the list should be cleared.
 DONE - [1.4] Add a check if the podcast name is empty when Discover button is
               pressed
-- Mark podcasts as favorites
 - Download podcast episodes
 DONE - [1.4.1] Add more filters, like categories, language etc.
 - Change the language column to have the Language name than the iso code
@@ -124,7 +122,10 @@ DONE - [1.4.1] Add more filters, like categories, language etc.
 DONE - [1.5] Check if DB file exists
 DONE - [1.5] Initialize the DB file
 - Add a method to check the DB version
-
+DONE - [1.5] Mark stations as favourites
+DONE - [1.5] Add a favorites list of radio stations
+- Mark podcasts as favorites
+- Download Favourites radio list as .pls/.m3u playlists
 
 
 //// BUGS

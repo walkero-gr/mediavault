@@ -296,12 +296,12 @@ int getRadioFavouriteStations(void *unused, int cntCols, char **fields, char **c
   IUtility->Strlcpy(itemData->uuid,         fields[0], sizeof(itemData->uuid));
   IUtility->Strlcpy(itemData->name,         fields[4], sizeof(itemData->name));
   IUtility->Strlcpy(itemData->country,      fields[5], sizeof(itemData->country));
-  IUtility->Strlcpy(itemData->bitrate,      fields[6], sizeof(itemData->bitrate));
-  IUtility->Strlcpy(itemData->codec,        fields[7], sizeof(itemData->codec));
-  IUtility->Strlcpy(itemData->url_resolved, fields[8], sizeof(itemData->url_resolved));
+  IUtility->Strlcpy(itemData->bitrate,      fields[7], sizeof(itemData->bitrate));
+  IUtility->Strlcpy(itemData->codec,        fields[8], sizeof(itemData->codec));
+  IUtility->Strlcpy(itemData->url_resolved, fields[9], sizeof(itemData->url_resolved));
 
   char codecBitrate[15];
-  IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%s kbit/s %s", fields[6], fields[7]);
+  IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%s kbit/s %s", fields[7], fields[8]);
 
   itemNode = IListBrowser->AllocListBrowserNode( 4,
       LBNA_UserData,          itemData,
@@ -395,26 +395,7 @@ void showRadioInfo(struct Node *res_node)
           GA_Disabled,   FALSE,
           TAG_DONE);
 
-    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
-          GA_Disabled,   FALSE,
-          TAG_DONE);
-
     toggleFavouriteButton(sqlCheckExist(itemData->uuid, "radio"));
-
-    /*
-    if(sqlCheckExist(itemData->uuid, "radio"))
-    {
-      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
-            BUTTON_RenderImage, objects[OID_FAVOURITES_REMOVE_IMAGE],
-            TAG_DONE);
-    }
-    else
-    {
-      IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
-            BUTTON_RenderImage, objects[OID_FAVOURITES_ADD_IMAGE],
-            TAG_DONE);
-    }
-  */
 
     // TODO: Free itemData
   }
@@ -494,11 +475,11 @@ void fillRadioList(struct filters lastFilters, BOOL newSearch)
 void fillRadioFavouriteList(void)
 {
   IExec->NewList(&radioFavouriteList);
-  sqlGetFavourites((STRPTR)"radio", getRadioFavouriteStations);
+  sqlGetFavourites("radio", getRadioFavouriteStations);
 
   if (listCount(&radioFavouriteList) == 0)
   {
-
+    // TODO: Add a message to the user
   }
 
   if (listCount(&radioFavouriteList) > 0)
@@ -535,35 +516,35 @@ void fillRadioTrendList(void)
 
 void addFavouriteRadio(struct Node *res_node)
 {
-    struct stationInfo *itemData = NULL;
-    itemData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
-          AVT_Type,            MEMF_PRIVATE,
-          AVT_ClearWithValue,  "\0",
-          TAG_DONE);
+  struct stationInfo *itemData = NULL;
+  itemData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+        AVT_Type,            MEMF_PRIVATE,
+        AVT_ClearWithValue,  "\0",
+        TAG_DONE);
 
-    IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
-          LBNA_UserData, &itemData,
-          TAG_DONE);
+  IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+        LBNA_UserData, &itemData,
+        TAG_DONE);
 
-    if(sqlCheckExist(itemData->uuid, "radio"))
-    {
-      // TODO: Remove from favourites
-      sqlRemoveFavourite(itemData->uuid, "radio");
-      toggleFavouriteButton(FALSE);
-    }
-    else
-    {
-      sqlAddFavouriteRadio(itemData->uuid,
-        itemData->name,
-        itemData->country,
-        itemData->bitrate,
-        itemData->codec,
-        itemData->url_resolved
-      );
-      toggleFavouriteButton(TRUE);
-    }
+  if(sqlCheckExist(itemData->uuid, "radio"))
+  {
+    sqlRemoveFavourite(itemData->uuid, "radio");
+    toggleFavouriteButton(FALSE);
+  }
+  else
+  {
+    sqlAddFavouriteRadio(
+      itemData->uuid,
+      itemData->name,
+      itemData->country,
+      itemData->bitrate,
+      itemData->codec,
+      itemData->url_resolved
+    );
+    toggleFavouriteButton(TRUE);
+  }
 
-    // TODO: Free itemData
+  // TODO: Free itemData
 }
 
 static void toggleFavouriteButton(BOOL status)
@@ -571,13 +552,15 @@ static void toggleFavouriteButton(BOOL status)
   if (status)
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
-          BUTTON_RenderImage, objects[OID_FAVOURITES_REMOVE_IMAGE],
+          GA_Disabled,          FALSE,
+          BUTTON_RenderImage,   objects[OID_FAVOURITES_REMOVE_IMAGE],
           TAG_DONE);
   }
   else
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
-          BUTTON_RenderImage, objects[OID_FAVOURITES_ADD_IMAGE],
+          GA_Disabled,          FALSE,
+          BUTTON_RenderImage,   objects[OID_FAVOURITES_ADD_IMAGE],
           TAG_DONE);
   }
 }

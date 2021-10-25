@@ -35,6 +35,7 @@ struct List radioList,
             radioTrendList,
             leftSidebarList,
             podcastList,
+            podcastFavouriteList,
             trendingPodcastList,
             podcastEpisodeList;
 
@@ -404,11 +405,7 @@ void showGUI(void)
                         {
                           if (res_node)
                           {
-
-                            // TODO: Add station to favourites
                             addFavouriteRadio((struct Node *)res_node);
-
-                            // TODO: Disable the button and show favourites remove button
                           }
                         }
                         break;
@@ -423,14 +420,6 @@ void showGUI(void)
                           case 1:
                             switchRightSidebar(PAGE_RADIO_INFO);
                             fillRadioFavouriteList();
-                            /*
-                            if(listCount(&radioFavouriteList) == 0)
-                            {
-                              windowBlocking(objects[OID_MAIN], TRUE);
-                              fillRadioPopularList();
-                              windowBlocking(objects[OID_MAIN], FALSE);
-                            }
-                            */
                             break;
                           case 2:
                             switchRightSidebar(PAGE_RADIO_INFO);
@@ -451,10 +440,12 @@ void showGUI(void)
                             }
                             break;
                           case 4:
+                          case 6:
                             switchRightSidebar(PAGE_PODCAST_INFO);
                             break;
                           case 5:
                             switchRightSidebar(PAGE_PODCAST_INFO);
+                            fillPodcastFavouriteList();
                             break;
                         }
                         break;
@@ -499,43 +490,23 @@ void showGUI(void)
                         break;
 
                       case GID_PODCAST_LISTBROWSER:
-                        {
-                          Object *lb = NULL;
-
-                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_LISTBROWSER)
-                          {
-                            lb = gadgets[GID_PODCAST_LISTBROWSER];
-
-                            IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
-                            if (res_value == LBRE_NORMAL)
-                            {                     
-                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
-
-                              windowBlocking(objects[OID_MAIN], TRUE);
-                              showPodcastInfo((struct Node *)res_node);
-                              windowBlocking(objects[OID_MAIN], FALSE);
-                            }
-                          }
-                        }
-                        break;
-
+                      case GID_PODCAST_FAVOURITE_LISTBROWSER:
                       case GID_PODCAST_TRENDING_LISTBROWSER:
                         {
                           Object *lb = NULL;
 
-                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_TRENDING_LISTBROWSER)
+                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_LISTBROWSER) lb = gadgets[GID_PODCAST_LISTBROWSER];
+                            else if ((result & WMHI_GADGETMASK) == GID_PODCAST_FAVOURITE_LISTBROWSER) lb = gadgets[GID_PODCAST_FAVOURITE_LISTBROWSER];
+                            else lb = gadgets[GID_PODCAST_TRENDING_LISTBROWSER];
+
+                          IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+                          if (res_value == LBRE_NORMAL)
                           {
-                            lb = gadgets[GID_PODCAST_TRENDING_LISTBROWSER];
+                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
 
-                            IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
-                            if (res_value == LBRE_NORMAL)
-                            {
-                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
-
-                              windowBlocking(objects[OID_MAIN], TRUE);
-                              showPodcastInfo((struct Node *)res_node);
-                              windowBlocking(objects[OID_MAIN], FALSE);
-                            }
+                            windowBlocking(objects[OID_MAIN], TRUE);
+                            showPodcastInfo((struct Node *)res_node);
+                            windowBlocking(objects[OID_MAIN], FALSE);
                           }
                         }
                         break;
@@ -570,6 +541,16 @@ void showGUI(void)
                           }
                         }
                         break;  
+
+                      case GID_PODCAST_FAVOURITE_BUTTON:
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          if (res_node)
+                          {
+                            addFavouritePodcast((struct Node *)res_node);
+                          }
+                        }
+                        break;
                     }
                     break;
                 }
@@ -634,6 +615,10 @@ void showGUI(void)
           {
             freeList(&podcastList, STRUCT_PODCAST_INFO);
           }
+          if(listCount(&podcastFavouriteList))
+          {
+            freeList(&podcastFavouriteList, STRUCT_PODCAST_INFO);
+          }
           if(listCount(&trendingPodcastList))
           {
             freeList(&trendingPodcastList, STRUCT_PODCAST_INFO);
@@ -655,6 +640,7 @@ void showGUI(void)
           IIntuition->DisposeObject(objects[OID_PLAY_IMAGE]);
           IIntuition->DisposeObject(objects[OID_PODCAST_PLAY_IMAGE]);
           IIntuition->DisposeObject(objects[OID_FAVOURITES_ADD_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_FAVOURITES_REMOVE_IMAGE]);
 
           IIntuition->DisposeObject(menus[MID_PROJECT]);
         }

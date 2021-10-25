@@ -67,9 +67,12 @@ BOOL createDB(void)
           "lastepisode TEXT, " \
           "title TEXT, " \
           "country TEXT, " \
+          "language TEXT, " \
           "bitrate TEXT, " \
           "codec TEXT, " \
-          "url TEXT); " \
+          "url TEXT, " \
+          "image TEXT, " \
+          "description TEXT); " \
       "CREATE TABLE plays ( " \
           "uuid    Text, " \
           "type    Text, " \
@@ -117,6 +120,52 @@ BOOL sqlAddFavouriteRadio(
     "VALUES " \
     "('%s', '%s', '%ld', 'radio', '%s', '%s', '%s', '%s');",
     uuid, title, now(), country, bitrate, codec, url
+  );
+
+  rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+  IExec->FreeVec(sql);
+
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "SQL error: %s\n", err_msg);
+    sqlite3_free(err_msg);
+    sqlite3_close(db);
+    return FALSE;
+  }
+  sqlite3_close(db);
+
+  return TRUE;
+}
+
+BOOL sqlAddFavouritePodcast(
+  STRPTR uuid,
+  STRPTR title,
+  STRPTR language,
+  STRPTR image,
+  STRPTR description
+) {
+  sqlite3 *db;
+  char *err_msg = 0;
+  int sqlSize = 1024;
+
+  int rc = sqlite3_open(dbFileName, &db);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  STRPTR sql = IExec->AllocVecTags(sizeof(char) * sqlSize,
+          AVT_Type,            MEMF_SHARED,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+
+  snprintf(sql, sqlSize,
+    "INSERT INTO favourites " \
+    "(uuid, title, added, type, language, image, description) " \
+    "VALUES " \
+    "('%s', '%s', '%ld', 'podcast', '%s', '%s', '%s');",
+    uuid, title, now(), language, image, description
   );
 
   rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
@@ -213,7 +262,7 @@ BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
   return result;
 }
 
-BOOL sqlGetFavourites(STRPTR type, int (*resultCallback)(void *, int, char **, char **))
+BOOL sqlGetFavourites(CONST_STRPTR type, int (*resultCallback)(void *, int, char **, char **))
 {
   sqlite3 *db;
   char *err_msg = 0;

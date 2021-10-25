@@ -3,8 +3,22 @@ All notable changes to this project will be documented in this file.
 
 ## [1.5.0] - future
 ### Added
-- Added the ability to mark favourite radio stations and select one
-  of them to listen to
+- Added the ability to mark favourite radio stations and podcasts.
+  A new list is created where you can find them and select one to
+  listen to
+- Added an asterisk above the play button that helps the users to
+  add the selected podcast or radio station to the favourite list.
+  It also works as an indicator if the selected item is already
+  in the list or not.
+
+### Changed
+- Compiled with libcurl 7.79.1
+
+### Fixed
+- Fixed issues that could make MediaVault crash system at the
+  image download section. This fixed also some images that were
+  not downloaded. So now it will be able to show more images
+  than before.
 
 
 ## [1.4.3] - 2021-10-21

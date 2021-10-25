@@ -24,11 +24,11 @@
 #endif
 
 #ifndef REVISION
-#define REVISION 5
+#define REVISION 4
 #endif
 
 #ifndef PATCH
-#define PATCH 0
+#define PATCH 3
 #endif
 
 #ifndef RELEASE_DATE

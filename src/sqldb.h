@@ -21,8 +21,9 @@
 void printSqliteVer(void); 
 BOOL createDB(void);
 BOOL sqlAddFavouriteRadio(STRPTR, STRPTR, STRPTR, STRPTR, STRPTR, STRPTR);
+BOOL sqlAddFavouritePodcast(STRPTR, STRPTR, STRPTR, STRPTR, STRPTR);
 BOOL sqlRemoveFavourite(STRPTR, CONST_STRPTR);
 BOOL sqlCheckExist(STRPTR, CONST_STRPTR);
-BOOL sqlGetFavourites(STRPTR, int (*)(void *, int, char **, char **));
+BOOL sqlGetFavourites(CONST_STRPTR, int (*)(void *, int, char **, char **));
 
 #endif
