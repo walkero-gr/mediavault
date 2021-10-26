@@ -761,16 +761,6 @@ void addFavouritePodcast(struct Node *res_node)
         LBNA_UserData, &itemData,
         TAG_DONE);
 
-  if(listCount(&podcastEpisodeList))
-  {
-    IUtility->SNPrintf(
-        latestEpisodePublishDate,
-        sizeof(latestEpisodePublishDate),
-        "%lu",
-        getLatestEpisodePublishDate(&podcastEpisodeList)
-    );
-  }
-
   IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", itemData->id);
   if(sqlCheckExist(itemUID, "podcast"))
   {
@@ -779,6 +769,16 @@ void addFavouritePodcast(struct Node *res_node)
   }
   else
   {
+    if(listCount(&podcastEpisodeList))
+    {
+      IUtility->SNPrintf(
+          latestEpisodePublishDate,
+          sizeof(latestEpisodePublishDate),
+          "%lu",
+          getLatestEpisodePublishDate(&podcastEpisodeList)
+      );
+    }
+    
     sqlAddFavouritePodcast(
       itemUID,
       itemData->title,
