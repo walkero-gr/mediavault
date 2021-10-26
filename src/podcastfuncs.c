@@ -458,6 +458,28 @@ int getPodcastFavourite(void *unused, int cntCols, char **fields, char **colName
   return 0;
 }
 
+static ULONG getLatestEpisodePublishDate(struct List *list)
+{
+  if (list->lh_Head)
+  {
+    struct Node *node = list->lh_Head;
+
+    struct podcastEpisodeInfo *episodeData = {0};
+    episodeData = (struct podcastEpisodeInfo *)IExec->AllocVecTags(sizeof(struct podcastEpisodeInfo),
+          AVT_Type,            MEMF_PRIVATE,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+
+    IListBrowser->GetListBrowserNodeAttrs((struct Node *)node,
+          LBNA_UserData, &episodeData,
+          TAG_DONE);
+
+    return episodeData->datePublished;
+  }
+
+  return 0;
+}
+
 void showPodcastInfo(struct Node *res_node)
 {
   if (res_node)
@@ -728,7 +750,8 @@ void playPodcast(struct Node *res_node)
 void addFavouritePodcast(struct Node *res_node)
 {
   char itemUID[32];
-  struct podcastInfo *itemData = NULL;
+  char latestEpisodePublishDate[11];
+  struct podcastInfo *itemData = {0};
   itemData = (struct podcastInfo *)IExec->AllocVecTags(sizeof(struct podcastInfo),
         AVT_Type,            MEMF_PRIVATE,
         AVT_ClearWithValue,  "\0",
@@ -737,6 +760,16 @@ void addFavouritePodcast(struct Node *res_node)
   IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
         LBNA_UserData, &itemData,
         TAG_DONE);
+
+  if(listCount(&podcastEpisodeList))
+  {
+    IUtility->SNPrintf(
+        latestEpisodePublishDate,
+        sizeof(latestEpisodePublishDate),
+        "%lu",
+        getLatestEpisodePublishDate(&podcastEpisodeList)
+    );
+  }
 
   IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", itemData->id);
   if(sqlCheckExist(itemUID, "podcast"))
@@ -751,7 +784,8 @@ void addFavouritePodcast(struct Node *res_node)
       itemData->title,
       itemData->language,
       itemData->image,
-      itemData->description
+      itemData->description,
+      latestEpisodePublishDate
     );
     toggleFavouriteButton(TRUE);
   }

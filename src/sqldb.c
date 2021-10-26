@@ -61,18 +61,18 @@ BOOL createDB(void)
       "     ver Integer); " \
       "INSERT into version VALUES (\"1\");" \
       "CREATE TABLE favourites ( " \
-          "uuid    Text, " \
-          "type    Text, " \
-          "added TEXT, " \
-          "lastepisode TEXT, " \
-          "title TEXT, " \
-          "country TEXT, " \
-          "language TEXT, " \
-          "bitrate TEXT, " \
-          "codec TEXT, " \
-          "url TEXT, " \
-          "image TEXT, " \
-          "description TEXT); " \
+          "uuid         Text, " \
+          "type         Text, " \
+          "added        Text, " \
+          "lastepisode  Text, " \
+          "title        Text, " \
+          "country      Text, " \
+          "language     Text, " \
+          "bitrate      Text, " \
+          "codec        Text, " \
+          "url          Text, " \
+          "image        Text, " \
+          "description  Text); " \
       "CREATE TABLE plays ( " \
           "uuid    Text, " \
           "type    Text, " \
@@ -147,7 +147,8 @@ BOOL sqlAddFavouritePodcast(
   STRPTR title,
   STRPTR language,
   STRPTR image,
-  STRPTR description
+  STRPTR description,
+  STRPTR lastepisode
 ) {
   sqlite3 *db;
   sqlite3_stmt *res;
@@ -160,8 +161,8 @@ BOOL sqlAddFavouritePodcast(
   }
 
   CONST_STRPTR sql = "INSERT INTO favourites " \
-    "(uuid, title, added, type, language, image, description) " \
-    "VALUES (:uuid, :title, :added, 'podcast', :language, :image, :descr)";
+    "(uuid, title, added, lastepisode, type, language, image, description) " \
+    "VALUES (:uuid, :title, :added, :lastepisode, 'podcast', :language, :image, :descr)";
 
   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
   if (rc != SQLITE_OK) {
@@ -173,6 +174,7 @@ BOOL sqlAddFavouritePodcast(
   int uuidIdx     = sqlite3_bind_parameter_index(res, ":uuid");
   int titleIdx    = sqlite3_bind_parameter_index(res, ":title");
   int addedIdx    = sqlite3_bind_parameter_index(res, ":added");
+  int lastEpIdx   = sqlite3_bind_parameter_index(res, ":lastepisode");
   int languageIdx = sqlite3_bind_parameter_index(res, ":language");
   int imageIdx    = sqlite3_bind_parameter_index(res, ":image");
   int descrIdx    = sqlite3_bind_parameter_index(res, ":descr");
@@ -180,6 +182,7 @@ BOOL sqlAddFavouritePodcast(
   sqlite3_bind_text(res, uuidIdx, uuid, -1, 0);
   sqlite3_bind_text(res, titleIdx, title, -1, 0);
   sqlite3_bind_int(res, addedIdx, now());
+  sqlite3_bind_text(res, lastEpIdx, lastepisode, -1, 0);
   sqlite3_bind_text(res, languageIdx, language, -1, 0);
   sqlite3_bind_text(res, imageIdx, image, -1, 0);
   sqlite3_bind_text(res, descrIdx, description, -1, 0);
