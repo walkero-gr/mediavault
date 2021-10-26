@@ -750,7 +750,6 @@ void playPodcast(struct Node *res_node)
 void addFavouritePodcast(struct Node *res_node)
 {
   char itemUID[32];
-  char latestEpisodePublishDate[11];
   struct podcastInfo *itemData = {0};
   itemData = (struct podcastInfo *)IExec->AllocVecTags(sizeof(struct podcastInfo),
         AVT_Type,            MEMF_PRIVATE,
@@ -769,6 +768,8 @@ void addFavouritePodcast(struct Node *res_node)
   }
   else
   {
+    char latestEpisodePublishDate[11];
+    
     if(listCount(&podcastEpisodeList))
     {
       IUtility->SNPrintf(
