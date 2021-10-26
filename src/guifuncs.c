@@ -257,32 +257,26 @@ void freeList(struct List *listBrowser, int structID)
 
 static STRPTR getCachedImageIfExists(STRPTR uuid)
 {
-  char buf[cacheFilenameSize];
   char avatarBase[cacheFilenameSize];
+  STRPTR buf = IExec->AllocVecTags(sizeof(char) * cacheFilenameSize,
+          AVT_Type,            MEMF_SHARED,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+  
   IUtility->Strlcpy(avatarBase, CACHE_DIR, sizeof(avatarBase));
   IUtility->Strlcat(avatarBase, uuid, sizeof(avatarBase));
 
-  BPTR imgLock;
   const char ext[][6] = {".jpg", ".png", ".webp", ".ico", ".gif"};
 
   size_t i;
   for (i = 0; i < sizeof(ext)/sizeof(ext[0]); i++)
   {
-    IUtility->Strlcpy(buf, avatarBase, sizeof(buf));
-    IUtility->Strlcat(buf, ext[i], sizeof(buf));
+    IUtility->Strlcpy(buf, avatarBase, sizeof(char) * cacheFilenameSize);
+    IUtility->Strlcat(buf, ext[i], sizeof(char) * cacheFilenameSize);
 
-    // TODO: Change below code with fileExists()
-    imgLock = IDOS->Lock(buf, SHARED_LOCK);
-    if (imgLock)
+    if (fileExists(buf))
     {
-      STRPTR avatar = IExec->AllocVecTags(sizeof(char) * cacheFilenameSize,
-          AVT_Type,            MEMF_SHARED,
-          AVT_ClearWithValue,  "\0",
-          TAG_DONE);
-      IDOS->UnLock(imgLock);
-
-      strcpy(avatar, buf);
-      return avatar;
+      return buf;
     }
   }
   return NULL;
@@ -477,6 +471,7 @@ static BOOL getGithubLatestData(void)
         if (json_is_string(buf))
         {
           IUtility->Strlcpy(release->changes, IJansson->json_string_value(buf), sizeof(release->changes));
+          strReplace("\r", "", release->changes);
         }
 
         assets = IJansson->json_object_get(jsonRoot, "assets");
@@ -543,8 +538,7 @@ void workOnUpdate(void)
       {
         IUtility->Strlcpy(infoMsg, "There is a new version available!\nWould you like to download and install the new version automatically?\n", infoMsgSize);
         IUtility->Strlcat(infoMsg, "\nChanges:\n", infoMsgSize);
-      
-        // TODO: Clear \r from the changes string
+
         IUtility->Strlcat(infoMsg, release->changes, infoMsgSize);
         requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, REQTYPE_INFO, "_Sure|_Nah", REQIMAGE_QUESTION);
         

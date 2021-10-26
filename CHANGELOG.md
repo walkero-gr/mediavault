@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Compiled with libcurl 7.79.1
+- Removed the small boxes at the end of each line at the update
+  changelog text
+- Code simplified and cleaned in some places
 
 ### Fixed
 - Fixed issues that could make MediaVault crash system at the

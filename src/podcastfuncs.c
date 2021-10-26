@@ -742,8 +742,6 @@ void playPodcast(struct Node *res_node)
         SYS_Error,    ZERO,
         SYS_Asynch,   TRUE,
         TAG_DONE);
-
-    // TODO: Free itemData
   }
 }
 
@@ -790,8 +788,6 @@ void addFavouritePodcast(struct Node *res_node)
     );
     toggleFavouriteButton(TRUE);
   }
-
-  // TODO: Free itemData
 }
 
 static void toggleFavouriteButton(BOOL status)

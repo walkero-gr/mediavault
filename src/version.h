@@ -28,7 +28,7 @@
 #endif
 
 #ifndef PATCH
-#define PATCH 3
+#define PATCH 2
 #endif
 
 #ifndef RELEASE_DATE

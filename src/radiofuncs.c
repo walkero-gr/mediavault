@@ -364,8 +364,6 @@ void playRadio(struct Node *res_node)
         SYS_Asynch,   TRUE,
         TAG_DONE);
   }
-
-  // TODO: Free itemData
 }
 
 void showRadioInfo(struct Node *res_node)
@@ -397,8 +395,6 @@ void showRadioInfo(struct Node *res_node)
           TAG_DONE);
 
     toggleFavouriteButton(sqlCheckExist(itemData->uuid, "radio"));
-
-    // TODO: Free itemData
   }
 }
 
@@ -545,8 +541,6 @@ void addFavouriteRadio(struct Node *res_node)
     );
     toggleFavouriteButton(TRUE);
   }
-
-  // TODO: Free itemData
 }
 
 static void toggleFavouriteButton(BOOL status)

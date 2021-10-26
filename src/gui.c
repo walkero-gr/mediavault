@@ -578,6 +578,7 @@ void showGUI(void)
             }
           }
 
+          // TODO: Move clearance to a separate method
           if (windows[WID_MAIN])
           {
             IIntuition->IDoMethod(objects[OID_MAIN], WM_CLOSE, TAG_DONE);
@@ -637,7 +638,6 @@ void showGUI(void)
           IIntuition->DisposeObject(objects[OID_PODCAST_AVATAR_IMAGE]);
 
           IIntuition->DisposeObject(objects[OID_PLAY_IMAGE]);
-          IIntuition->DisposeObject(objects[OID_PODCAST_PLAY_IMAGE]);
           IIntuition->DisposeObject(objects[OID_FAVOURITES_ADD_IMAGE]);
           IIntuition->DisposeObject(objects[OID_FAVOURITES_REMOVE_IMAGE]);
 

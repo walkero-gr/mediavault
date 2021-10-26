@@ -278,8 +278,38 @@ STRPTR SHA1Encrypt(STRPTR string)
   * Return Value: pointer to the string in memory
   *
   */
-void stringToLower(STRPTR string)
+void stringToLower(STRPTR subject)
 {
-  for (size_t i = 0; i <= strlen(string) - 1; i++)
-    string[i] = IUtility->ToLower(string[i]);
+  size_t i = 0;
+  for(i = 0; subject[i] != '\0'; i++)
+    subject[i] = IUtility->ToLower(subject[i]);
 }
+
+void strReplace(CONST_STRPTR search, CONST_STRPTR replace, STRPTR subject)
+{
+  char buf[4096];
+  //to store the pointer returned from strstr
+  char *ch;
+
+  //first exit condition
+  if(!(ch = strstr(subject, search)))
+    return;
+
+  //copy all the content to buffer before the first occurrence of the search string
+  strncpy(buf, subject, ch - subject);
+
+  //prepare the buffer for appending by adding a null to the end of it
+  buf[ch - subject] = 0;
+
+  //append using sprintf function
+  sprintf(buf+(ch - subject), "%s%s", replace, ch + strlen(search));
+
+  //empty subject for copying
+  subject[0] = 0;
+  strcpy(subject, buf);
+  //pass recursively to replace other occurrences
+  return strReplace(search, replace, subject);
+
+
+}
+
