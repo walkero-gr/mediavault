@@ -22,6 +22,7 @@
 #include "httpfuncs.h"
 #include "stringfuncs.h"
 #include "guifuncs.h"
+#include "sqldb.h"
 #include "fsfuncs.h"
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";
@@ -30,10 +31,13 @@ static uint8 maxRadioResults = 100;
 
 extern struct memory response;
 extern struct RenderHook *renderhook;
-extern struct ColumnInfo *columnInfo;
-extern struct List radioList,
-                radioPopularList,
-                radioTrendList;
+extern struct ColumnInfo *columnInfo, *radioFavouritesColInfo;
+extern struct List  radioList,
+                    radioFavouriteList,
+                    radioPopularList,
+                    radioTrendList;
+
+static void toggleFavouriteButton(BOOL);
 
 static void setBaseSearchUrl(void)
 {
@@ -237,9 +241,10 @@ size_t getRadioList(struct List *stationList, int offset)
     buf = IJansson->json_object_get(data, "bitrate");
     if(json_is_integer(buf))
     {
-      stationData->bitrate = (uint8)IJansson->json_integer_value(buf);
+      uint8 bitrate = (uint8)IJansson->json_integer_value(buf);
+      IUtility->SNPrintf(stationData->bitrate, sizeof(stationData->bitrate), "%ld", bitrate);
     }
-    else stationData->bitrate = 0;
+    else IUtility->Strlcpy(stationData->bitrate, "0", sizeof(stationData->bitrate));
 
     buf = IJansson->json_object_get(data, "votes");
     if(!json_is_integer(buf))
@@ -250,7 +255,7 @@ size_t getRadioList(struct List *stationList, int offset)
     stationData->votes = (ULONG)IJansson->json_integer_value(buf);
 
     char codecBitrate[15];
-    IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%ld kbit/s %s", stationData->bitrate, stationData->codec);
+    IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%s kbit/s %s", stationData->bitrate, stationData->codec);
 
     stationNode = IListBrowser->AllocListBrowserNode( 5,
         LBNA_UserData,          stationData,
@@ -277,6 +282,54 @@ size_t getRadioList(struct List *stationList, int offset)
   IJansson->json_decref(jsonRoot);
   return cnt;
 }
+
+int getRadioFavouriteStations(void *unused, int cntCols, char **fields, char **colNames)
+{
+  struct Node *itemNode;
+  struct stationInfo *itemData = {0};
+
+  itemData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+      AVT_Type,            MEMF_PRIVATE,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+
+  IUtility->Strlcpy(itemData->uuid,         fields[0], sizeof(itemData->uuid));
+  IUtility->Strlcpy(itemData->name,         fields[4], sizeof(itemData->name));
+  IUtility->Strlcpy(itemData->country,      fields[5], sizeof(itemData->country));
+  IUtility->Strlcpy(itemData->bitrate,      fields[7], sizeof(itemData->bitrate));
+  IUtility->Strlcpy(itemData->codec,        fields[8], sizeof(itemData->codec));
+  IUtility->Strlcpy(itemData->url_resolved, fields[9], sizeof(itemData->url_resolved));
+  IUtility->Strlcpy(itemData->favicon,      fields[10], sizeof(itemData->favicon));
+
+  char codecBitrate[15];
+  IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%s kbit/s %s", fields[7], fields[8]);
+
+  itemNode = IListBrowser->AllocListBrowserNode( 4,
+      LBNA_UserData,          itemData,
+      LBNA_Column,            0,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           fields[4],
+      LBNA_Column,            1,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           fields[5],
+      LBNA_Column,            2,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           codecBitrate,
+      TAG_DONE);
+
+  if(itemNode)
+  {
+    IExec->AddTail(&radioFavouriteList, itemNode);
+  }
+
+  // Dummy variable usage for gcc happiness
+  if (unused) unused = 0;
+  if (cntCols) cntCols = 0;
+  if (colNames) colNames = NULL;
+
+  return 0;
+}
+
 
 void playRadio(struct Node *res_node)
 {
@@ -332,7 +385,7 @@ void showRadioInfo(struct Node *res_node)
 
     showAvatarImage(itemData->uuid, itemData->favicon, gadgets[GID_INFO_RADIO_DATA], objects[OID_AVATAR_IMAGE], renderhook);
 
-    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n%ld kbit/s %s\n",
+    IUtility->SNPrintf(radioInfo, sizeof(radioInfo), "%s\n%s\n%s kbit/s %s\n",
           itemData->name, itemData->country, itemData->bitrate, itemData->codec);
 
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_RADIO_DATA], windows[WID_MAIN], NULL,
@@ -342,6 +395,8 @@ void showRadioInfo(struct Node *res_node)
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_INFO_PLAY_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,   FALSE,
           TAG_DONE);
+
+    toggleFavouriteButton(sqlCheckExist(itemData->uuid, "radio"));
 
     // TODO: Free itemData
   }
@@ -418,6 +473,34 @@ void fillRadioList(struct filters lastFilters, BOOL newSearch)
   }
 }
 
+void fillRadioFavouriteList(void)
+{
+  IExec->NewList(&radioFavouriteList);
+  sqlGetFavourites("radio", getRadioFavouriteStations);
+
+  if (listCount(&radioFavouriteList) == 0)
+  {
+    // TODO: Add a message to the user
+  }
+
+  if (listCount(&radioFavouriteList) > 0)
+  {
+    IIntuition->SetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER],
+      LISTBROWSER_Labels, NULL,
+      TAG_DONE);
+
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER], windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         &radioFavouriteList,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     radioFavouritesColInfo,
+        TAG_DONE);
+  }
+  //char notFoundMsg[] = "No Favourite Radio Stations found!";
+  //getRadioFavouriteStations();
+  //listStations((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER], &radioFavouriteList, 0, (char *)notFoundMsg, NULL);
+}
+
 void fillRadioPopularList(void)
 {
   char notFoundMsg[] = "No Popular Radio Stations found!";
@@ -430,4 +513,58 @@ void fillRadioTrendList(void)
   char notFoundMsg[] = "No Trending Radio Stations found!";
   getRadioTrendStations();
   listStations((struct Gadget*)gadgets[GID_RADIO_TREND_LISTBROWSER], &radioTrendList, 0, (char *)notFoundMsg, NULL);
+}
+
+void addFavouriteRadio(struct Node *res_node)
+{
+  struct stationInfo *itemData = NULL;
+  itemData = (struct stationInfo *)IExec->AllocVecTags(sizeof(struct stationInfo),
+        AVT_Type,            MEMF_PRIVATE,
+        AVT_ClearWithValue,  "\0",
+        TAG_DONE);
+
+  IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+        LBNA_UserData, &itemData,
+        TAG_DONE);
+
+  if(sqlCheckExist(itemData->uuid, "radio"))
+  {
+    sqlRemoveFavourite(itemData->uuid, "radio");
+    toggleFavouriteButton(FALSE);
+  }
+  else
+  {
+    sqlAddFavouriteRadio(
+      itemData->uuid,
+      itemData->name,
+      itemData->country,
+      itemData->bitrate,
+      itemData->codec,
+      itemData->url_resolved,
+      itemData->favicon
+    );
+    toggleFavouriteButton(TRUE);
+  }
+
+  // TODO: Free itemData
+}
+
+static void toggleFavouriteButton(BOOL status)
+{
+  if (status)
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
+          GA_Disabled,          FALSE,
+          GA_HintInfo,          "Click to remove the selected\nradio station from the favourites list",
+          BUTTON_RenderImage,   objects[OID_FAVOURITES_REMOVE_IMAGE],
+          TAG_DONE);
+  }
+  else
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
+          GA_Disabled,          FALSE,
+          GA_HintInfo,          "Click to add the selected\nradio station to the favourites list",
+          BUTTON_RenderImage,   objects[OID_FAVOURITES_ADD_IMAGE],
+          TAG_DONE);
+  }
 }

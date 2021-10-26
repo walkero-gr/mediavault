@@ -16,23 +16,6 @@
 #ifndef _MEDIAVAULT_H
 #define _MEDIAVAULT_H
 
-/* System */
-//#include <sys/types.h>
-//#include <sys/socket.h>
-//#include <sys/time.h>
 
-/* BSDSocket */
-//#include <netinet/in.h>
-
-/* Prototypes */
-
-/* ANSI C */
-#include <stdio.h>
-#include <stdlib.h>
-
-// #include "globals.h"
-
-#include "libshandler.h"
-#include "gui.h"
 
 #endif

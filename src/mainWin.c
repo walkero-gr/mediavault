@@ -19,209 +19,20 @@
 
 #include "globals.h"
 #include "gui.h"
+#include "lists.h"
 #include "mainWin.h"
 #include "guifuncs.h"
-
-CONST_STRPTR genres[] =
-{
-  "All Genres",
-  (STRPTR) ~0L,
-  "Alternative",
-  "Blues",
-  "Classical",
-  "Country",
-  "Dance",
-  "Disco",
-  "Drum and bass",
-  "Electronic",
-  "Folk",
-  "Jazz",
-  "Latin",
-  "Love",
-  "Metal",
-  "New Age",
-  "News",
-  "Oldies",
-  "Pop",
-  "Rap",
-  "Rock",
-  "Reggae",
-  "Religion",
-  "RnB",
-  "Punk",
-  "Soul",
-  "Sports",
-  "Talk",
-  "Techno",
-  "Trance",
-  NULL
-};
-
-CONST_STRPTR languages[] =
-{
-  "All Languages",
-  (STRPTR) ~0L,
-  "Arabic",
-  "Bulgarian",
-  "Chinese",
-  "Croatian",
-  "Czech",
-  "Danish",
-  "Dutch",
-  "English",
-  "Finnish",
-  "French",
-  "German",
-  "Greek",
-  "Hindi",
-  "Hungarian",
-  "Irish",
-  "Italian",
-  "Japanese",
-  "Korean",
-  "Norwegian",
-  "Polish",
-  "Portuguese",
-  "Romanian",
-  "Russian",
-  "Serbian",
-  "Slovak",
-  "Slovenian",
-  "Spanish",
-  "Swedish",
-  "Thai",
-  "Turkish",
-  "Ukrainian",
-  NULL
-};
-
-CONST_STRPTR languagesISO6391[] =
-{
-  NULL,
-  (STRPTR) ~0L,
-  "ar",
-  "bg",
-  "zh",
-  "hr",
-  "cs",
-  "da",
-  "nl",
-  "en,en-us",
-  "fi",
-  "fr",
-  "de",
-  "el",
-  "hi",
-  "hu",
-  "ga",
-  "it",
-  "ja",
-  "ko",
-  "no,nn,nb",
-  "pl",
-  "pt,pt-br",
-  "ro",
-  "ru",
-  "sr",
-  "sk",
-  "sl",
-  "es",
-  "sv",
-  "th",
-  "tr",
-  "uk",
-  NULL
-};
-
-CONST_STRPTR countries[] =
-{
-  "All Countries",
-  (STRPTR) ~0L,
-  "Argentina",
-  "Australia",
-  "Austria",
-  "Belgium",
-  "Brazil",
-  "Canada",
-  "Chile",
-  "China",
-  "Colombia",
-  "Croatia",
-  "Czechia",
-  "France",
-  "Germany",
-  "Greece",
-  "Hungary",
-  "India",
-  "Ireland",
-  "Italy",
-  "Mexico",
-  "Peru",
-  "Poland",
-  "Portugal",
-  "Romania",
-  "Russia",
-  "Spain",
-  "Switzerland",
-  "The Netherlands",
-  "The Russian Federation",
-  "The United Kingdom",
-  "The United States Of America",
-  "Turkey",
-  "Ukraine",
-  NULL
-};
-
-CONST_STRPTR podcastCategories[] =
-{
-  "All Categories",
-  (STRPTR) ~0L,
-  "Arts",
-  "Beauty",
-  "Books",
-  "Business",
-  "Careers",
-  "Comedy",
-  "Design",
-  "Documentary",
-  "Education",
-  "Entrepreneurship",
-  "Fashion", 
-  "Fiction",
-  "Film",
-  "Fitness",
-  "Food",
-  "Games",
-  "History",
-  "Hobbies",
-  "Interviews",
-  "Kids",
-  "Learning",
-  "Marketing", 
-  "Manga",
-  "Music",
-  "News",
-  "Pets",
-  "Philosophy",
-  "Politics",
-  "Religion",
-  "Science",
-  "Sports",
-  "Technology",
-  "Travel",
-  "TV",
-  "Video-Games",  
-  NULL
-};
 
 extern struct List leftSidebarList;
 extern struct RenderHook *renderhook;
 extern struct RenderHook *podcastImageRenderHook;
 
 static Object *buildRadioSearchPage(void);
+static Object *buildRadioFavouritePage(void);
 static Object *buildRadioPopularPage(void);
 static Object *buildRadioTrendPage(void);
 static Object *buildPodcastSearchPage(void);
+static Object *buildPodcastFavouritePage(void);
 static Object *buildPodcastTrendingPage(void);
 static Object *buildRadioRightSidebar(struct Screen *, struct RenderHook *);
 static Object *buildPodcastRightSidebar(struct Screen *, struct RenderHook *);
@@ -245,6 +56,24 @@ extern Class *WindowClass;
 
 Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen *screen)
 {                                           
+  objects[OID_FAVOURITES_ADD_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        BITMAP_SourceFile,            "tbimages:favouritesadd",
+        BITMAP_DisabledSourceFile,    "tbimages:favouritesadd_g",
+        BITMAP_SelectSourceFile,      "tbimages:favouritesadd_s",
+        BITMAP_Screen,                screen,
+        BITMAP_Precision,             PRECISION_EXACT,
+        BITMAP_Masking,               TRUE,
+        TAG_END);
+
+  objects[OID_FAVOURITES_REMOVE_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        BITMAP_SourceFile,            "tbimages:favouritesremove",
+        BITMAP_DisabledSourceFile,    "tbimages:favouritesremove_g",
+        BITMAP_SelectSourceFile,      "tbimages:favouritesremove_s",
+        BITMAP_Screen,                screen,
+        BITMAP_Precision,             PRECISION_EXACT,
+        BITMAP_Masking,               TRUE,
+        TAG_END);
+  
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
   renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
         ASOHOOK_Size,  sizeof(struct RenderHook),
@@ -259,10 +88,12 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
   Object *radioPages = IIntuition->NewObject(NULL, "page.gadget",
         LAYOUT_DeferLayout, TRUE,
         PAGE_Add, gadgets[GID_PAGE_1] = buildRadioSearchPage(),
-        PAGE_Add, gadgets[GID_PAGE_2] = buildRadioPopularPage(),
-        PAGE_Add, gadgets[GID_PAGE_3] = buildRadioTrendPage(),
-        PAGE_Add, gadgets[GID_PAGE_4] = buildPodcastSearchPage(),
-        PAGE_Add, gadgets[GID_PAGE_5] = buildPodcastTrendingPage(),
+        PAGE_Add, gadgets[GID_PAGE_2] = buildRadioFavouritePage(),
+        PAGE_Add, gadgets[GID_PAGE_3] = buildRadioPopularPage(),
+        PAGE_Add, gadgets[GID_PAGE_4] = buildRadioTrendPage(),
+        PAGE_Add, gadgets[GID_PAGE_5] = buildPodcastSearchPage(),
+        PAGE_Add, gadgets[GID_PAGE_6] = buildPodcastFavouritePage(),
+        PAGE_Add, gadgets[GID_PAGE_7] = buildPodcastTrendingPage(),
         TAG_DONE);
 
   //Object *rightSidebarPages = IIntuition->NewObject(NULL, "page.gadget",
@@ -286,6 +117,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
     //WA_FadeTime,            250000, /* Duration of transition in microseconds */
     WA_NewLookMenus,        TRUE,
     WINDOW_AppPort,         appPort,
+    WINDOW_GadgetHelp,      FALSE,
     WINDOW_Iconifiable,     TRUE,
     WINDOW_IconifyGadget,   TRUE,
     WINDOW_Icon,            IIcon->GetDiskObject("PROGDIR:MediaVault"),
@@ -512,6 +344,28 @@ static Object *buildRadioSearchPage(void)
         TAG_DONE);
 }
 
+static Object *buildRadioFavouritePage(void)
+{
+  return IIntuition->NewObject(LayoutClass, NULL,
+      LAYOUT_BevelStyle,      BVS_GROUP,
+      LAYOUT_Label,           "Favourite Radio Stations",
+
+        LAYOUT_AddChild, gadgets[GID_RADIO_FAVOURITE_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+          GA_ID,                      GID_RADIO_FAVOURITE_LISTBROWSER,
+          GA_RelVerify,               TRUE,
+          GA_TabCycle,                TRUE,
+          LISTBROWSER_ColumnTitles,   TRUE,
+          LISTBROWSER_HorizontalProp, TRUE,
+          LISTBROWSER_Separators,     TRUE,
+          LISTBROWSER_ShowSelected,   TRUE,
+          LISTBROWSER_Striping,       LBS_ROWS,
+          LISTBROWSER_SortColumn,     0,
+          LISTBROWSER_TitleClickable, TRUE,
+          TAG_DONE),
+
+        TAG_DONE);
+}
+
 static Object *buildRadioPopularPage(void)
 {
   return IIntuition->NewObject(LayoutClass, NULL,
@@ -578,6 +432,17 @@ void getLeftSidebarContent(void)
     LBNA_Generation,    2,
     LBNA_Column,        0,
       LBNCA_CopyText,   TRUE,
+      LBNCA_Text,       "Favourite",
+    TAG_DONE);
+  if (node)
+  {
+    IExec->AddTail( &leftSidebarList, node );
+  }
+
+  node = IListBrowser->AllocListBrowserNode(1,
+    LBNA_Generation,    2,
+    LBNA_Column,        0,
+      LBNCA_CopyText,   TRUE,
       LBNCA_Text,       "Popular",
     TAG_DONE);
   if (node)
@@ -608,6 +473,17 @@ void getLeftSidebarContent(void)
     IExec->AddTail( &leftSidebarList, node );
   }
 
+  node = IListBrowser->AllocListBrowserNode(1,
+    LBNA_Generation,    2,
+    LBNA_Column,        0,
+      LBNCA_CopyText,   TRUE,
+      LBNCA_Text,       "Favourite",
+    TAG_DONE);
+  if (node)
+  {
+    IExec->AddTail( &leftSidebarList, node );
+  }
+  
   node = IListBrowser->AllocListBrowserNode(1,
     LBNA_Generation,    2,
     LBNA_Column,        0,
@@ -683,6 +559,28 @@ static Object *buildPodcastSearchPage(void)
           CHILD_MinHeight,  300,
           // END - Bottom List Section
         
+        TAG_DONE);
+}
+
+static Object *buildPodcastFavouritePage(void)
+{
+  return IIntuition->NewObject(LayoutClass, NULL,
+      LAYOUT_BevelStyle,      BVS_GROUP,
+      LAYOUT_Label,           "Favourite Podcasts",
+
+        LAYOUT_AddChild, gadgets[GID_PODCAST_FAVOURITE_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+          GA_ID,                      GID_PODCAST_FAVOURITE_LISTBROWSER,
+          GA_RelVerify,               TRUE,
+          GA_TabCycle,                TRUE,
+          LISTBROWSER_ColumnTitles,   TRUE,
+          LISTBROWSER_HorizontalProp, TRUE,
+          LISTBROWSER_Separators,     TRUE,
+          LISTBROWSER_ShowSelected,   TRUE,
+          LISTBROWSER_Striping,       LBS_ROWS,
+          LISTBROWSER_SortColumn,     0,
+          LISTBROWSER_TitleClickable, TRUE,
+          TAG_DONE),
+
         TAG_DONE);
 }
 
@@ -795,12 +693,40 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
             SPACE_MinWidth,             128,
             SPACE_MinHeight,            128,
             SPACE_RenderHook,           renderhook,
+            //SPACE_BevelStyle,           BVS_GROUP,
             GA_Image,                   objects[OID_AVATAR_IMAGE],
             TAG_DONE),
             CHILD_WeightedHeight, 30,
 
           LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
             LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
+            //LAYOUT_BevelStyle,      BVS_GROUP,
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 70,
+
+            LAYOUT_AddChild, gadgets[GID_RADIO_FAVOURITE_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,                      GID_RADIO_FAVOURITE_BUTTON,
+              GA_Disabled,                TRUE,
+              BUTTON_Transparent,         TRUE,
+              BUTTON_AutoButton,          0,
+              BUTTON_BevelStyle,          BVS_NONE,
+              BUTTON_Justification,       BCJ_CENTER,
+              BUTTON_RenderImage,         objects[OID_FAVOURITES_ADD_IMAGE],
+              TAG_DONE),
+              //CHILD_MaxHeight, 40,
+              CHILD_WeightedWidth, 10,
+
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 20,
+            TAG_DONE),
+            //CHILD_MaxHeight, 30,
+            CHILD_WeightedHeight, 5,
+
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+            LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
+            //LAYOUT_BevelStyle,      BVS_GROUP,
             LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
               TAG_DONE),
               CHILD_WeightedWidth, 30,
@@ -808,10 +734,12 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
             LAYOUT_AddChild, gadgets[GID_INFO_PLAY_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
               GA_ID,                      GID_INFO_PLAY_BUTTON,
               GA_Disabled,                TRUE,
+              GA_HintInfo,                "When this is enabled,\nclick to listen to the\nselected radio station",
               BUTTON_Transparent,         TRUE,
               BUTTON_AutoButton,          0,
               BUTTON_BevelStyle,          BVS_NONE,
-              BUTTON_Justification,       1,
+              BUTTON_Justification,       BCJ_CENTER,
+              // TODO: Set the play button object globally, so it is not set twice
               BUTTON_RenderImage, objects[OID_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
                 BITMAP_SourceFile,            "tbimages:td_tn_play",
                 BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",
@@ -826,9 +754,10 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
 
             LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
               TAG_DONE),
-              CHILD_WeightedWidth, 30,
+              CHILD_WeightedWidth, 25,
             TAG_DONE),
-            CHILD_MaxHeight, 60,
+            //CHILD_MaxHeight, 60,
+            CHILD_WeightedHeight, 10,
 
           LAYOUT_AddChild, gadgets[GID_INFO_RADIO_DATA] = IIntuition->NewObject(TextEditorClass, NULL,
             GA_ID,                      GID_INFO_RADIO_DATA,
@@ -841,11 +770,12 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
             GA_TEXTEDITOR_ReadOnly,     TRUE,
             GA_TEXTEDITOR_Transparent,  TRUE,
             TAG_DONE),
-            CHILD_WeightedHeight, 18,
+            CHILD_WeightedHeight, 25,
 
           LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+            //SPACE_BevelStyle,           BVS_GROUP,
             TAG_DONE),
-            CHILD_WeightedHeight, 40,
+            CHILD_WeightedHeight, 30,
 
           TAG_DONE);
 }
@@ -880,6 +810,32 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
             TAG_DONE),
             CHILD_WeightedHeight, 30,
 
+          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
+            LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
+            //LAYOUT_BevelStyle,      BVS_GROUP,
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 70,
+
+            LAYOUT_AddChild, gadgets[GID_PODCAST_FAVOURITE_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,                      GID_PODCAST_FAVOURITE_BUTTON,
+              GA_Disabled,                TRUE,
+              BUTTON_Transparent,         TRUE,
+              BUTTON_AutoButton,          0,
+              BUTTON_BevelStyle,          BVS_NONE,
+              BUTTON_Justification,       BCJ_CENTER,
+              BUTTON_RenderImage,         objects[OID_FAVOURITES_ADD_IMAGE],
+              TAG_DONE),
+              //CHILD_MaxHeight, 40,
+              CHILD_WeightedWidth, 10,
+
+            LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
+              TAG_DONE),
+              CHILD_WeightedWidth, 20,
+            TAG_DONE),
+            //CHILD_MaxHeight, 30,
+            CHILD_WeightedHeight, 5,
+
          LAYOUT_AddChild, IIntuition->NewObject(LayoutClass, NULL,
             LAYOUT_Orientation,     LAYOUT_ORIENT_HORIZ,
             LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
@@ -889,10 +845,12 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
             LAYOUT_AddChild, gadgets[GID_PODCAST_PLAY_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
               GA_ID,                      GID_PODCAST_PLAY_BUTTON,
               GA_Disabled,                TRUE,
+              GA_HintInfo,                "When this is enabled,\nclick to listen to the\nselected podcast episode",
               BUTTON_Transparent,         TRUE,
               BUTTON_AutoButton,          0,
               BUTTON_BevelStyle,          BVS_NONE,
-              BUTTON_Justification,       1,
+              BUTTON_Justification,       BCJ_CENTER,
+              // TODO: Set the play button object globally, so it is not set twice
               BUTTON_RenderImage, objects[OID_PODCAST_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
                 BITMAP_SourceFile,            "tbimages:td_tn_play",
                 BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",
@@ -922,7 +880,7 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
             GA_TEXTEDITOR_ReadOnly,     TRUE,
             GA_TEXTEDITOR_Transparent,  TRUE,
             TAG_DONE),
-            CHILD_WeightedHeight, 18,
+            CHILD_WeightedHeight, 13,
           
           LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
             TAG_DONE),

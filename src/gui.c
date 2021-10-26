@@ -27,13 +27,15 @@
 #include "podcastfuncs.h"
 #include "httpfuncs.h"
 
-struct ColumnInfo *columnInfo, *leftSidebarCI,
+struct ColumnInfo *columnInfo, *radioFavouritesColInfo, *leftSidebarCI,
             *podcastColInfo, *podcastEpisodeColInfo;
 struct List radioList,
+            radioFavouriteList,
             radioPopularList,
             radioTrendList,
             leftSidebarList,
             podcastList,
+            podcastFavouriteList,
             trendingPodcastList,
             podcastEpisodeList;
 
@@ -117,6 +119,30 @@ void showGUI(void)
                 LBCIA_Sortable,             TRUE,
                 LBCIA_SortArrow,            TRUE,
                 LBCIA_Weight,               5,
+              TAG_DONE);
+
+          radioFavouritesColInfo = IListBrowser->AllocLBColumnInfo( 3,
+              LBCIA_Column,                 0,
+                LBCIA_Title,                " Title",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               50,
+              LBCIA_Column,                 1,
+                LBCIA_Title,                " Country",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               30,
+              LBCIA_Column,                 2,
+                LBCIA_Title,                " Bitrate",
+                LBCIA_AutoSort,             TRUE,
+                LBCIA_DraggableSeparator,   TRUE,
+                LBCIA_Sortable,             TRUE,
+                LBCIA_SortArrow,            TRUE,
+                LBCIA_Weight,               20,
               TAG_DONE);
 
           podcastColInfo = IListBrowser->AllocLBColumnInfo( 2,
@@ -209,7 +235,9 @@ void showGUI(void)
             {
               uint32  result = WMHI_LASTMSG,
                       res_value,
-                      res_node,
+                      radioNode,
+                      podcastNode,
+                      podcastEpisodeNode,
                       lsbNodeIdx;
 
               //## Main Window events
@@ -341,19 +369,21 @@ void showGUI(void)
                       case GID_RADIO_LISTBROWSER:
                       case GID_RADIO_POPULAR_LISTBROWSER:
                       case GID_RADIO_TREND_LISTBROWSER:
+                      case GID_RADIO_FAVOURITE_LISTBROWSER:
                         {
                           Object *lb = NULL;
 
                           if ((result & WMHI_GADGETMASK) == GID_RADIO_LISTBROWSER) lb = gadgets[GID_RADIO_LISTBROWSER];
                           else if ((result & WMHI_GADGETMASK) == GID_RADIO_POPULAR_LISTBROWSER) lb = gadgets[GID_RADIO_POPULAR_LISTBROWSER];
-                          else lb = gadgets[GID_RADIO_TREND_LISTBROWSER];
+                          else if ((result & WMHI_GADGETMASK) == GID_RADIO_TREND_LISTBROWSER) lb = gadgets[GID_RADIO_TREND_LISTBROWSER];
+                          else lb = gadgets[GID_RADIO_FAVOURITE_LISTBROWSER];
 
                           IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                           if (res_value == LBRE_NORMAL)
                           {
-                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&radioNode);
                             windowBlocking(objects[OID_MAIN], TRUE);
-                            showRadioInfo((struct Node *)res_node);
+                            showRadioInfo((struct Node *)radioNode);
                             windowBlocking(objects[OID_MAIN], FALSE);
                           }
                         }
@@ -362,9 +392,19 @@ void showGUI(void)
                       case GID_INFO_PLAY_BUTTON:
                         if (res_value == LBRE_NORMAL)
                         {
-                          if (res_node)
+                          if (radioNode)
                           {
-                            playRadio((struct Node *)res_node);
+                            playRadio((struct Node *)radioNode);
+                          }
+                        }
+                        break;
+
+                      case GID_RADIO_FAVOURITE_BUTTON:
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          if (radioNode)
+                          {
+                            addFavouriteRadio((struct Node *)radioNode);
                           }
                         }
                         break;
@@ -378,6 +418,10 @@ void showGUI(void)
                             break;
                           case 1:
                             switchRightSidebar(PAGE_RADIO_INFO);
+                            fillRadioFavouriteList();
+                            break;
+                          case 2:
+                            switchRightSidebar(PAGE_RADIO_INFO);
                             if(listCount(&radioPopularList) == 0)
                             {
                               windowBlocking(objects[OID_MAIN], TRUE);
@@ -385,7 +429,7 @@ void showGUI(void)
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                             break;
-                          case 2:
+                          case 3:
                             switchRightSidebar(PAGE_RADIO_INFO);
                             if(listCount(&radioTrendList) == 0)
                             {
@@ -394,11 +438,13 @@ void showGUI(void)
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                             break;
-                          case 3:
+                          case 4:
+                          case 6:
                             switchRightSidebar(PAGE_PODCAST_INFO);
                             break;
-                          case 4:
+                          case 5:
                             switchRightSidebar(PAGE_PODCAST_INFO);
+                            fillPodcastFavouriteList();
                             break;
                         }
                         break;
@@ -443,43 +489,23 @@ void showGUI(void)
                         break;
 
                       case GID_PODCAST_LISTBROWSER:
-                        {
-                          Object *lb = NULL;
-
-                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_LISTBROWSER)
-                          {
-                            lb = gadgets[GID_PODCAST_LISTBROWSER];
-
-                            IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
-                            if (res_value == LBRE_NORMAL)
-                            {                     
-                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
-
-                              windowBlocking(objects[OID_MAIN], TRUE);
-                              showPodcastInfo((struct Node *)res_node);
-                              windowBlocking(objects[OID_MAIN], FALSE);
-                            }
-                          }
-                        }
-                        break;
-
+                      case GID_PODCAST_FAVOURITE_LISTBROWSER:
                       case GID_PODCAST_TRENDING_LISTBROWSER:
                         {
                           Object *lb = NULL;
 
-                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_TRENDING_LISTBROWSER)
+                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_LISTBROWSER) lb = gadgets[GID_PODCAST_LISTBROWSER];
+                            else if ((result & WMHI_GADGETMASK) == GID_PODCAST_FAVOURITE_LISTBROWSER) lb = gadgets[GID_PODCAST_FAVOURITE_LISTBROWSER];
+                            else lb = gadgets[GID_PODCAST_TRENDING_LISTBROWSER];
+
+                          IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
+                          if (res_value == LBRE_NORMAL)
                           {
-                            lb = gadgets[GID_PODCAST_TRENDING_LISTBROWSER];
+                            IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&podcastNode);
 
-                            IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
-                            if (res_value == LBRE_NORMAL)
-                            {
-                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
-
-                              windowBlocking(objects[OID_MAIN], TRUE);
-                              showPodcastInfo((struct Node *)res_node);
-                              windowBlocking(objects[OID_MAIN], FALSE);
-                            }
+                            windowBlocking(objects[OID_MAIN], TRUE);
+                            showPodcastInfo((struct Node *)podcastNode);
+                            windowBlocking(objects[OID_MAIN], FALSE);
                           }
                         }
                         break;
@@ -495,21 +521,32 @@ void showGUI(void)
                             IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                             if (res_value == LBRE_NORMAL)
                             {
-                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&res_node);
+                              IIntuition->GetAttr(LISTBROWSER_SelectedNode, lb, (uint32 *)&podcastEpisodeNode);
 
                               windowBlocking(objects[OID_MAIN], TRUE);
-                              showPodcastEpisodeInfo((struct Node *)res_node);
+                              showPodcastEpisodeInfo((struct Node *)podcastEpisodeNode);
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                           }
                         }
                         break;
+
                       case GID_PODCAST_PLAY_BUTTON:
                         if (res_value == LBRE_NORMAL)
                         {
-                          if (res_node)
+                          if (podcastEpisodeNode)
                           {
-                            playPodcast((struct Node *)res_node);
+                            playPodcast((struct Node *)podcastEpisodeNode);
+                          }
+                        }
+                        break;  
+
+                      case GID_PODCAST_FAVOURITE_BUTTON:
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          if (podcastNode)
+                          {
+                            addFavouritePodcast((struct Node *)podcastNode);
                           }
                         }
                         break;
@@ -553,6 +590,12 @@ void showGUI(void)
             freeList(&radioList, STRUCT_STATION_INFO);
           }
 
+          IListBrowser->FreeLBColumnInfo(radioFavouritesColInfo);
+          if(listCount(&radioFavouriteList))
+          {
+            freeList(&radioFavouriteList, STRUCT_STATION_INFO);
+          }
+
           if(listCount(&radioPopularList))
           {
             freeList(&radioPopularList, STRUCT_STATION_INFO);
@@ -570,6 +613,10 @@ void showGUI(void)
           if(listCount(&podcastList))
           {
             freeList(&podcastList, STRUCT_PODCAST_INFO);
+          }
+          if(listCount(&podcastFavouriteList))
+          {
+            freeList(&podcastFavouriteList, STRUCT_PODCAST_INFO);
           }
           if(listCount(&trendingPodcastList))
           {
@@ -591,6 +638,8 @@ void showGUI(void)
 
           IIntuition->DisposeObject(objects[OID_PLAY_IMAGE]);
           IIntuition->DisposeObject(objects[OID_PODCAST_PLAY_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_FAVOURITES_ADD_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_FAVOURITES_REMOVE_IMAGE]);
 
           IIntuition->DisposeObject(menus[MID_PROJECT]);
         }

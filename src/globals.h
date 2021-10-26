@@ -57,14 +57,14 @@ struct filters
 struct stationInfo
 {
   char uuid[42];
-  char name[64];
+  char name[128];
   char url_resolved[255];
   char country[64];
   char language[64];
   char homepage[255];
   char favicon[255];
   char codec[6];
-  uint8 bitrate;
+  char bitrate[6];
   ULONG votes;
 };
 

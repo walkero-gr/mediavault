@@ -32,7 +32,7 @@ static char rfc3986[256] = {0},
             html5[256] = {0};
 
 
-//// TODO: Find a way to use different codesets and charsets based on station language
+// TODO: Find a way to use different codesets and charsets based on station language
 STRPTR charConv(CONST_STRPTR value)
 {
   iconv_t cd = (iconv_t) -1;
@@ -119,7 +119,6 @@ STRPTR urlEncode(STRPTR value)
 
   return buf;
 }
-
 
  /**
   *

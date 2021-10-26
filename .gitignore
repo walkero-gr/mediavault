@@ -2,6 +2,7 @@ src/*_cat.*
 src/*.o
 MediaVault
 *.bak
+*.db
 debug/
 cache/*
 src/secrets.h

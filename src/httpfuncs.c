@@ -47,9 +47,8 @@ static size_t gotData(STRPTR buf, size_t itemSize, size_t numItems, void *userDa
 
   mem->body = ptr;
   memcpy(&(mem->body[mem->size]), buf, bytes);
-  mem->size += bytes;
+  mem->size += bytes;;
   mem->body[mem->size] = 0;
-
   return bytes;
 }
 
@@ -218,29 +217,36 @@ void addRequestHeader(STRPTR headerString)
 
 static CONST_STRPTR getContentTypeExt(STRPTR contentType)
 {
-  if (!stricmp(contentType, "image/jpeg"))
+  if(contentType)
   {
-    return ".jpg";
-  }
-  if (!stricmp(contentType, "image/png"))
-  {
-    return ".png";
-  }
-  if (!stricmp(contentType, "image/webp"))
-  {
-    return ".webp";
-  }
-  if (!stricmp(contentType, "image/vnd.microsoft.icon"))
-  {
-    return ".ico";
-  }
-  if (!stricmp(contentType, "image/gif"))
-  {
-    return ".gif";
-  }
-  if (!stricmp(contentType, "application/octet-stream"))
-  {
-    return ".lha";
+    if (!stricmp(contentType, "image/jpg"))
+    {
+      return ".jpg";
+    }
+    if (!stricmp(contentType, "image/jpeg"))
+    {
+      return ".jpg";
+    }
+    if (!stricmp(contentType, "image/png"))
+    {
+      return ".png";
+    }
+    if (!stricmp(contentType, "image/webp"))
+    {
+      return ".webp";
+    }
+    if (!stricmp(contentType, "image/vnd.microsoft.icon"))
+    {
+      return ".ico";
+    }
+    if (!stricmp(contentType, "image/gif"))
+    {
+      return ".gif";
+    }
+    if (!stricmp(contentType, "application/octet-stream"))
+    {
+      return ".lha";
+    }
   }
   return NULL;
 }
