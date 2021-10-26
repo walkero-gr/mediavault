@@ -165,10 +165,31 @@ static Object *buildSupportersPage(void)
   CONST_STRPTR text =
     "If you would like to support MediaVault's development, and be part of the list below, please visit: https://ko-fi.com/walkero\n\n" \
     "* AmigaPals supporters\n" \
-    "\tlevellord\n\tRoman Kargin\n\n" \
+    "\tlevellord\n" \
+    "\tRoman Kargin\n" \
+    "\n" \
     "* Supporters\n" \
-    "\tarisamiga\n\tDaniel \"trixie\" Jedlicka\n\tjabierdlr\n\tktadd\n\tMike Brantley\n" \
-    "\tscottcampbell\n\tSkateman\n\tSoLiD-SNaKe\n\tThomas Kolsch\n\tTim Grooms";
+    "\tAndrea Palmate\n" \
+    "\tarisamiga\n" \
+    "\tBreed\n" \
+    "\tDaniel \"trixie\" Jedlicka\n" \
+    "\tFalcon_11\n" \
+    "\tHobson (cat)\n" \
+    "\tjabierdlr\n" \
+    "\tktadd\n" \
+    "\tMike Brantley\n" \
+    "\tmufa\n" \
+    "\tnbache\n" \
+    "\tPetrol\n" \
+    "\tPrimax\n" \
+    "\tscottcampbell\n" \
+    "\tSkateman\n" \
+    "\tSlygon\n" \
+    "\tSoLiD-SNaKe\n" \
+    "\tThomas Kolsch\n" \
+    "\tTim Grooms" \
+    "\tVagaPPC\n" \
+    "\tVulture\n";
 
   Object *textBox = IIntuition->NewObject(TextEditorClass, NULL,
       GA_ID,                      GID_ABOUT_SUPPORTERS_TEXT,
@@ -203,7 +224,7 @@ static Object *buildSupportersPage(void)
 static Object *buildCreditsPage(void)
 {
   CONST_STRPTR text =
-    "Developed by George Sokianos\n" \
+    "Developed by George Sokianos\n\n" \
     "Icons by:\n\tMartin (Mason) Merz\n\tIconDesigner";
 
   Object *textBox = IIntuition->NewObject(TextEditorClass, NULL,
