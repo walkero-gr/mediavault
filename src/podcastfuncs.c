@@ -765,6 +765,7 @@ static void toggleFavouriteButton(BOOL status)
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,          FALSE,
+          GA_HintInfo,          "Click to remove the selected\npodcast from the favourites list",
           BUTTON_RenderImage,   objects[OID_FAVOURITES_REMOVE_IMAGE],
           TAG_DONE);
   }
@@ -772,6 +773,7 @@ static void toggleFavouriteButton(BOOL status)
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,          FALSE,
+          GA_HintInfo,          "Click to add the selected\npodcast to the favourites list",
           BUTTON_RenderImage,   objects[OID_FAVOURITES_ADD_IMAGE],
           TAG_DONE);
   }

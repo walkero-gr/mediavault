@@ -553,6 +553,7 @@ static void toggleFavouriteButton(BOOL status)
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,          FALSE,
+          GA_HintInfo,          "Click to remove the selected\nradio station from the favourites list",
           BUTTON_RenderImage,   objects[OID_FAVOURITES_REMOVE_IMAGE],
           TAG_DONE);
   }
@@ -560,6 +561,7 @@ static void toggleFavouriteButton(BOOL status)
   {
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,          FALSE,
+          GA_HintInfo,          "Click to add the selected\nradio station to the favourites list",
           BUTTON_RenderImage,   objects[OID_FAVOURITES_ADD_IMAGE],
           TAG_DONE);
   }

@@ -98,6 +98,7 @@ DONE - [1.4] Add a check if the podcast name is empty when Discover button is
 - Download podcast episodes
 DONE - [1.4.1] Add more filters, like categories, language etc.
 - Change the language column to have the Language name than the iso code
+- When an episode is selected, show it's duration in info section
 
 ## UPnP
 - Create a unique list of the UPnP servers

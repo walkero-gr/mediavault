@@ -117,6 +117,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
     //WA_FadeTime,            250000, /* Duration of transition in microseconds */
     WA_NewLookMenus,        TRUE,
     WINDOW_AppPort,         appPort,
+    WINDOW_GadgetHelp,      FALSE,
     WINDOW_Iconifiable,     TRUE,
     WINDOW_IconifyGadget,   TRUE,
     WINDOW_Icon,            IIcon->GetDiskObject("PROGDIR:MediaVault"),
@@ -733,6 +734,7 @@ static Object *buildRadioRightSidebar(struct Screen *screen, struct RenderHook *
             LAYOUT_AddChild, gadgets[GID_INFO_PLAY_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
               GA_ID,                      GID_INFO_PLAY_BUTTON,
               GA_Disabled,                TRUE,
+              GA_HintInfo,                "When this is enabled,\nclick to listen to the\nselected radio station",
               BUTTON_Transparent,         TRUE,
               BUTTON_AutoButton,          0,
               BUTTON_BevelStyle,          BVS_NONE,
@@ -843,6 +845,7 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
             LAYOUT_AddChild, gadgets[GID_PODCAST_PLAY_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
               GA_ID,                      GID_PODCAST_PLAY_BUTTON,
               GA_Disabled,                TRUE,
+              GA_HintInfo,                "When this is enabled,\nclick to listen to the\nselected podcast episode",
               BUTTON_Transparent,         TRUE,
               BUTTON_AutoButton,          0,
               BUTTON_BevelStyle,          BVS_NONE,
