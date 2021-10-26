@@ -285,11 +285,27 @@ void stringToLower(STRPTR subject)
     subject[i] = IUtility->ToLower(subject[i]);
 }
 
+ /**
+  *
+  * void strReplace(CONST_STRPTR search, CONST_STRPTR replace, STRPTR subject)
+  *
+  * Summary:
+  *
+  *    This function replaces all the occurences of a
+  *    string with an other
+  *
+  * Parameters  : search: contains the string to replace
+  *               replace: the new string
+  *               subject: the original string
+  *
+  * Return Value:
+  *
+  */
 void strReplace(CONST_STRPTR search, CONST_STRPTR replace, STRPTR subject)
 {
   char buf[4096];
   //to store the pointer returned from strstr
-  char *ch;
+  STRPTR ch;
 
   //first exit condition
   if(!(ch = strstr(subject, search)))
@@ -302,14 +318,13 @@ void strReplace(CONST_STRPTR search, CONST_STRPTR replace, STRPTR subject)
   buf[ch - subject] = 0;
 
   //append using sprintf function
-  sprintf(buf+(ch - subject), "%s%s", replace, ch + strlen(search));
+  sprintf(buf + (ch - subject), "%s%s", replace, ch + strlen(search));
 
   //empty subject for copying
   subject[0] = 0;
   strcpy(subject, buf);
+
   //pass recursively to replace other occurrences
   return strReplace(search, replace, subject);
-
-
 }
 

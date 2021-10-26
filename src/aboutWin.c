@@ -180,6 +180,7 @@ static Object *buildSupportersPage(void)
     "\tMike Brantley\n" \
     "\tmufa\n" \
     "\tnbache\n" \
+    "\tPaul Zager\n" \
     "\tPetrol\n" \
     "\tPrimax\n" \
     "\tscottcampbell\n" \
