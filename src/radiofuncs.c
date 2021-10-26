@@ -299,6 +299,7 @@ int getRadioFavouriteStations(void *unused, int cntCols, char **fields, char **c
   IUtility->Strlcpy(itemData->bitrate,      fields[7], sizeof(itemData->bitrate));
   IUtility->Strlcpy(itemData->codec,        fields[8], sizeof(itemData->codec));
   IUtility->Strlcpy(itemData->url_resolved, fields[9], sizeof(itemData->url_resolved));
+  IUtility->Strlcpy(itemData->favicon,      fields[10], sizeof(itemData->favicon));
 
   char codecBitrate[15];
   IUtility->SNPrintf(codecBitrate, sizeof(codecBitrate), "%s kbit/s %s", fields[7], fields[8]);
@@ -539,7 +540,8 @@ void addFavouriteRadio(struct Node *res_node)
       itemData->country,
       itemData->bitrate,
       itemData->codec,
-      itemData->url_resolved
+      itemData->url_resolved,
+      itemData->favicon
     );
     toggleFavouriteButton(TRUE);
   }

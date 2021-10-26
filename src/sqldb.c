@@ -96,7 +96,8 @@ BOOL sqlAddFavouriteRadio(
   STRPTR country,
   STRPTR bitrate,
   STRPTR codec,
-  STRPTR url
+  STRPTR url,
+  STRPTR image
 ) {
   sqlite3 *db;
   sqlite3_stmt *res;
@@ -109,8 +110,8 @@ BOOL sqlAddFavouriteRadio(
   }
 
   CONST_STRPTR sql = "INSERT INTO favourites " \
-    "(uuid, title, added, type, country, bitrate, codec, url) " \
-    "VALUES (:uuid, :title, :added, 'radio', :country, :bitrate, :codec, :url)";
+    "(uuid, title, added, type, country, bitrate, codec, url, image) " \
+    "VALUES (:uuid, :title, :added, 'radio', :country, :bitrate, :codec, :url, :image)";
 
   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
   if (rc != SQLITE_OK) {
@@ -126,6 +127,7 @@ BOOL sqlAddFavouriteRadio(
   int bitrateIdx  = sqlite3_bind_parameter_index(res, ":bitrate");
   int codecIdx    = sqlite3_bind_parameter_index(res, ":codec");
   int urlIdx      = sqlite3_bind_parameter_index(res, ":url");
+  int imageIdx    = sqlite3_bind_parameter_index(res, ":image");
 
   sqlite3_bind_text(res, uuidIdx, uuid, -1, 0);
   sqlite3_bind_text(res, titleIdx, title, -1, 0);
@@ -134,6 +136,7 @@ BOOL sqlAddFavouriteRadio(
   sqlite3_bind_text(res, bitrateIdx, bitrate, -1, 0);
   sqlite3_bind_text(res, codecIdx, codec, -1, 0);
   sqlite3_bind_text(res, urlIdx, url, -1, 0);
+  sqlite3_bind_text(res, imageIdx, image, -1, 0);
 
   sqlite3_step(res);
   sqlite3_finalize(res);
