@@ -47,7 +47,8 @@ uint32 cacheFilenameSize = 128;
  *
  * Copyright of Hyperion Entertainment CVBA
  */
-struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen) {
+struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen)
+{
    struct Image *i = NULL;
    APTR prev_win;
    BPTR dir, prev_dir;
@@ -56,7 +57,7 @@ struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen) {
 
    len = IUtility->Strlen(name);
 
-   name_s = IExec->AllocVecTags(len + 3 + len + 3,TAG_END);
+   name_s = IExec->AllocVecTags((len + 3) * 2, TAG_END);
 
    if (name_s)
    {
@@ -70,7 +71,7 @@ struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen) {
 
       prev_win = IDOS->SetProcWindow((APTR)-1);  /* Disable requesters */
 
-      dir = IDOS->Lock("TBIMAGES:",SHARED_LOCK);
+      dir = IDOS->Lock("PROGDIR:images",SHARED_LOCK);
 
       IDOS->SetProcWindow(prev_win);             /* Re-enable requesters */
 

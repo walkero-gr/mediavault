@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
   add the selected podcast or radio station to the favourite list.
   It also works as an indicator if the selected item is already
   in the list or not.
+- Added all the necessary images into the archive, with
+  Martin (Mason) Merz permission
 
 ### Changed
 - Compiled with libcurl 7.79.1

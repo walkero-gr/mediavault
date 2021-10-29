@@ -57,27 +57,27 @@ extern Class *WindowClass;
 Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen *screen)
 {                                           
   objects[OID_FAVOURITES_ADD_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        BITMAP_SourceFile,            "tbimages:favouritesadd",
-        BITMAP_DisabledSourceFile,    "tbimages:favouritesadd_g",
-        BITMAP_SelectSourceFile,      "tbimages:favouritesadd_s",
+        BITMAP_SourceFile,            "PROGDIR:images/favouritesadd",
+        BITMAP_DisabledSourceFile,    "PROGDIR:images/favouritesadd_g",
+        BITMAP_SelectSourceFile,      "PROGDIR:images/favouritesadd_s",
         BITMAP_Screen,                screen,
         BITMAP_Precision,             PRECISION_EXACT,
         BITMAP_Masking,               TRUE,
         TAG_END);
 
   objects[OID_FAVOURITES_REMOVE_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        BITMAP_SourceFile,            "tbimages:favouritesremove",
-        BITMAP_DisabledSourceFile,    "tbimages:favouritesremove_g",
-        BITMAP_SelectSourceFile,      "tbimages:favouritesremove_s",
+        BITMAP_SourceFile,            "PROGDIR:images/favouritesremove",
+        BITMAP_DisabledSourceFile,    "PROGDIR:images/favouritesremove_g",
+        BITMAP_SelectSourceFile,      "PROGDIR:images/favouritesremove_s",
         BITMAP_Screen,                screen,
         BITMAP_Precision,             PRECISION_EXACT,
         BITMAP_Masking,               TRUE,
         TAG_END);
 
   objects[OID_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        BITMAP_SourceFile,            "tbimages:td_tn_play",
-        BITMAP_DisabledSourceFile,    "tbimages:td_tn_play_g",
-        BITMAP_SelectSourceFile,      "tbimages:td_tn_play_s",
+        BITMAP_SourceFile,            "PROGDIR:images/td_tn_play",
+        BITMAP_DisabledSourceFile,    "PROGDIR:images/td_tn_play_g",
+        BITMAP_SelectSourceFile,      "PROGDIR:images/td_tn_play_s",
         BITMAP_Screen,                screen,
         BITMAP_Precision,             PRECISION_EXACT,
         BITMAP_Masking,               TRUE,
