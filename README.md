@@ -76,8 +76,9 @@ My plan for MediaVault is to create an application which users will use to:
 Requirements
 --------------------------
 * jansson.library v2.12.1 by Simon Tyrrell
-* AmigaAmp3 v3.29 by Thomas Wenzel
 * AISS by Martin (Mason) Merz
+* An audio/video player that supports URL streaming and HTTPS, like ffplay,
+  Emotion and AmigaAmp3
 
 I would like to thank
 --------------------------
@@ -115,6 +116,32 @@ Help me persuade my wife that what I am doing matters
 
 Changelog
 --------------------------
+v1.5.0 - 2021-10-29
+* Added the ability to mark favourite radio stations and podcasts.
+  A new list is created where you can find them and select one to
+  listen to
+* Added an asterisk above the play button that helps the users to
+  add the selected podcast or radio station to the favourite list.
+  It also works as an indicator if the selected item is already
+  in the list or not.
+* Added all the necessary images into the archive, with
+  Martin (Mason) Merz permission
+* Added help hint texts at the play, bookmark and favourite
+  buttons
+* Compiled with libcurl 7.79.1
+* Removed the small boxes at the end of each line at the update
+  changelog text
+* Code simplified and cleaned in some places
+* Fixed issues that could make MediaVault crash system at the
+  image download section. This fixed also some images that were
+  not downloaded. So now it will be able to show more images
+  than before.
+* When the radio station and podcast list was populated but a
+  new search brought no results, the lists was not cleared and
+  the choices were not usable. Now the list remains as it was,
+  with the reults it had, but the choices are usable, as they
+  were.
+
 v1.4.3 - 2021-10-21
 * Compiled with openssl to 1.1.1l
 * Fixed the search of trending podcasts when the user didn't select
@@ -164,41 +191,3 @@ v1.3.0 - 2021-09-08
 * Added a play button at the right sidebar which is enabled as soon as the user selects a radio station. By clicking it the radio will be loaded at the default player. The double click on the radio list was disabled.
 * On every request of radio stations, a list of 100 stations are returned and listed
 
-v1.2.1 - 2021-05-31
-* Reduced results to 20 as a temporary workaround of a bug that occurs with the default discovery of radio stations. Found where the problem is and it will be fixed on a later release.
-* Disabled the load of the window when AmiSSL 4.9 is missing
-* Fixed the exit of MediaVault when a library is not available
-* Fixed the issue with duplicate results when "discover more" was clicked
-* Fixed a crash that had to do with a broken API response. Now an info requester appears.
-
-v1.2.0 - 2021-05-27
-* Added Unicode conversion to system charset on radio station names - Thanks to Daniel "trixie" Jedlicka
-* Now the application registers properly and can get requests from other apps, like Exchanger - Thanks to Daniel "trixie" Jedlicka
-* Now the MediaVault can jump to different screens - Thanks to Daniel "trixie" Jedlicka
-* Added better error manipulation when there were API response errors - Thanks to Daniel "trixie" Jedlicka
-* Now the size and the position of the window can be saved by the Popup Gadget - Thanks to Daniel "trixie" Jedlicka
-* Added code to detach the listbrowser before change it's data. That's the way it should be done
-* Restructured code to reduce the duplicated code in radiofuncs.c. Now, one method is used instead of three separated that had pretty much the same code. Better code, less problems.
-* A lot of refactoring, removing global variables.
-* Reduced a lot of duplicated code.                                                  
-* Now the default radio station number increased to 50. The response is also much faster - Thanks to Tuomas Hokka and oo.library 1.13 fixes
-* Changed the way classes and gadgets are initiallized - Thanks to Daniel "trixie" Jedlicka
-
-v1.1.1 - 2021-05-15
-* Changed the required oo.library version to 1.12
-* Fixed a bug on requesting radio stations without using the filters
-
-v1.1.0 - 2021-05-13
-* Added a message requester for messages to the user
-* The "Discover" button changes to "Discover more" after the first search, so to load more radio stations results. If the user change a filter, then it resets.
-* Added more options at the Genre select box
-* Added more options at the countries and languages select boxes
-* Now the retrieved radio stations list doesn't include the marked as broken stations
-* Added Trending list of radio stations
-* Added Popular list of radio stations
-* Changed columns' widths on listbrowsers to be weighted
-
-v1.0.0 - 2021-04-30
-* Initial release
-* Radio stations discovery is working
-* Station url can be loaded in AmigaAmp3

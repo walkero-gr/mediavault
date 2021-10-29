@@ -176,6 +176,7 @@ static Object *buildSupportersPage(void)
     "\tFalcon_11\n" \
     "\tHobson (cat)\n" \
     "\tjabierdlr\n" \
+    "\tJerome Senay\n" \
     "\tktadd\n" \
     "\tMike Brantley\n" \
     "\tmufa\n" \
