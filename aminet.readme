@@ -126,6 +126,9 @@ v1.5.0 - 2021-10-29
   add the selected podcast or radio station to the favourite list.
   It also works as an indicator if the selected item is already
   in the list or not.
+* Added "Listen Later" list which will have the marked podcasts
+  episodes which the user select from the Bookmark button,
+  above the play button.
 * Added all the necessary images into the archive, with
   Martin (Mason) Merz permission
 * Added help hint texts at the play, bookmark and favourite
