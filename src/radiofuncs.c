@@ -122,7 +122,7 @@ void getRadioPopularStations(void)
 
 size_t getRadioList(struct List *stationList, int offset)
 {
-  LONG  responseCode = getResponseCode();
+  LONG responseCode = getResponseCode();
   if (responseCode != 200)
     return ~0UL;
 
@@ -150,12 +150,13 @@ size_t getRadioList(struct List *stationList, int offset)
     return ~0UL;
   }
 
-  if (offset == 0)
+  ULONG jsonArraySize = IJansson->json_array_size(jsonRoot);
+  if ((offset == 0) && (jsonArraySize > 0))
   {
     IExec->NewList(stationList);
   }
 
-  for(cnt = 0; cnt < IJansson->json_array_size(jsonRoot); cnt++)
+  for(cnt = 0; cnt < jsonArraySize; cnt++)
   {
     struct Node *stationNode;
     struct stationInfo *stationData = NULL;

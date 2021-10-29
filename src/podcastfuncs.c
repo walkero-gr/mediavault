@@ -162,12 +162,13 @@ size_t getPodcastList(struct List *itemsList, int offset)
   json_t *feeds = IJansson->json_object_get(jsonRoot, "feeds");
   if (json_is_array(feeds))
   {
-    if (offset == 0)
+    ULONG jsonArraySize = IJansson->json_array_size(feeds);
+    if ((offset == 0) && (jsonArraySize > 0))
     {
       IExec->NewList(itemsList);
     }
 
-    for(cnt = 0; cnt < IJansson->json_array_size(feeds); cnt++)
+    for(cnt = 0; cnt < jsonArraySize; cnt++)
     {
       struct Node *itemNode;
       struct podcastInfo *itemData = NULL;

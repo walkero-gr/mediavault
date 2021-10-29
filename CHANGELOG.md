@@ -22,6 +22,11 @@ All notable changes to this project will be documented in this file.
   image download section. This fixed also some images that were
   not downloaded. So now it will be able to show more images
   than before.
+- When the radio station and podcast list was populated but a
+  new search brought no results, the lists was not cleared and
+  the choices were not usable. Now the list remains as it was,
+  with the reults it had, but the choices are usable, as they
+  were.
 
 
 ## [1.4.3] - 2021-10-21
