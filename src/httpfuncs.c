@@ -107,7 +107,7 @@ void doHTTPRequest(STRPTR url)
 
       if(res != CURLE_OK)
       {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        //fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
       }
 
       if(res == CURLE_OK)
@@ -157,7 +157,7 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
       }
       else
       {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        //fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
       }
 
       curl_easy_cleanup(curl);

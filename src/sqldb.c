@@ -73,6 +73,20 @@ BOOL createDB(void)
           "url          Text, " \
           "image        Text, " \
           "description  Text); " \
+      "CREATE TABLE listenlater ( " \
+          "id                   Text, " \
+          "added                Text, " \
+          "title                Text, " \
+          "datePublishedPretty  Text, " \
+          "datePublished        Text, " \
+          "feedTitle            Text, " \
+          "feedImage            Text, " \
+          "feedId               Text, " \
+          "season               Numeric, " \
+          "episode              Numeric, " \
+          "duration             Numeric, " \
+          "enclosureUrl         Text, " \
+          "description          Text); " \
       "CREATE TABLE plays ( " \
           "uuid    Text, " \
           "type    Text, " \
@@ -115,7 +129,7 @@ BOOL sqlAddFavouriteRadio(
 
   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
   if (rc != SQLITE_OK) {
-    fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    //fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
     return FALSE;
   }
@@ -169,7 +183,7 @@ BOOL sqlAddFavouritePodcast(
 
   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
   if (rc != SQLITE_OK) {
-    fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    //fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
     return FALSE;
   }
@@ -197,6 +211,73 @@ BOOL sqlAddFavouritePodcast(
   return TRUE;
 }
 
+BOOL sqlAddListenLaterPodcast(
+  STRPTR id,
+  STRPTR title,
+  STRPTR datePublishedPretty,
+  STRPTR enclosureUrl,
+  STRPTR description,
+  STRPTR feedImage,
+  STRPTR feedId,
+  uint8 season,
+  uint8 episode
+) {
+  sqlite3 *db;
+  sqlite3_stmt *res;
+
+  int rc = sqlite3_open(dbFileName, &db);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  CONST_STRPTR sql = "INSERT INTO listenlater " \
+    "(" \
+      "id, added, title, datePublishedPretty, enclosureUrl, description, " \
+      "feedImage, feedId, season, episode" \
+    ") " \
+    "VALUES (" \
+      ":id, :added, :title, :datePublishedPretty, :enclosureUrl, :descr, " \
+      ":feedImage, :feedId, :season, :episode" \
+    ")";
+
+  rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  int idIdx                   = sqlite3_bind_parameter_index(res, ":id");
+  int addedIdx                = sqlite3_bind_parameter_index(res, ":added");
+  int titleIdx                = sqlite3_bind_parameter_index(res, ":title");
+  int datePublishedPrettyIdx  = sqlite3_bind_parameter_index(res, ":datePublishedPretty");
+  int enclosureUrlIdx         = sqlite3_bind_parameter_index(res, ":enclosureUrl");
+  int descrIdx                = sqlite3_bind_parameter_index(res, ":descr");
+  int feedImageIdx            = sqlite3_bind_parameter_index(res, ":feedImage");
+  int feedIdIdx               = sqlite3_bind_parameter_index(res, ":feedId");
+  int seasonIdx               = sqlite3_bind_parameter_index(res, ":season");
+  int episodeIdx              = sqlite3_bind_parameter_index(res, ":episode");
+
+  sqlite3_bind_text(res, idIdx, id, -1, 0);
+  sqlite3_bind_int(res, addedIdx, now());
+  sqlite3_bind_text(res, titleIdx, title, -1, 0);
+  sqlite3_bind_text(res, datePublishedPrettyIdx, datePublishedPretty, -1, 0);
+  sqlite3_bind_text(res, enclosureUrlIdx, enclosureUrl, -1, 0);
+  sqlite3_bind_text(res, descrIdx, description, -1, 0);
+  sqlite3_bind_text(res, feedImageIdx, feedImage, -1, 0);
+  sqlite3_bind_text(res, feedIdIdx, feedId, -1, 0);
+  sqlite3_bind_int(res, seasonIdx, season);
+  sqlite3_bind_int(res, episodeIdx, episode);
+
+  sqlite3_step(res);
+  sqlite3_finalize(res);
+  sqlite3_close(db);
+
+  return TRUE;
+}
+
 BOOL sqlRemoveFavourite(STRPTR uuid, CONST_STRPTR type)
 {
   sqlite3 *db;
@@ -214,7 +295,7 @@ BOOL sqlRemoveFavourite(STRPTR uuid, CONST_STRPTR type)
 
   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
   if (rc != SQLITE_OK) {
-    fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    //fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
     return FALSE;
   }
@@ -232,11 +313,43 @@ BOOL sqlRemoveFavourite(STRPTR uuid, CONST_STRPTR type)
   return TRUE;
 }
 
-BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
+BOOL sqlRemoveListenLater(STRPTR id)
+{
+  sqlite3 *db;
+  sqlite3_stmt *res;
+
+  int rc = sqlite3_open(dbFileName, &db);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  CONST_STRPTR sql = "DELETE FROM listenlater " \
+        "WHERE id = :id ";
+
+  rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  int idIdx = sqlite3_bind_parameter_index(res, ":id");
+
+  sqlite3_bind_text(res, idIdx, id, -1, 0);
+
+  sqlite3_step(res);
+  sqlite3_finalize(res);
+  sqlite3_close(db);
+
+  return TRUE;
+}
+
+BOOL sqlCheckFavouriteExist(STRPTR uuid, CONST_STRPTR type)
 {
   BOOL result = FALSE;
   sqlite3 *db;
-  //char *err_msg = 0;
   sqlite3_stmt *res;
 
   int rc = sqlite3_open(dbFileName, &db);
@@ -253,8 +366,7 @@ BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
 
   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
   if (rc != SQLITE_OK) {
-    fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
-    //sqlite3_free(err_msg);
+    //fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
     return FALSE;
   }
@@ -264,6 +376,47 @@ BOOL sqlCheckExist(STRPTR uuid, CONST_STRPTR type)
   sqlite3_bind_text(res, uuidIdx, uuid, -1, 0);
   sqlite3_bind_text(res, typeIdx, type, -1, 0);
   
+  int step = sqlite3_step(res);
+  if (step == SQLITE_ROW) {
+    if(sqlite3_column_int(res, 0) == 1)
+    {
+      result = TRUE;
+    }
+  }
+  sqlite3_finalize(res);
+  sqlite3_close(db);
+
+  return result;
+}
+
+BOOL sqlCheckListenLaterExist(STRPTR id)
+{
+  BOOL result = FALSE;
+  sqlite3 *db;
+  sqlite3_stmt *res;
+
+  int rc = sqlite3_open(dbFileName, &db);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  CONST_STRPTR sql = "SELECT COUNT(*) AS cnt " \
+        "FROM listenlater " \
+        "WHERE id = :id " \
+        "LIMIT 1";
+
+  rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  int idIdx = sqlite3_bind_parameter_index(res, ":id");
+  sqlite3_bind_text(res, idIdx, id, -1, 0);
+
   int step = sqlite3_step(res);
   if (step == SQLITE_ROW) {
     if(sqlite3_column_int(res, 0) == 1)
@@ -314,3 +467,39 @@ BOOL sqlGetFavourites(CONST_STRPTR type, int (*resultCallback)(void *, int, char
 
   return TRUE;
 }
+
+BOOL sqlGetListenLater(int (*resultCallback)(void *, int, char **, char **))
+{
+  sqlite3 *db;
+  char *err_msg = 0;
+  int sqlSize = 64;
+
+  int rc = sqlite3_open(dbFileName, &db);
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return FALSE;
+  }
+
+  STRPTR sql = IExec->AllocVecTags(sizeof(char) * sqlSize,
+          AVT_Type,            MEMF_SHARED,
+          AVT_ClearWithValue,  "\0",
+          TAG_DONE);
+
+  snprintf(sql, sqlSize, "SELECT * FROM listenlater;");
+
+  rc = sqlite3_exec(db, sql, resultCallback, 0, &err_msg);
+
+  IExec->FreeVec(sql);
+
+  if (rc != SQLITE_OK) {
+    //fprintf(stderr, "SQL error: %s\n", err_msg);
+    sqlite3_free(err_msg);
+    sqlite3_close(db);
+    return FALSE;
+  }
+  sqlite3_close(db);
+
+  return TRUE;
+}
+

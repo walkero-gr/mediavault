@@ -36,6 +36,7 @@ struct List radioList,
             leftSidebarList,
             podcastList,
             podcastFavouriteList,
+            podcastListenLaterList,
             trendingPodcastList,
             podcastEpisodeList;
 
@@ -374,9 +375,9 @@ void showGUI(void)
                           Object *lb = NULL;
 
                           if ((result & WMHI_GADGETMASK) == GID_RADIO_LISTBROWSER) lb = gadgets[GID_RADIO_LISTBROWSER];
-                          else if ((result & WMHI_GADGETMASK) == GID_RADIO_POPULAR_LISTBROWSER) lb = gadgets[GID_RADIO_POPULAR_LISTBROWSER];
-                          else if ((result & WMHI_GADGETMASK) == GID_RADIO_TREND_LISTBROWSER) lb = gadgets[GID_RADIO_TREND_LISTBROWSER];
-                          else lb = gadgets[GID_RADIO_FAVOURITE_LISTBROWSER];
+                            else if ((result & WMHI_GADGETMASK) == GID_RADIO_POPULAR_LISTBROWSER)   lb = gadgets[GID_RADIO_POPULAR_LISTBROWSER];
+                            else if ((result & WMHI_GADGETMASK) == GID_RADIO_TREND_LISTBROWSER)     lb = gadgets[GID_RADIO_TREND_LISTBROWSER];
+                            else if ((result & WMHI_GADGETMASK) == GID_RADIO_FAVOURITE_LISTBROWSER) lb = gadgets[GID_RADIO_FAVOURITE_LISTBROWSER];
 
                           IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                           if (res_value == LBRE_NORMAL)
@@ -439,12 +440,16 @@ void showGUI(void)
                             }
                             break;
                           case 4:
-                          case 6:
+                          case 7:
                             switchRightSidebar(PAGE_PODCAST_INFO);
                             break;
                           case 5:
                             switchRightSidebar(PAGE_PODCAST_INFO);
                             fillPodcastFavouriteList();
+                            break;
+                          case 6:
+                            switchRightSidebar(PAGE_PODCAST_INFO);
+                            fillPodcastListenLaterList();
                             break;
                         }
                         break;
@@ -494,9 +499,9 @@ void showGUI(void)
                         {
                           Object *lb = NULL;
 
-                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_LISTBROWSER) lb = gadgets[GID_PODCAST_LISTBROWSER];
+                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_LISTBROWSER)                  lb = gadgets[GID_PODCAST_LISTBROWSER];
                             else if ((result & WMHI_GADGETMASK) == GID_PODCAST_FAVOURITE_LISTBROWSER) lb = gadgets[GID_PODCAST_FAVOURITE_LISTBROWSER];
-                            else lb = gadgets[GID_PODCAST_TRENDING_LISTBROWSER];
+                            else if ((result & WMHI_GADGETMASK) == GID_PODCAST_TRENDING_LISTBROWSER)  lb = gadgets[GID_PODCAST_TRENDING_LISTBROWSER];
 
                           IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                           if (res_value == LBRE_NORMAL)
@@ -511,12 +516,12 @@ void showGUI(void)
                         break;
 
                       case GID_PODCAST_EPISODES_LISTBROWSER:
+                      case GID_PODCAST_LISTEN_LATER_LISTBROWSER:
                         {
                           Object *lb = NULL;
 
-                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_EPISODES_LISTBROWSER)
-                          {
-                            lb = gadgets[GID_PODCAST_EPISODES_LISTBROWSER];
+                          if ((result & WMHI_GADGETMASK) == GID_PODCAST_EPISODES_LISTBROWSER)             lb = gadgets[GID_PODCAST_EPISODES_LISTBROWSER];
+                            else if ((result & WMHI_GADGETMASK) == GID_PODCAST_LISTEN_LATER_LISTBROWSER)  lb = gadgets[GID_PODCAST_LISTEN_LATER_LISTBROWSER];
 
                             IIntuition->GetAttr(LISTBROWSER_RelEvent, lb, &res_value);
                             if (res_value == LBRE_NORMAL)
@@ -527,7 +532,6 @@ void showGUI(void)
                               showPodcastEpisodeInfo((struct Node *)podcastEpisodeNode);
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
-                          }
                         }
                         break;
 
@@ -547,6 +551,16 @@ void showGUI(void)
                           if (podcastNode)
                           {
                             addFavouritePodcast((struct Node *)podcastNode);
+                          }
+                        }
+                        break;
+
+                      case GID_PODCAST_LISTEN_LATER_BUTTON:
+                        if (res_value == LBRE_NORMAL)
+                        {
+                          if (podcastEpisodeNode)
+                          {
+                            addListenLaterPodcast((struct Node *)podcastEpisodeNode);
                           }
                         }
                         break;
@@ -619,6 +633,10 @@ void showGUI(void)
           {
             freeList(&podcastFavouriteList, STRUCT_PODCAST_INFO);
           }
+          if(listCount(&podcastListenLaterList))
+          {
+            freeList(&podcastListenLaterList, STRUCT_PODCAST_INFO);
+          }
           if(listCount(&trendingPodcastList))
           {
             freeList(&trendingPodcastList, STRUCT_PODCAST_INFO);
@@ -640,6 +658,8 @@ void showGUI(void)
           IIntuition->DisposeObject(objects[OID_PLAY_IMAGE]);
           IIntuition->DisposeObject(objects[OID_FAVOURITES_ADD_IMAGE]);
           IIntuition->DisposeObject(objects[OID_FAVOURITES_REMOVE_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_BOOKMARK_ADD_IMAGE]);
+          IIntuition->DisposeObject(objects[OID_BOOKMARK_REMOVE_IMAGE]);
 
           IIntuition->DisposeObject(menus[MID_PROJECT]);
         }

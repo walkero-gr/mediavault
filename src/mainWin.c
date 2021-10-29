@@ -33,6 +33,7 @@ static Object *buildRadioPopularPage(void);
 static Object *buildRadioTrendPage(void);
 static Object *buildPodcastSearchPage(void);
 static Object *buildPodcastFavouritePage(void);
+static Object *buildPodcastListenLaterPage(void);
 static Object *buildPodcastTrendingPage(void);
 static Object *buildRadioRightSidebar(struct Screen *, struct RenderHook *);
 static Object *buildPodcastRightSidebar(struct Screen *, struct RenderHook *);
@@ -82,6 +83,24 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         BITMAP_Precision,             PRECISION_EXACT,
         BITMAP_Masking,               TRUE,
         TAG_END),
+
+  objects[OID_BOOKMARK_ADD_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        BITMAP_SourceFile,            "tbimages:bookmarkadd",
+        BITMAP_DisabledSourceFile,    "tbimages:bookmarkadd_g",
+        BITMAP_SelectSourceFile,      "tbimages:bookmarkadd_s",
+        BITMAP_Screen,                screen,
+        BITMAP_Precision,             PRECISION_EXACT,
+        BITMAP_Masking,               TRUE,
+        TAG_END),
+
+  objects[OID_BOOKMARK_REMOVE_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
+        BITMAP_SourceFile,            "tbimages:bookmarkremove",
+        BITMAP_DisabledSourceFile,    "tbimages:bookmarkremove_g",
+        BITMAP_SelectSourceFile,      "tbimages:bookmarkremove_s",
+        BITMAP_Screen,                screen,
+        BITMAP_Precision,             PRECISION_EXACT,
+        BITMAP_Masking,               TRUE,
+        TAG_END),
   
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
   renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
@@ -94,6 +113,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         ASOHOOK_Entry, (HOOKFUNC)renderfunct,
         TAG_END);
 
+  // TODO: Move the following pages to different
   Object *radioPages = IIntuition->NewObject(NULL, "page.gadget",
         LAYOUT_DeferLayout, TRUE,
         PAGE_Add, gadgets[GID_PAGE_1] = buildRadioSearchPage(),
@@ -102,7 +122,8 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         PAGE_Add, gadgets[GID_PAGE_4] = buildRadioTrendPage(),
         PAGE_Add, gadgets[GID_PAGE_5] = buildPodcastSearchPage(),
         PAGE_Add, gadgets[GID_PAGE_6] = buildPodcastFavouritePage(),
-        PAGE_Add, gadgets[GID_PAGE_7] = buildPodcastTrendingPage(),
+        PAGE_Add, gadgets[GID_PAGE_PODCAST_LISTEN_LATER]  = buildPodcastListenLaterPage(),
+        PAGE_Add, gadgets[GID_PAGE_PODCAST_TRENDING]      = buildPodcastTrendingPage(),
         TAG_DONE);
 
   //Object *rightSidebarPages = IIntuition->NewObject(NULL, "page.gadget",
@@ -126,7 +147,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
     //WA_FadeTime,            250000, /* Duration of transition in microseconds */
     WA_NewLookMenus,        TRUE,
     WINDOW_AppPort,         appPort,
-    WINDOW_GadgetHelp,      FALSE,
+    WINDOW_GadgetHelp,      TRUE,
     WINDOW_Iconifiable,     TRUE,
     WINDOW_IconifyGadget,   TRUE,
     WINDOW_Icon,            IIcon->GetDiskObject("PROGDIR:MediaVault"),
@@ -492,6 +513,17 @@ void getLeftSidebarContent(void)
   {
     IExec->AddTail( &leftSidebarList, node );
   }
+
+  node = IListBrowser->AllocListBrowserNode(1,
+    LBNA_Generation,    2,
+    LBNA_Column,        0,
+      LBNCA_CopyText,   TRUE,
+      LBNCA_Text,       "Listen Later",
+    TAG_DONE);
+  if (node)
+  {
+    IExec->AddTail( &leftSidebarList, node );
+  }
   
   node = IListBrowser->AllocListBrowserNode(1,
     LBNA_Generation,    2,
@@ -579,6 +611,28 @@ static Object *buildPodcastFavouritePage(void)
 
         LAYOUT_AddChild, gadgets[GID_PODCAST_FAVOURITE_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
           GA_ID,                      GID_PODCAST_FAVOURITE_LISTBROWSER,
+          GA_RelVerify,               TRUE,
+          GA_TabCycle,                TRUE,
+          LISTBROWSER_ColumnTitles,   TRUE,
+          LISTBROWSER_HorizontalProp, TRUE,
+          LISTBROWSER_Separators,     TRUE,
+          LISTBROWSER_ShowSelected,   TRUE,
+          LISTBROWSER_Striping,       LBS_ROWS,
+          LISTBROWSER_SortColumn,     0,
+          LISTBROWSER_TitleClickable, TRUE,
+          TAG_DONE),
+
+        TAG_DONE);
+}
+
+static Object *buildPodcastListenLaterPage(void)
+{
+  return IIntuition->NewObject(LayoutClass, NULL,
+      LAYOUT_BevelStyle,      BVS_GROUP,
+      LAYOUT_Label,           "Listen Later Podcast Episodes",
+
+        LAYOUT_AddChild, gadgets[GID_PODCAST_LISTEN_LATER_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
+          GA_ID,                      GID_PODCAST_LISTEN_LATER_LISTBROWSER,
           GA_RelVerify,               TRUE,
           GA_TabCycle,                TRUE,
           LISTBROWSER_ColumnTitles,   TRUE,
@@ -827,6 +881,17 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
               BUTTON_Justification,       BCJ_CENTER,
               BUTTON_RenderImage,         objects[OID_FAVOURITES_ADD_IMAGE],
               TAG_DONE),
+              CHILD_WeightedWidth, 10,
+
+            LAYOUT_AddChild, gadgets[GID_PODCAST_LISTEN_LATER_BUTTON] = IIntuition->NewObject(ButtonClass, NULL,
+              GA_ID,                      GID_PODCAST_LISTEN_LATER_BUTTON,
+              GA_Disabled,                TRUE,
+              BUTTON_Transparent,         TRUE,
+              BUTTON_AutoButton,          0,
+              BUTTON_BevelStyle,          BVS_NONE,
+              BUTTON_Justification,       BCJ_CENTER,
+              BUTTON_RenderImage,         objects[OID_BOOKMARK_ADD_IMAGE],
+              TAG_DONE),
               //CHILD_MaxHeight, 40,
               CHILD_WeightedWidth, 10,
 
@@ -893,3 +958,4 @@ static Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook
 
           TAG_DONE);
 }
+

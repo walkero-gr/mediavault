@@ -22,8 +22,10 @@ void showPodcastInfo(struct Node *);
 void showPodcastEpisodeInfo(struct Node *);
 void fillPodcastList(struct filters);
 void fillPodcastFavouriteList(void);
+void fillPodcastListenLaterList(void);
 void fillPodcastTrendingList(struct filters);
 void playPodcast(struct Node *);
 void addFavouritePodcast(struct Node *);
+void addListenLaterPodcast(struct Node *);
 
 #endif

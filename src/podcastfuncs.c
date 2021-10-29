@@ -33,11 +33,13 @@ static uint8 maxEpisodesResults = 100;
 extern struct memory response;
 extern struct RenderHook *podcastImageRenderHook;
 extern struct ColumnInfo *podcastColInfo, *podcastEpisodeColInfo;
-extern struct List  podcastList, podcastFavouriteList,
+extern struct List  podcastList, podcastFavouriteList, podcastListenLaterList,
                     trendingPodcastList, podcastEpisodeList;
 
-static void fillEpisodesList(ULONG);
+static void fillEpisodesList(STRPTR);
 static void toggleFavouriteButton(BOOL);
+static void resetListenLaterButton(void);
+static void toggleListenLaterButton(BOOL);
 
 static void addRequestHeaders(void)
 {
@@ -187,13 +189,21 @@ size_t getPodcastList(struct List *itemsList, int offset)
       }
 
       buf = IJansson->json_object_get(data, "id");
+      if(json_is_integer(buf))
+      {
+        ULONG id = (ULONG)IJansson->json_integer_value(buf);
+        IUtility->SNPrintf(itemData->id, sizeof(itemData->id), "%lu", id);
+      }
+      else IUtility->Strlcpy(itemData->id, "0", sizeof(itemData->id));
+      /*
+      buf = IJansson->json_object_get(data, "id");
       if(!json_is_integer(buf))
       {
         IJansson->json_decref(jsonRoot);
         return ~0UL;
       }
       itemData->id = (ULONG)IJansson->json_integer_value(buf);
-
+      */
       buf = IJansson->json_object_get(data, "title");
       if(!json_is_string(buf))
       {
@@ -329,12 +339,22 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       }
 
       buf = IJansson->json_object_get(data, "id");
+      if(json_is_integer(buf))
+      {
+        ULONG id = (ULONG)IJansson->json_integer_value(buf);
+        IUtility->SNPrintf(itemData->id, sizeof(itemData->id), "%lu", id);
+      }
+      else IUtility->Strlcpy(itemData->id, "0", sizeof(itemData->id));
+
+      /*
+      buf = IJansson->json_object_get(data, "id");
       if(!json_is_integer(buf))
       {
         IJansson->json_decref(jsonRoot);
         return ~0UL;
       }
       itemData->id = (ULONG)IJansson->json_integer_value(buf);
+      */
 
       buf = IJansson->json_object_get(data, "title");
       if(!json_is_string(buf))
@@ -377,12 +397,21 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       IUtility->Strlcpy(itemData->image, IJansson->json_string_value(buf), sizeof(itemData->image));
 
       buf = IJansson->json_object_get(data, "feedId");
+      if(json_is_integer(buf))
+      {
+        ULONG feedId = (ULONG)IJansson->json_integer_value(buf);
+        IUtility->SNPrintf(itemData->feedId, sizeof(itemData->feedId), "%lu", feedId);
+      }
+      else IUtility->Strlcpy(itemData->feedId, "0", sizeof(itemData->feedId));
+      /*
+      buf = IJansson->json_object_get(data, "feedId");
       if(!json_is_integer(buf))
       {
         IJansson->json_decref(jsonRoot);
         return ~0UL;
       }
       itemData->feedId = (ULONG)IJansson->json_integer_value(buf);
+      */
 
       buf = IJansson->json_object_get(data, "season");
       if(!json_is_integer(buf))
@@ -420,7 +449,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
 
 int getPodcastFavourite(void *unused, int cntCols, char **fields, char **colNames)
 {
-  char itemUID[32];
   struct Node *itemNode;
   struct podcastInfo *itemData = {0};
 
@@ -428,9 +456,8 @@ int getPodcastFavourite(void *unused, int cntCols, char **fields, char **colName
       AVT_Type,            MEMF_PRIVATE,
       AVT_ClearWithValue,  "\0",
       TAG_DONE);
-  
-  IUtility->Strlcpy(itemUID, strcpy(itemUID, fields[0] + 4), sizeof(itemUID));
-  itemData->id = atoi(itemUID);
+                                               
+  IUtility->Strlcpy(itemData->id,           fields[0], sizeof(itemData->id));
   IUtility->Strlcpy(itemData->title,        fields[4], sizeof(itemData->title));
   IUtility->Strlcpy(itemData->language,     fields[6], sizeof(itemData->language));
   IUtility->Strlcpy(itemData->image,        fields[10], sizeof(itemData->image));
@@ -449,6 +476,52 @@ int getPodcastFavourite(void *unused, int cntCols, char **fields, char **colName
   if(itemNode)
   {
     IExec->AddTail(&podcastFavouriteList, itemNode);
+  }
+
+  // Dummy variable usage for gcc happiness
+  if (unused) unused = 0;
+  if (cntCols) cntCols = 0;
+  if (colNames) colNames = NULL;
+
+  return 0;
+}
+
+int getPodcastListenLater(void *unused, int cntCols, char **fields, char **colNames)
+{
+  struct Node *itemNode;
+  struct podcastEpisodeInfo *itemData = {0};
+
+  itemData = (struct podcastEpisodeInfo *)IExec->AllocVecTags(sizeof(struct podcastEpisodeInfo),
+      AVT_Type,            MEMF_PRIVATE,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+
+  //itemData->id        = atoi(fields[0]);
+  //itemData->feedId    = atoi(fields[7]);
+  //itemData->season    = atoi(fields[8]);
+  //itemData->episode   = atoi(fields[9]);
+  //itemData->duration  = atoi(fields[10]);
+  IUtility->Strlcpy(itemData->id,                     fields[0], sizeof(itemData->id));
+  IUtility->Strlcpy(itemData->title,                  fields[2], sizeof(itemData->title));
+  IUtility->Strlcpy(itemData->datePublishedPretty,    fields[3], sizeof(itemData->datePublishedPretty));
+  IUtility->Strlcpy(itemData->image,                  fields[6], sizeof(itemData->image));
+  IUtility->Strlcpy(itemData->feedId,                 fields[7], sizeof(itemData->feedId));
+  IUtility->Strlcpy(itemData->enclosureUrl,           fields[11], sizeof(itemData->enclosureUrl));
+  IUtility->Strlcpy(itemData->description,            fields[12], sizeof(itemData->description));
+
+  itemNode = IListBrowser->AllocListBrowserNode( 3,
+      LBNA_UserData,          itemData,
+      LBNA_Column,            0,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           itemData->title,
+      LBNA_Column,            1,
+        LBNCA_CopyText,       TRUE,
+        LBNCA_Text,           itemData->datePublishedPretty,
+      TAG_DONE);
+
+  if(itemNode)
+  {
+    IExec->AddTail(&podcastListenLaterList, itemNode);
   }
 
   // Dummy variable usage for gcc happiness
@@ -502,10 +575,10 @@ void showPodcastInfo(struct Node *res_node)
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_INFO_DATA], windows[WID_MAIN], NULL,
           GA_TEXTEDITOR_Contents,   infoText,
           TAG_DONE);
-    
+
     fillEpisodesList(podcastData->id);
 
-    IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", podcastData->id);
+    IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%s", podcastData->id);
     showAvatarImage(
       itemUID, podcastData->image,
       gadgets[GID_PODCAST_INFO_DATA], objects[OID_PODCAST_AVATAR_IMAGE],
@@ -515,8 +588,9 @@ void showPodcastInfo(struct Node *res_node)
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_PLAY_BUTTON], windows[WID_MAIN], NULL,
         GA_Disabled,   TRUE,
         TAG_DONE);
-
-    toggleFavouriteButton(sqlCheckExist(itemUID, "podcast"));
+    
+    resetListenLaterButton();
+    toggleFavouriteButton(sqlCheckFavouriteExist(podcastData->id, "podcast"));
   }
 }
 
@@ -541,7 +615,7 @@ void showPodcastEpisodeInfo(struct Node *res_node)
       episodeData->season,
       episodeData->episode,
       episodeData->description);
-    IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", episodeData->feedId);
+    IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%s", episodeData->feedId);
 
     if (IUtility->Stricmp(itemUID, ""))
     {
@@ -559,18 +633,20 @@ void showPodcastEpisodeInfo(struct Node *res_node)
     IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_PLAY_BUTTON], windows[WID_MAIN], NULL,
           GA_Disabled,   FALSE,
           TAG_DONE);
+
+    toggleListenLaterButton(sqlCheckListenLaterExist(episodeData->id));
   }
 }
 
-static BOOL getEpisodesByID(ULONG feedID)
+static BOOL getEpisodesByID(STRPTR feedID)
 {
   BOOL success = FALSE;
-  if (feedID > 0)
+  //if (feedID > 0)
+  if (IUtility->Stricmp(feedID, ""))
   {
     char url[255];
 
-    IUtility->SNPrintf(url, sizeof(url), "%s/episodes/byfeedid?id=%lu&max=%ld", podcastAPIUrl, feedID, maxEpisodesResults);
-    
+    IUtility->SNPrintf(url, sizeof(url), "%s/episodes/byfeedid?id=%s&max=%ld", podcastAPIUrl, feedID, maxEpisodesResults);
     addRequestHeaders();
     doHTTPRequest(url);
     if (getResponseCode() == 200)
@@ -652,6 +728,31 @@ void fillPodcastFavouriteList(void)
   //listStations((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER], &radioFavouriteList, 0, (char *)notFoundMsg, NULL);
 }
 
+void fillPodcastListenLaterList(void)
+{
+  IExec->NewList(&podcastListenLaterList);
+  sqlGetListenLater(getPodcastListenLater);
+
+  if (listCount(&podcastListenLaterList) == 0)
+  {
+    // TODO: Add a message to the user
+  }
+
+  if (listCount(&podcastListenLaterList) > 0)
+  {
+    IIntuition->SetAttrs((struct Gadget*)gadgets[GID_PODCAST_LISTEN_LATER_LISTBROWSER],
+      LISTBROWSER_Labels, NULL,
+      TAG_DONE);
+
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_LISTEN_LATER_LISTBROWSER], windows[WID_MAIN], NULL,
+        LISTBROWSER_Labels,         &podcastListenLaterList,
+        LISTBROWSER_SortColumn,     0,
+        LISTBROWSER_Selected,       -1,
+        LISTBROWSER_ColumnInfo,     podcastColInfo,
+        TAG_DONE);
+  }
+}
+
 void fillPodcastTrendingList(struct filters lastFilters)
 {
   char jsonErrorMsg[] = "There was an error with the returned data.\n" \
@@ -681,7 +782,7 @@ void fillPodcastTrendingList(struct filters lastFilters)
   else showMsgReq(gadgets[GID_MSG_REQ], "MediaVault error", (char *)jsonErrorMsg, 0, NULL, 0);
 }
 
-static void fillEpisodesList(ULONG feedID)
+static void fillEpisodesList(STRPTR feedID)
 {
   char jsonErrorMsg[] = "There was an error with the returned data.\n" \
       "Please try again. If the problem remains,\n" \
@@ -748,7 +849,6 @@ void playPodcast(struct Node *res_node)
 
 void addFavouritePodcast(struct Node *res_node)
 {
-  char itemUID[32];
   struct podcastInfo *itemData = {0};
   itemData = (struct podcastInfo *)IExec->AllocVecTags(sizeof(struct podcastInfo),
         AVT_Type,            MEMF_PRIVATE,
@@ -759,10 +859,9 @@ void addFavouritePodcast(struct Node *res_node)
         LBNA_UserData, &itemData,
         TAG_DONE);
 
-  IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%lu", itemData->id);
-  if(sqlCheckExist(itemUID, "podcast"))
+  if(sqlCheckFavouriteExist(itemData->id, "podcast"))
   {
-    sqlRemoveFavourite(itemUID, "podcast");
+    sqlRemoveFavourite(itemData->id, "podcast");
     toggleFavouriteButton(FALSE);
   }
   else
@@ -780,7 +879,7 @@ void addFavouritePodcast(struct Node *res_node)
     }
     
     sqlAddFavouritePodcast(
-      itemUID,
+      itemData->id,
       itemData->title,
       itemData->language,
       itemData->image,
@@ -789,6 +888,41 @@ void addFavouritePodcast(struct Node *res_node)
     );
     toggleFavouriteButton(TRUE);
   }
+}
+
+void addListenLaterPodcast(struct Node *res_node)
+{
+  struct podcastEpisodeInfo *itemData = {0};
+  itemData = (struct podcastEpisodeInfo *)IExec->AllocVecTags(sizeof(struct podcastEpisodeInfo),
+        AVT_Type,            MEMF_PRIVATE,
+        AVT_ClearWithValue,  "\0",
+        TAG_DONE);
+
+  IListBrowser->GetListBrowserNodeAttrs((struct Node *)res_node,
+        LBNA_UserData, &itemData,
+        TAG_DONE);
+
+  if(sqlCheckListenLaterExist(itemData->id))
+  {
+    sqlRemoveListenLater(itemData->id);
+    toggleListenLaterButton(FALSE);
+  }
+  else
+  {
+    sqlAddListenLaterPodcast(
+      itemData->id,
+      itemData->title,
+      itemData->datePublishedPretty,
+      itemData->enclosureUrl,
+      itemData->description,
+      itemData->image,
+      itemData->feedId,
+      itemData->season,
+      itemData->episode
+    );
+    toggleListenLaterButton(TRUE);
+  }
+
 }
 
 static void toggleFavouriteButton(BOOL status)
@@ -810,3 +944,33 @@ static void toggleFavouriteButton(BOOL status)
           TAG_DONE);
   }
 }
+
+static void resetListenLaterButton(void)
+{
+  IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_LISTEN_LATER_BUTTON], windows[WID_MAIN], NULL,
+        GA_Disabled,          TRUE,
+        GA_HintInfo,          "Click to add the selected\npodcast episode from the listen later list",
+        BUTTON_RenderImage,   objects[OID_BOOKMARK_ADD_IMAGE],
+        TAG_DONE);
+}
+
+static void toggleListenLaterButton(BOOL status)
+{
+  if (status)
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_LISTEN_LATER_BUTTON], windows[WID_MAIN], NULL,
+          GA_Disabled,          FALSE,
+          GA_HintInfo,          "Click to remove the selected\npodcast episode from the\nListen Later list",
+          BUTTON_RenderImage,   objects[OID_BOOKMARK_REMOVE_IMAGE],
+          TAG_DONE);
+  }
+  else
+  {
+    IIntuition->SetGadgetAttrs((struct Gadget*)gadgets[GID_PODCAST_LISTEN_LATER_BUTTON], windows[WID_MAIN], NULL,
+          GA_Disabled,          FALSE,
+          GA_HintInfo,          "Click to add the selected\npodcast episode from the\nListen Later list",
+          BUTTON_RenderImage,   objects[OID_BOOKMARK_ADD_IMAGE],
+          TAG_DONE);
+  }
+}
+

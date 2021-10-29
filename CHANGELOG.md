@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.5.0] - future
+## [1.5.0] - 2021-10-29
 ### Added
 - Added the ability to mark favourite radio stations and podcasts.
   A new list is created where you can find them and select one to
@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
   in the list or not.
 - Added all the necessary images into the archive, with
   Martin (Mason) Merz permission
+- Added help hint texts at the play, bookmark and favourite
+  buttons
 
 ### Changed
 - Compiled with libcurl 7.79.1

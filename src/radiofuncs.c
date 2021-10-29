@@ -395,7 +395,7 @@ void showRadioInfo(struct Node *res_node)
           GA_Disabled,   FALSE,
           TAG_DONE);
 
-    toggleFavouriteButton(sqlCheckExist(itemData->uuid, "radio"));
+    toggleFavouriteButton(sqlCheckFavouriteExist(itemData->uuid, "radio"));
   }
 }
 
@@ -524,7 +524,7 @@ void addFavouriteRadio(struct Node *res_node)
         LBNA_UserData, &itemData,
         TAG_DONE);
 
-  if(sqlCheckExist(itemData->uuid, "radio"))
+  if(sqlCheckFavouriteExist(itemData->uuid, "radio"))
   {
     sqlRemoveFavourite(itemData->uuid, "radio");
     toggleFavouriteButton(FALSE);

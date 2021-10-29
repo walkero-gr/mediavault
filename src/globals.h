@@ -70,7 +70,7 @@ struct stationInfo
 
 struct podcastInfo
 {
-  ULONG id;
+  char id[42];
   char title[128];
   char description[512];
   char author[64];
@@ -82,7 +82,7 @@ struct podcastInfo
 
 struct podcastEpisodeInfo
 {
-  ULONG id;
+  char  id[42];
   char  title[128];
   char  description[512];
   ULONG datePublished;
@@ -92,8 +92,8 @@ struct podcastEpisodeInfo
   ULONG duration;
   uint8 episode;
   uint8 season;
-  ULONG feedId;
-  char image[255];
+  char  feedId[42];
+  char  image[255];
 };
 
 #endif
