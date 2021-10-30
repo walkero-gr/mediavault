@@ -24,11 +24,11 @@
 
 #include "globals.h"
 #include "gui.h"
-#include "guifuncs.h"
 #include "radiofuncs.h"
 #include "httpfuncs.h"
 #include "stringfuncs.h"
 #include "fsfuncs.h"
+#include "guifuncs.h"
 
 extern Class *BitMapClass;
 

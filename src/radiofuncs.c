@@ -24,6 +24,7 @@
 #include "guifuncs.h"
 #include "sqldb.h"
 #include "fsfuncs.h"
+#include "radiofuncs.h"
 
 static CONST_STRPTR radioAPIUrl = "https://de1.api.radio-browser.info/json";
 static char url[255];

@@ -19,13 +19,13 @@
 #include <proto/listbrowser.h>
 
 #include "globals.h"
-#include "gui.h"
 #include "guifuncs.h"
 #include "mainWin.h"
 #include "aboutWin.h"
 #include "radiofuncs.h"
 #include "podcastfuncs.h"
 #include "httpfuncs.h"
+#include "gui.h"
 
 struct ColumnInfo *columnInfo, *radioFavouritesColInfo, *leftSidebarCI,
             *podcastColInfo, *podcastEpisodeColInfo;

@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 14-10-2021 23:58:06
+# Created on: 30-10-2021 21:02:38
 #
 #
 
@@ -19,7 +19,7 @@ MediaVault_OBJ := \
 	 src/mainWin.o src/guifuncs.o src/aboutWin.o \
 	 src/httpfuncs.o src/radiofuncs.o src/stringfuncs.o \
 	 src/fsfuncs.o src/podcastfuncs.o src/sqldb.o \
-	
+	 src/radiopages.o src/podcastpages.o
 
 
 ###################################################################
@@ -87,8 +87,7 @@ MediaVault: $(MediaVault_OBJ)
 	@$(CC) -c $< -o $*.o $(CFLAGS)
 
 src/mediavault.o: src/mediavault.c src/libshandler.h src/gui.h \
-	 src/sqldb.h src/mediavault.h src/globals.h \
-	
+	 src/sqldb.h src/fsfuncs.h
 
 src/libshandler.o: src/libshandler.c src/globals.h src/version.h \
 	
@@ -106,7 +105,8 @@ src/httpfuncs.o: src/httpfuncs.c src/version.h
 src/fsfuncs.o: src/fsfuncs.c src/globals.h src/version.h \
 	
 
-src/sqldb.o: src/sqldb.c src/version.h
+src/sqldb.o: src/sqldb.c src/globals.h src/version.h \
+	 src/radiofuncs.h src/stringfuncs.h
 
 src/guifuncs.o: src/guifuncs.c src/globals.h src/version.h \
 	 src/gui.h src/guifuncs.h src/radiofuncs.h \
@@ -114,21 +114,29 @@ src/guifuncs.o: src/guifuncs.c src/globals.h src/version.h \
 
 src/podcastfuncs.o: src/podcastfuncs.c src/globals.h src/version.h \
 	 src/gui.h src/libshandler.h src/httpfuncs.h \
-	 src/stringfuncs.h src/guifuncs.h src/secrets.h \
-	
+	 src/sqldb.h src/stringfuncs.h src/guifuncs.h \
+	 src/secrets.h
 
 src/mainWin.o: src/mainWin.c src/globals.h src/version.h \
-	 src/gui.h src/mainWin.h
+	 src/gui.h src/lists.h src/guifuncs.h \
+	 src/radiopages.h
 
 src/aboutWin.o: src/aboutWin.c src/globals.h src/version.h \
 	 src/gui.h
 
 src/radiofuncs.o: src/radiofuncs.c src/globals.h src/version.h \
 	 src/gui.h src/libshandler.h src/httpfuncs.h \
-	 src/stringfuncs.h src/guifuncs.h
+	 src/stringfuncs.h src/guifuncs.h src/sqldb.h \
+	
 
 src/stringfuncs.o: src/stringfuncs.c src/globals.h src/version.h \
 	 src/libshandler.h
+
+src/radiopages.o: src/radiopages.c src/globals.h src/version.h \
+	 src/gui.h
+
+src/podcastpages.o: src/podcastpages.c src/globals.h src/version.h \
+	 src/gui.h
 
 
 ###################################################################
