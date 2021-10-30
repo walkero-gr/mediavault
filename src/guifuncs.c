@@ -15,8 +15,6 @@
 */
 
 
-#include <intuition/gadgetclass.h>
-#include <classes/window.h>
 #include <gadgets/space.h>
 
 #include <proto/application.h>
@@ -24,7 +22,6 @@
 
 #include "globals.h"
 #include "gui.h"
-#include "radiofuncs.h"
 #include "httpfuncs.h"
 #include "stringfuncs.h"
 #include "fsfuncs.h"
@@ -36,9 +33,9 @@ struct releaseInfo {
   char tag_name[10];
   char content_type[24];
   char browser_download_url[255];
-  char changes[1024];
+  char changes[2048];
 };
-static struct releaseInfo *release = NULL;
+static struct releaseInfo *release = {0};
 
 uint32 cacheFilenameSize = 128;
 
@@ -79,12 +76,13 @@ struct Image *MenuImage(CONST_STRPTR name, struct Screen *screen)
       {
          prev_dir = IDOS->SetCurrentDir(dir);
 
-         i = (struct Image *)IIntuition->NewObject(NULL,"bitmap.image",BITMAP_SourceFile, name,
-                                                           BITMAP_SelectSourceFile, name_s,
-                                                           BITMAP_DisabledSourceFile, name_g,
-                                                           BITMAP_Screen, screen,
-                                                           BITMAP_Masking, TRUE,
-                                                           TAG_END);
+         i = (struct Image *)IIntuition->NewObject(BitMapClass, NULL,
+                  BITMAP_SourceFile, name,
+                  BITMAP_SelectSourceFile, name_s,
+                  BITMAP_DisabledSourceFile, name_g,
+                  BITMAP_Screen, screen,
+                  BITMAP_Masking, TRUE,
+                  TAG_END);
 
          if (i)
             IIntuition->SetAttrs((Object *)i,IA_Height,i->Height + 2,TAG_END);

@@ -303,12 +303,12 @@ void stringToLower(STRPTR subject)
   */
 void strReplace(CONST_STRPTR search, CONST_STRPTR replace, STRPTR subject)
 {
-  char buf[4096];
+  char buf[2048];
   //to store the pointer returned from strstr
   STRPTR ch;
-
-  //first exit condition
-  if(!(ch = strstr(subject, search)))
+  
+  ch = strstr(subject, search);
+  if (ch == NULL)
     return;
 
   //copy all the content to buffer before the first occurrence of the search string

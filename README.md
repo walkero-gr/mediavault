@@ -135,8 +135,8 @@ v1.5.0 - 2021-10-29
 * Removed the small boxes at the end of each line at the update
   changelog text
 * Code simplified and cleaned in some places
-* Fixed issues that could make MediaVault crash system at the
-  image download section. This fixed also some images that were
+* Fixed issues that could make MediaVault crash the system at the
+  image download process. This fixed also some images that were
   not downloaded. So now it will be able to show more images
   than before.
 * When the radio station and podcast list was populated but a
