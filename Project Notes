@@ -52,7 +52,7 @@ DONE - [1.5] Include in the package all the necessary AISS icons
 - Add icons at the left sidebar based on the item
 - When MediaVault is on other screen, all the popups open on public one,
   instead the same screen
-- Before show avatar, check if it is already visible
+DONE - [1.5.1] Before show avatar, check if it is already visible
 
 ## Radio
 DONE - Add Radio filter section with fields at the top of the window (Genre,
@@ -130,7 +130,7 @@ DONE - [1.5] Mark podcasts as favorites
 - Download favourite radio list as .pls/.m3u playlists
 DONE - [1.5] Add listen later episode podcasts
 - When the user selects a listen later episode, hide the episodes listbrowser
-- Update the Favourite and Listen Later lists in real time
+DONE - [1.5.1] Update the Favourite and Listen Later lists in real time
 
 
 //// BUGS

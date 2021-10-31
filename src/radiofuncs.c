@@ -543,6 +543,7 @@ void addFavouriteRadio(struct Node *res_node)
     );
     toggleFavouriteButton(TRUE);
   }
+  fillRadioFavouriteList();
 }
 
 static void toggleFavouriteButton(BOOL status)

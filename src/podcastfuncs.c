@@ -888,6 +888,7 @@ void addFavouritePodcast(struct Node *res_node)
     );
     toggleFavouriteButton(TRUE);
   }
+  fillPodcastFavouriteList();
 }
 
 void addListenLaterPodcast(struct Node *res_node)
@@ -922,7 +923,7 @@ void addListenLaterPodcast(struct Node *res_node)
     );
     toggleListenLaterButton(TRUE);
   }
-
+  fillPodcastListenLaterList();
 }
 
 static void toggleFavouriteButton(BOOL status)
