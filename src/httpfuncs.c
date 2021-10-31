@@ -155,10 +155,10 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
         curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &response.type);
       }
-      else
-      {
+      //else
+      //{
         //fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-      }
+      //}
 
       curl_easy_cleanup(curl);
 

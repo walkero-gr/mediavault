@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [1.5.1] - future
 ### Changed
 - Compiled with SQLite 3.34.0
+- Before show an avatar image, now there is a check if this is already visible
 
 ### Fixed
 - Fixed a bug at the update process that could make MediaVault crash

@@ -304,56 +304,61 @@ static STRPTR getCachedImageIfExists(STRPTR uuid)
 void showAvatarImage(STRPTR uuid, STRPTR url, Object *avatarWrapperGadget, Object *avatarImageObject, struct RenderHook *renderhook)
 {
   struct Screen *screen = NULL;
+  static char prevUuid[42];
 
-  STRPTR avatarImage = getCachedImageIfExists(uuid);
-
-  if (!avatarImage)
+  if (IUtility->Stricmp(uuid, prevUuid))
   {
-    downloadFile(url, uuid, (STRPTR)CACHE_DIR);
-    avatarImage = getCachedImageIfExists(uuid);
-  }
+    STRPTR avatarImage = getCachedImageIfExists(uuid);
+    IUtility->Strlcpy(prevUuid, uuid, sizeof(prevUuid));
 
-  if (!avatarImage)
-  {
-    avatarImage = (STRPTR)IMAGES_PATH LOGO_IMAGE_BIG;
-  }
-
-  if (avatarImage)
-  {
-    if((screen = IIntuition->LockPubScreen(NULL)))
+    if (!avatarImage)
     {
-      // Clean previous image shown
-      IIntuition->SetGadgetAttrs((struct Gadget*)avatarWrapperGadget, windows[WID_MAIN], NULL,
-          GA_Image, NULL,
-          TAG_END );
-      IIntuition->DisposeObject(avatarImageObject);
+      downloadFile(url, uuid, (STRPTR)CACHE_DIR);
+      avatarImage = getCachedImageIfExists(uuid);
+    }
 
-      // Create a new object for the image
-      avatarImageObject = IIntuition->NewObject(BitMapClass, NULL,
-          IA_Scalable,        TRUE,
-          BITMAP_Screen,      screen,
-          BITMAP_SourceFile,  avatarImage,
-          BITMAP_Masking,     TRUE,
-          TAG_END);
+    if (!avatarImage)
+    {
+      avatarImage = (STRPTR)IMAGES_PATH LOGO_IMAGE_BIG;
+    }
 
-      if (renderhook && avatarImageObject)
+    if (avatarImage)
+    {
+      if((screen = IIntuition->LockPubScreen(NULL)))
       {
-        renderhook->img  = avatarImageObject;
-        renderhook->w    = ((struct Image *)avatarImageObject)->Width;
-        renderhook->h    = ((struct Image *)avatarImageObject)->Height;
-        renderhook->fill = FALSE;
-
+        // Clean previous image shown
         IIntuition->SetGadgetAttrs((struct Gadget*)avatarWrapperGadget, windows[WID_MAIN], NULL,
-            SPACE_RenderHook,   renderhook,
-            GA_Image,           avatarImageObject,
+            GA_Image, NULL,
             TAG_END );
+        IIntuition->DisposeObject(avatarImageObject);
 
-        IIntuition->IDoMethod( objects[OID_MAIN], WM_RETHINK );
-        IIntuition->RefreshWindowFrame( windows[WID_MAIN] );
+        // Create a new object for the image
+        avatarImageObject = IIntuition->NewObject(BitMapClass, NULL,
+            IA_Scalable,        TRUE,
+            BITMAP_Screen,      screen,
+            BITMAP_SourceFile,  avatarImage,
+            BITMAP_Masking,     TRUE,
+            TAG_END);
+
+        if (renderhook && avatarImageObject)
+        {
+          renderhook->img  = avatarImageObject;
+          renderhook->w    = ((struct Image *)avatarImageObject)->Width;
+          renderhook->h    = ((struct Image *)avatarImageObject)->Height;
+          renderhook->fill = FALSE;
+
+          IIntuition->SetGadgetAttrs((struct Gadget*)avatarWrapperGadget, windows[WID_MAIN], NULL,
+              SPACE_RenderHook,   renderhook,
+              GA_Image,           avatarImageObject,
+              TAG_END );
+
+          IIntuition->IDoMethod( objects[OID_MAIN], WM_RETHINK );
+          IIntuition->RefreshWindowFrame( windows[WID_MAIN] );
+        }
+
+        IIntuition->UnlockPubScreen(NULL, screen);
+        screen = NULL;
       }
-
-      IIntuition->UnlockPubScreen(NULL, screen);
-      screen = NULL;
     }
   }
 }
