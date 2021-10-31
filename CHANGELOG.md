@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [1.5.1] - future
+### Added
+- Added podcast episode duration at the right sidebar, when one is selected
+
 ### Changed
 - Compiled with SQLite 3.34.0
 - Before show an avatar image, now there is a check if this is already visible
@@ -9,6 +12,9 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Fixed a bug at the update process that could make MediaVault crash
+- Fixed podcast episode number to show higher numbers than 255
+- Fixed showing Season and Episode on podcast episodes from "Listen
+  Later" list
 
 ## [1.5.0] - 2021-10-29
 ### Added

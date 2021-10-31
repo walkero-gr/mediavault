@@ -220,7 +220,8 @@ BOOL sqlAddListenLaterPodcast(
   STRPTR feedImage,
   STRPTR feedId,
   uint8 season,
-  uint8 episode
+  ULONG episode,
+  ULONG duration
 ) {
   sqlite3 *db;
   sqlite3_stmt *res;
@@ -235,11 +236,11 @@ BOOL sqlAddListenLaterPodcast(
   CONST_STRPTR sql = "INSERT INTO listenlater " \
     "(" \
       "id, added, title, datePublishedPretty, enclosureUrl, description, " \
-      "feedImage, feedId, season, episode" \
+      "feedImage, feedId, season, episode, duration" \
     ") " \
     "VALUES (" \
       ":id, :added, :title, :datePublishedPretty, :enclosureUrl, :descr, " \
-      ":feedImage, :feedId, :season, :episode" \
+      ":feedImage, :feedId, :season, :episode, :duration" \
     ")";
 
   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
@@ -259,6 +260,7 @@ BOOL sqlAddListenLaterPodcast(
   int feedIdIdx               = sqlite3_bind_parameter_index(res, ":feedId");
   int seasonIdx               = sqlite3_bind_parameter_index(res, ":season");
   int episodeIdx              = sqlite3_bind_parameter_index(res, ":episode");
+  int durationIdx             = sqlite3_bind_parameter_index(res, ":duration");
 
   sqlite3_bind_text(res, idIdx, id, -1, 0);
   sqlite3_bind_int(res, addedIdx, now());
@@ -270,6 +272,7 @@ BOOL sqlAddListenLaterPodcast(
   sqlite3_bind_text(res, feedIdIdx, feedId, -1, 0);
   sqlite3_bind_int(res, seasonIdx, season);
   sqlite3_bind_int(res, episodeIdx, episode);
+  sqlite3_bind_int(res, durationIdx, duration);
 
   sqlite3_step(res);
   sqlite3_finalize(res);

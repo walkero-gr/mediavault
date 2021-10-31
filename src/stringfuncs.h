@@ -28,5 +28,6 @@ int32 getOffsetUTC(void);
 STRPTR SHA1Encrypt(STRPTR);
 void stringToLower(STRPTR);
 void strReplace(CONST_STRPTR, CONST_STRPTR, STRPTR);
+STRPTR durationPretty(ULONG);
 
 #endif

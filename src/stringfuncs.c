@@ -16,6 +16,7 @@
   */
 
 #include <iconv.h>
+#include <math.h>
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -328,3 +329,25 @@ void strReplace(CONST_STRPTR search, CONST_STRPTR replace, STRPTR subject)
   return strReplace(search, replace, subject);
 }
 
+STRPTR durationPretty(ULONG duration)
+{
+  STRPTR buf = IExec->AllocVecTags(sizeof(char) * 12,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+
+  ULONG minutes = ceil(duration / 60);
+  uint8 hours = floor(minutes / 60);
+
+  if (hours > 0)
+  {
+    minutes = minutes - (hours * 60);
+    IUtility->SNPrintf(buf, sizeof(char) * 12, "%ld hr %lu mins", hours, minutes);
+  }
+  else
+  {
+    IUtility->SNPrintf(buf, sizeof(char) * 12, "%lu mins", minutes);
+  }
+
+  return buf;
+}

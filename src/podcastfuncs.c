@@ -346,16 +346,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       }
       else IUtility->Strlcpy(itemData->id, "0", sizeof(itemData->id));
 
-      /*
-      buf = IJansson->json_object_get(data, "id");
-      if(!json_is_integer(buf))
-      {
-        IJansson->json_decref(jsonRoot);
-        return ~0UL;
-      }
-      itemData->id = (ULONG)IJansson->json_integer_value(buf);
-      */
-
       buf = IJansson->json_object_get(data, "title");
       if(!json_is_string(buf))
       {
@@ -403,15 +393,6 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
         IUtility->SNPrintf(itemData->feedId, sizeof(itemData->feedId), "%lu", feedId);
       }
       else IUtility->Strlcpy(itemData->feedId, "0", sizeof(itemData->feedId));
-      /*
-      buf = IJansson->json_object_get(data, "feedId");
-      if(!json_is_integer(buf))
-      {
-        IJansson->json_decref(jsonRoot);
-        return ~0UL;
-      }
-      itemData->feedId = (ULONG)IJansson->json_integer_value(buf);
-      */
 
       buf = IJansson->json_object_get(data, "season");
       if(!json_is_integer(buf))
@@ -425,6 +406,12 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
       {
         itemData->episode = 0;
       } else itemData->episode = (ULONG)IJansson->json_integer_value(buf);
+
+      buf = IJansson->json_object_get(data, "duration");
+      if(!json_is_integer(buf))
+      {
+        itemData->duration = 0;
+      } else itemData->duration = (ULONG)IJansson->json_integer_value(buf);
 
       itemNode = IListBrowser->AllocListBrowserNode( 3,
           LBNA_UserData,          itemData,
@@ -498,9 +485,9 @@ int getPodcastListenLater(void *unused, int cntCols, char **fields, char **colNa
 
   //itemData->id        = atoi(fields[0]);
   //itemData->feedId    = atoi(fields[7]);
-  //itemData->season    = atoi(fields[8]);
-  //itemData->episode   = atoi(fields[9]);
-  //itemData->duration  = atoi(fields[10]);
+  itemData->season    = atoi(fields[8]);
+  itemData->episode   = atoi(fields[9]);
+  itemData->duration  = atoi(fields[10]);
   IUtility->Strlcpy(itemData->id,                     fields[0], sizeof(itemData->id));
   IUtility->Strlcpy(itemData->title,                  fields[2], sizeof(itemData->title));
   IUtility->Strlcpy(itemData->datePublishedPretty,    fields[3], sizeof(itemData->datePublishedPretty));
@@ -610,11 +597,13 @@ void showPodcastEpisodeInfo(struct Node *res_node)
           LBNA_UserData, &episodeData,
           TAG_DONE);
 
-    IUtility->SNPrintf(infoText, sizeof(infoText), "%s\nSeason: %ld, Episode: %ld\n\n%s\n",
+    IUtility->SNPrintf(infoText, sizeof(infoText), "%s\nSeason: %ld, Episode: %ld\n%s\n\n%s\n",
       episodeData->title,
       episodeData->season,
       episodeData->episode,
-      episodeData->description);
+      durationPretty(episodeData->duration),
+      episodeData->description
+      );
     IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%s", episodeData->feedId);
 
     if (IUtility->Stricmp(itemUID, ""))
@@ -919,7 +908,8 @@ void addListenLaterPodcast(struct Node *res_node)
       itemData->image,
       itemData->feedId,
       itemData->season,
-      itemData->episode
+      itemData->episode,
+      itemData->duration
     );
     toggleListenLaterButton(TRUE);
   }

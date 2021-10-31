@@ -41,13 +41,13 @@ DONE - [1.3] Add play button at the right sidebar menu and replace double click
 DONE - [1.3] Selfupdate process
 DONE - [1.3] Add libcurl support
 DONE - Simplify downloadFile() to make one http request
-- Add progress window at the Selfupdate process
 DONE - [1.3] Add new icons in the archive, the ones that IconDesigner created
 DONE - [1.3] Fix icons' positions
 DONE - [1.3] Create automated release packaging in Makefile
 DONE - [1.3] Fixed the version string to include the application name
 DONE - [1.3] Add COPYING/LICENSE files for the used libs
 DONE - [1.5] Include in the package all the necessary AISS icons
+- Add progress window at the Selfupdate process
 - Add more comments in sources for every method and file
 - Add icons at the left sidebar based on the item
 - When MediaVault is on other screen, all the popups open on public one,
@@ -92,14 +92,16 @@ DONE - [1.4] When the user clicks on an episode add info at the right sidebar
               and enable the play button
 DONE - [1.4] When the play button is clicked AmigaAmp3 should start playing
               the episode
-- When a podcast episodes list is filled but the user selects
-  an other podcast that has no episodes, the list should be cleared.
+DONE - [1.5] When a podcast episodes list is filled but the user selects
+              an other podcast that has no episodes, the list should be cleared*.
+              Actually what I did was to keep the list with the previous data,
+              but they are now usable.
 DONE - [1.4] Add a check if the podcast name is empty when Discover button is
               pressed
 - Download podcast episodes
 DONE - [1.4.1] Add more filters, like categories, language etc.
 - Change the language column to have the Language name than the iso code
-- When an episode is selected, show it's duration in info section
+DONE - [1.5.1] When an episode is selected, show it's duration in info section
 
 ## UPnP
 - Create a unique list of the UPnP servers
@@ -129,7 +131,8 @@ DONE - [1.5] Add a favorites list of radio stations
 DONE - [1.5] Mark podcasts as favorites
 - Download favourite radio list as .pls/.m3u playlists
 DONE - [1.5] Add listen later episode podcasts
-- When the user selects a listen later episode, hide the episodes listbrowser
+- When the user selects a podcasrt episode from "Listen Later" list,
+  hide the episodes listbrowser
 DONE - [1.5.1] Update the Favourite and Listen Later lists in real time
 
 

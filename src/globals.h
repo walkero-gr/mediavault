@@ -91,7 +91,7 @@ struct podcastEpisodeInfo
   char  enclosureUrl[255];
   char  enclosureType[11];
   ULONG duration;
-  uint8 episode;
+  ULONG episode;
   uint8 season;
   char  feedId[42];
   char  image[255];
