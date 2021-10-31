@@ -233,7 +233,7 @@ Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook *rende
         GA_ID,              OID_PODCAST_AVATAR_IMAGE,
         IA_Scalable,        FALSE,
         BITMAP_Screen,      screen,
-        BITMAP_SourceFile,  LOGO_IMAGE,
+        BITMAP_SourceFile,  IMAGES_PATH LOGO_IMAGE,
         BITMAP_Masking,     TRUE,
         TAG_END);
 

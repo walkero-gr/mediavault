@@ -39,6 +39,26 @@ static struct releaseInfo *release = {0};
 
 uint32 cacheFilenameSize = 128;
 
+
+Object *buildImage(CONST_STRPTR imageName, struct Screen *screen)
+{
+  char image[64], image_g[64], image_s[64];
+
+  IUtility->SNPrintf(image, sizeof(image), IMAGES_PATH "%s", imageName);
+  IUtility->SNPrintf(image_g, sizeof(image_g), IMAGES_PATH "%s_g", imageName);
+  IUtility->SNPrintf(image_s, sizeof(image_s), IMAGES_PATH "%s_s", imageName);
+
+  return IIntuition->NewObject(BitMapClass, NULL,
+              BITMAP_SourceFile,            image,
+              BITMAP_DisabledSourceFile,    image_g,
+              BITMAP_SelectSourceFile,      image_s,
+              BITMAP_Screen,                screen,
+              BITMAP_Precision,             PRECISION_EXACT,
+              BITMAP_Masking,               TRUE,
+              TAG_END);
+}
+
+
 /**
  * The following code is from MenuClass.c as found at the SDK 53.30 examples
  *
@@ -295,7 +315,7 @@ void showAvatarImage(STRPTR uuid, STRPTR url, Object *avatarWrapperGadget, Objec
 
   if (!avatarImage)
   {
-    avatarImage = (STRPTR)LOGO_IMAGE_BIG;
+    avatarImage = (STRPTR)IMAGES_PATH LOGO_IMAGE_BIG;
   }
 
   if (avatarImage)

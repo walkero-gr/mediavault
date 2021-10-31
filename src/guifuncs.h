@@ -27,7 +27,8 @@ struct RenderHook {
     BOOL fill;
 };
 
-struct Image *MenuImage(CONST_STRPTR name, struct Screen *);
+Object *buildImage(CONST_STRPTR, struct Screen *);
+struct Image *MenuImage(CONST_STRPTR, struct Screen *);
 void windowBlocking(Object *, BOOL);
 void gadgetBlocking(struct Window *, Object *, BOOL);
 LONG showMsgReq(Object *, CONST_STRPTR, CONST_STRPTR, ULONG, CONST_STRPTR, ULONG);

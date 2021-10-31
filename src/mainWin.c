@@ -34,58 +34,18 @@ static const ULONG listToPage[] = {
     TAG_END
 };
 
-extern Class *BitMapClass;
 extern Class *LayoutClass;
 extern Class *WindowClass;
 
 
 Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen *screen)
 {                                           
-  objects[OID_FAVOURITES_ADD_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        BITMAP_SourceFile,            "PROGDIR:images/favouritesadd",
-        BITMAP_DisabledSourceFile,    "PROGDIR:images/favouritesadd_g",
-        BITMAP_SelectSourceFile,      "PROGDIR:images/favouritesadd_s",
-        BITMAP_Screen,                screen,
-        BITMAP_Precision,             PRECISION_EXACT,
-        BITMAP_Masking,               TRUE,
-        TAG_END);
+  objects[OID_FAVOURITES_ADD_IMAGE]     = buildImage("favouritesadd", screen);
+  objects[OID_FAVOURITES_REMOVE_IMAGE]  = buildImage("favouritesremove", screen);
+  objects[OID_PLAY_IMAGE]               = buildImage("td_tn_play", screen);
+  objects[OID_BOOKMARK_ADD_IMAGE]       = buildImage("bookmarkadd", screen);
+  objects[OID_BOOKMARK_REMOVE_IMAGE]    = buildImage("bookmarkremove", screen);
 
-  objects[OID_FAVOURITES_REMOVE_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        BITMAP_SourceFile,            "PROGDIR:images/favouritesremove",
-        BITMAP_DisabledSourceFile,    "PROGDIR:images/favouritesremove_g",
-        BITMAP_SelectSourceFile,      "PROGDIR:images/favouritesremove_s",
-        BITMAP_Screen,                screen,
-        BITMAP_Precision,             PRECISION_EXACT,
-        BITMAP_Masking,               TRUE,
-        TAG_END);
-
-  objects[OID_PLAY_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        BITMAP_SourceFile,            "PROGDIR:images/td_tn_play",
-        BITMAP_DisabledSourceFile,    "PROGDIR:images/td_tn_play_g",
-        BITMAP_SelectSourceFile,      "PROGDIR:images/td_tn_play_s",
-        BITMAP_Screen,                screen,
-        BITMAP_Precision,             PRECISION_EXACT,
-        BITMAP_Masking,               TRUE,
-        TAG_END),
-
-  objects[OID_BOOKMARK_ADD_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        BITMAP_SourceFile,            "PROGDIR:images/bookmarkadd",
-        BITMAP_DisabledSourceFile,    "PROGDIR:images/bookmarkadd_g",
-        BITMAP_SelectSourceFile,      "PROGDIR:images/bookmarkadd_s",
-        BITMAP_Screen,                screen,
-        BITMAP_Precision,             PRECISION_EXACT,
-        BITMAP_Masking,               TRUE,
-        TAG_END),
-
-  objects[OID_BOOKMARK_REMOVE_IMAGE] = IIntuition->NewObject(BitMapClass, NULL,
-        BITMAP_SourceFile,            "PROGDIR:images/bookmarkremove",
-        BITMAP_DisabledSourceFile,    "PROGDIR:images/bookmarkremove_g",
-        BITMAP_SelectSourceFile,      "PROGDIR:images/bookmarkremove_s",
-        BITMAP_Screen,                screen,
-        BITMAP_Precision,             PRECISION_EXACT,
-        BITMAP_Masking,               TRUE,
-        TAG_END),
-  
   //struct DrawInfo *drInfo = IIntuition->GetScreenDrawInfo(screen);
   renderhook = (struct RenderHook *) IExec->AllocSysObjectTags (ASOT_HOOK,
         ASOHOOK_Size,  sizeof(struct RenderHook),
