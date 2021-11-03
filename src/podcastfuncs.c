@@ -564,6 +564,7 @@ void showPodcastInfo(struct Node *res_node)
           TAG_DONE);
 
     fillEpisodesList(podcastData->id);
+    switchPage(PAGE_MAIN_PODCAST_EPISODES, objects[OID_MAIN_PAGES]);
 
     IUtility->SNPrintf(itemUID, sizeof(itemUID), "pod_%s", podcastData->id);
     showAvatarImage(
@@ -964,4 +965,5 @@ static void toggleListenLaterButton(BOOL status)
           TAG_DONE);
   }
 }
+
 

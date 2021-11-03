@@ -414,15 +414,15 @@ void showGUI(void)
                         IIntuition->GetAttr(LISTBROWSER_Selected, gadgets[GID_LEFT_SIDEBAR], &lsbNodeIdx);
                         switch (lsbNodeIdx)
                         {
-                          case 0:
-                            switchRightSidebar(PAGE_RADIO_INFO);
+                          case PAGE_MAIN_RADIO:
+                            switchPage(PAGE_RADIO_INFO, objects[OID_RIGHT_SIDEBAR_PAGES]);
                             break;
-                          case 1:
-                            switchRightSidebar(PAGE_RADIO_INFO);
+                          case PAGE_MAIN_RADIO_FAVOURITE:
+                            switchPage(PAGE_RADIO_INFO, objects[OID_RIGHT_SIDEBAR_PAGES]);
                             fillRadioFavouriteList();
                             break;
-                          case 2:
-                            switchRightSidebar(PAGE_RADIO_INFO);
+                          case PAGE_MAIN_RADIO_POPULAR:
+                            switchPage(PAGE_RADIO_INFO, objects[OID_RIGHT_SIDEBAR_PAGES]);
                             if(listCount(&radioPopularList) == 0)
                             {
                               windowBlocking(objects[OID_MAIN], TRUE);
@@ -430,8 +430,8 @@ void showGUI(void)
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                             break;
-                          case 3:
-                            switchRightSidebar(PAGE_RADIO_INFO);
+                          case PAGE_MAIN_RADIO_TRENDING:
+                            switchPage(PAGE_RADIO_INFO, objects[OID_RIGHT_SIDEBAR_PAGES]);
                             if(listCount(&radioTrendList) == 0)
                             {
                               windowBlocking(objects[OID_MAIN], TRUE);
@@ -439,19 +439,20 @@ void showGUI(void)
                               windowBlocking(objects[OID_MAIN], FALSE);
                             }
                             break;
-                          case 4:
-                          case 7:
-                            switchRightSidebar(PAGE_PODCAST_INFO);
+                          case PAGE_MAIN_PODCAST:
+                          case PAGE_MAIN_PODCAST_TRENDING:
+                            switchPage(PAGE_PODCAST_INFO, objects[OID_RIGHT_SIDEBAR_PAGES]);
                             break;
-                          case 5:
-                            switchRightSidebar(PAGE_PODCAST_INFO);
+                          case PAGE_MAIN_PODCAST_FAVOURITE:
+                            switchPage(PAGE_PODCAST_INFO, objects[OID_RIGHT_SIDEBAR_PAGES]);
                             fillPodcastFavouriteList();
                             break;
-                          case 6:
-                            switchRightSidebar(PAGE_PODCAST_INFO);
+                          case PAGE_MAIN_PODCAST_LISTEN_LATER:
+                            switchPage(PAGE_PODCAST_INFO, objects[OID_RIGHT_SIDEBAR_PAGES]);
                             fillPodcastListenLaterList();
                             break;
                         }
+                        switchPage(lsbNodeIdx, objects[OID_MAIN_PAGES]);
                         break;
 
                       case GID_PODCAST_TRENDING_CHOOSER_GENRES:

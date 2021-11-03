@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 - Compiled with SQLite 3.34.0
 - Before show an avatar image, now there is a check if this is already visible
 - Update the Favourite and Listen Later lists in real time
+- Now the podcast episodes appear in the middle section, instead of the right
+  sidebar, so to be more visible and easy to use.
 
 ### Fixed
 - Fixed a bug at the update process that could make MediaVault crash

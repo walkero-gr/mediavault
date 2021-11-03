@@ -23,5 +23,6 @@ Object *buildPodcastFavouritePage(void);
 Object *buildPodcastListenLaterPage(void);
 Object *buildPodcastTrendingPage(CONST_STRPTR *, CONST_STRPTR *);
 Object *buildPodcastRightSidebar(struct Screen *, struct RenderHook *);
+Object *buildPodcastEpisodesPage(void);
 
 #endif

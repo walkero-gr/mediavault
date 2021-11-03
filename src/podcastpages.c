@@ -317,7 +317,8 @@ Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook *rende
               TAG_DONE),
               CHILD_WeightedWidth, 30,
             TAG_DONE),
-            CHILD_MaxHeight, 60,
+            //CHILD_MaxHeight, 60,
+            CHILD_WeightedHeight, 10,
 
           LAYOUT_AddChild, gadgets[GID_PODCAST_INFO_DATA] = IIntuition->NewObject(TextEditorClass, NULL,
             GA_ID,                      GID_PODCAST_INFO_DATA,
@@ -330,11 +331,20 @@ Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook *rende
             GA_TEXTEDITOR_ReadOnly,     TRUE,
             GA_TEXTEDITOR_Transparent,  TRUE,
             TAG_DONE),
-            CHILD_WeightedHeight, 13,
+            CHILD_WeightedHeight, 35,
 
           LAYOUT_AddChild, IIntuition->NewObject(NULL, "space.gadget",
             TAG_DONE),
-            CHILD_WeightedHeight, 2,
+            CHILD_WeightedHeight, 20,
+
+          TAG_DONE);
+}
+
+Object *buildPodcastEpisodesPage(void)
+{
+  return IIntuition->NewObject(LayoutClass, NULL,
+      LAYOUT_BevelStyle,      BVS_GROUP,
+      LAYOUT_Label,           "Podcast Episodes",
 
           LAYOUT_AddChild, gadgets[GID_PODCAST_EPISODES_LISTBROWSER] = IIntuition->NewObject(ListBrowserClass, NULL,
             GA_ID,                      GID_PODCAST_EPISODES_LISTBROWSER,
@@ -348,6 +358,5 @@ Object *buildPodcastRightSidebar(struct Screen *screen, struct RenderHook *rende
             TAG_DONE),
             CHILD_WeightedHeight, 40,
 
-          TAG_DONE);
+        TAG_DONE);
 }
-

@@ -29,10 +29,13 @@ extern struct List leftSidebarList;
 extern struct RenderHook *renderhook;
 extern struct RenderHook *podcastImageRenderHook;
 
+/*
+TODO: This needs to be removed
 static const ULONG listToPage[] = {
     LISTBROWSER_Selected,    PAGE_Current,
     TAG_END
 };
+*/
 
 extern Class *LayoutClass;
 extern Class *WindowClass;
@@ -57,7 +60,8 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         ASOHOOK_Entry, (HOOKFUNC)renderfunct,
         TAG_END);
 
-  Object *radioPages = IIntuition->NewObject(NULL, "page.gadget",
+  //Object *radioPages =
+  objects[OID_MAIN_PAGES] = IIntuition->NewObject(NULL, "page.gadget",
         LAYOUT_DeferLayout, TRUE,
         PAGE_Add, gadgets[GID_PAGE_RADIO_SEARCH]          = buildRadioSearchPage(genres, countries, languages),
         PAGE_Add, gadgets[GID_PAGE_RADIO_FAVOURITE]       = buildRadioFavouritePage(),
@@ -67,6 +71,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         PAGE_Add, gadgets[GID_PAGE_PODCAST_FAVOURITE]     = buildPodcastFavouritePage(),
         PAGE_Add, gadgets[GID_PAGE_PODCAST_LISTEN_LATER]  = buildPodcastListenLaterPage(),
         PAGE_Add, gadgets[GID_PAGE_PODCAST_TRENDING]      = buildPodcastTrendingPage(podcastCategories, languages),
+        PAGE_Add, gadgets[GID_PAGE_PODCAST_EPISODES]      = buildPodcastEpisodesPage(),
         TAG_DONE);
 
   //Object *rightSidebarPages = IIntuition->NewObject(NULL, "page.gadget",
@@ -116,15 +121,15 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
               LISTBROWSER_Hierarchical,   TRUE,
               LISTBROWSER_Separators,     FALSE,
               LISTBROWSER_ShowSelected,   TRUE,
-              ICA_TARGET,                 radioPages,
-              ICA_MAP,                    listToPage,
+              //ICA_TARGET,                 objects[OID_MAIN_PAGES], // TODO: This needs to be removed
+              //ICA_MAP,                    listToPage,
               TAG_DONE),
               CHILD_WeightedWidth, 20,
               CHILD_MinWidth, 150,
               LAYOUT_WeightBar, TRUE,
             // END - Left Sidebar
 
-            LAYOUT_AddChild, gadgets[GID_PAGES] = radioPages,
+            LAYOUT_AddChild, gadgets[GID_PAGES] = objects[OID_MAIN_PAGES],
             LAYOUT_WeightBar, TRUE,
 
             // START - Right Sidebar

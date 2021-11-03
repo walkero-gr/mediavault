@@ -611,32 +611,32 @@ void workOnUpdate(void)
 
  /**
   *
-  * void switchRightSidebar(ULONG)
+  * void switchPage(ULONG, Object *)
   *
   * Summary:
   *
-  *     This function switches the pages at the right sidebar
-  *     depending the selected section from the left sidebar
+  *     This function switches the pages at the any area of
+  *     the main window
   *
   * Parameters   : page: the page number
+  *                object: the main window area object
   *
   * Return Value :
   *
   * Description:
   *
-  *     This function checks the current visible page at the
-  *     right sidebar, and if it needs switches to the one
-  *     that reflects the choice at the left sidebar
+  *     This function checks the current visible page and if
+  *     it needs switches to the one that is defined
   *
   */
-void switchRightSidebar(ULONG page)
+void switchPage(ULONG page, Object *object)
 {
-  ULONG currentRightSidebarPage;
-  IIntuition->GetAttr(PAGE_Current, objects[OID_RIGHT_SIDEBAR_PAGES], &currentRightSidebarPage);
+  ULONG currentPage;
+  IIntuition->GetAttr(PAGE_Current, object, &currentPage);
 
-  if (currentRightSidebarPage != page)
+  if (currentPage != page)
   {
-    IIntuition->SetAttrs(objects[OID_RIGHT_SIDEBAR_PAGES],
+    IIntuition->SetAttrs(object,
         PAGE_Current, page,
         TAG_END);
 
