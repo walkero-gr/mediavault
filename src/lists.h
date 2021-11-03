@@ -31,6 +31,7 @@ CONST_STRPTR genres[] =
   "Drum and bass",
   "Electronic",
   "Folk",
+  "HardBass",
   "Jazz",
   "Latin",
   "Love",

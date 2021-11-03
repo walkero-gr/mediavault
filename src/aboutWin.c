@@ -189,7 +189,7 @@ static Object *buildSupportersPage(void)
     "\tSlygon\n" \
     "\tSoLiD-SNaKe\n" \
     "\tThomas Kolsch\n" \
-    "\tTim Grooms" \
+    "\tTim Grooms\n" \
     "\tVagaPPC\n" \
     "\tVulture\n";
 

@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [1.5.1] - future
 ### Added
 - Added podcast episode duration at the right sidebar, when one is selected
+- Added HardBass radio station genre after request
 
 ### Changed
 - Compiled with SQLite 3.34.0
