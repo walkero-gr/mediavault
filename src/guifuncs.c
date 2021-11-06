@@ -543,6 +543,66 @@ static BOOL checkForUpdates(void)
   return FALSE;
 }
 
+void startUpdateProcess(void)
+{
+  uint32 infoMsgSize = sizeof(char) * 2048;
+  STRPTR infoMsg = IExec->AllocVecTags(infoMsgSize,
+      AVT_Type,            MEMF_SHARED,
+      AVT_ClearWithValue,  "\0",
+      TAG_DONE);
+  
+  if (getGithubLatestData())
+  {
+    if (checkForUpdates())
+    {
+      IUtility->Strlcpy(infoMsg, "There is a new version available!\nWould you like to download and install the new version automatically?\n", infoMsgSize);
+      IUtility->Strlcat(infoMsg, "\nChanges:\n", infoMsgSize);
+
+      IUtility->Strlcat(infoMsg, release->changes, infoMsgSize);
+      LONG requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, REQTYPE_INFO, "_Sure|_Nah", REQIMAGE_QUESTION);
+
+      if (requesterResult)
+      {
+        windowBlocking(objects[OID_MAIN], TRUE);
+
+        // download the update archive
+        if (downloadLatestUpdate((STRPTR)release->browser_download_url))
+        {
+          int32 unarcResult = unarcFile((STRPTR)"RAM:mediavault_update.lha", getParentPath((STRPTR)"PROGDIR:MediaVault"));
+          if (unarcResult >= 0)
+          {
+            IUtility->Strlcpy(infoMsg, "MediaVault was updated to the latest version.\nPlease, close this window and restart it.\n", infoMsgSize);
+            requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
+          }
+          else
+          {
+            IUtility->Strlcpy(infoMsg, "There was an error with the update.\nYou will find in RAM the update.lha file,\nwhich you can use to update MediaVault manually.\n", infoMsgSize);
+            requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
+          }
+        }
+        else
+        {
+          IUtility->Strlcpy(infoMsg, "There was an error with the download of the update.\nPlease, check your internet connection.\n", infoMsgSize);
+          showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
+        }
+
+        windowBlocking(objects[OID_MAIN], FALSE);
+      }
+    }
+    else
+    {
+      IUtility->Strlcpy(infoMsg, "Congratulations!\nYou have the latest version installed on your machine.", infoMsgSize);
+      showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
+    }
+  }
+  else
+  {
+    IUtility->Strlcpy(infoMsg, "There was an error on update process.\nPlease, check your internet connection.\n", infoMsgSize);
+    showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
+  }
+  IExec->FreeVec(infoMsg);
+}
+
 void workOnUpdate(void)
 {
   uint32 infoMsgSize = sizeof(char) * 2048;
@@ -556,55 +616,7 @@ void workOnUpdate(void)
 
   if (requesterResult)
   {
-    if (getGithubLatestData())
-    {
-      if (checkForUpdates())
-      {
-        IUtility->Strlcpy(infoMsg, "There is a new version available!\nWould you like to download and install the new version automatically?\n", infoMsgSize);
-        IUtility->Strlcat(infoMsg, "\nChanges:\n", infoMsgSize);
-
-        IUtility->Strlcat(infoMsg, release->changes, infoMsgSize);
-        requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, REQTYPE_INFO, "_Sure|_Nah", REQIMAGE_QUESTION);
-        
-        if (requesterResult)
-        {
-          windowBlocking(objects[OID_MAIN], TRUE);
-          
-          // download the update archive
-          if (downloadLatestUpdate((STRPTR)release->browser_download_url))
-          {
-            int32 unarcResult = unarcFile((STRPTR)"RAM:mediavault_update.lha", getParentPath((STRPTR)"PROGDIR:MediaVault"));
-            if (unarcResult >= 0)
-            {
-              IUtility->Strlcpy(infoMsg, "MediaVault was updated to the latest version.\nPlease, close this window and restart it.\n", infoMsgSize);
-              requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
-            }
-            else
-            {
-              IUtility->Strlcpy(infoMsg, "There was an error with the update.\nYou will find in RAM the update.lha file,\nwhich you can use to update MediaVault manually.\n", infoMsgSize);
-              requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
-            }
-          }
-          else
-          {
-            IUtility->Strlcpy(infoMsg, "There was an error with the download of the update.\nPlease, check your internet connection.\n", infoMsgSize);
-            requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
-          }
-
-          windowBlocking(objects[OID_MAIN], FALSE);
-        }
-      }
-      else
-      {
-        IUtility->Strlcpy(infoMsg, "Congratulations!\nYou have the latest version installed on your machine.", infoMsgSize);
-        requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
-      }
-    }
-    else
-    {
-      IUtility->Strlcpy(infoMsg, "There was an error on update process.\nPlease, check your internet connection.\n", infoMsgSize);
-      requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
-    }
+    startUpdateProcess();
   }
   IExec->FreeVec(infoMsg);
 }

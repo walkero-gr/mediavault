@@ -90,6 +90,7 @@ void showGUI(void)
           struct filters lastPodcastFilters = {0};
 
           fillLeftSidebar();
+          startUpdateProcess();
 
           columnInfo = IListBrowser->AllocLBColumnInfo( 4,
               LBCIA_Column,                 0,

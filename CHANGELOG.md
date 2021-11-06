@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - Update the Favourite and Listen Later lists in real time
 - Now the podcast episodes appear in the middle section, instead of the right
   sidebar, so to be more visible and easy to use.
+- When the application starts, checks automatically for new updates and
+  informs the user
 
 ### Fixed
 - Fixed a bug at the update process that could make MediaVault crash
