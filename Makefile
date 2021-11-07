@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 07-11-2021 14:26:33
+# Created on: 07-11-2021 16:28:21
 #
 #
 
@@ -99,7 +99,7 @@ src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h src/globals.h \
 src/gui.o: src/gui.c src/globals.h src/version.h \
 	 src/guifuncs.h src/mainWin.h src/aboutWin.h \
 	 src/radiofuncs.h src/podcastfuncs.h src/httpfuncs.h \
-	
+	 src/updates.h
 
 src/httpfuncs.o: src/httpfuncs.c src/version.h
 
@@ -110,8 +110,8 @@ src/sqldb.o: src/sqldb.c src/globals.h src/version.h \
 	 src/radiofuncs.h src/stringfuncs.h
 
 src/guifuncs.o: src/guifuncs.c src/globals.h src/version.h \
-	 src/gui.h src/httpfuncs.h src/stringfuncs.h \
-	 src/fsfuncs.h src/updates.h
+	 src/gui.h src/httpfuncs.h src/fsfuncs.h \
+	 src/updates.h
 
 src/podcastfuncs.o: src/podcastfuncs.c src/globals.h src/version.h \
 	 src/gui.h src/libshandler.h src/httpfuncs.h \
@@ -122,8 +122,9 @@ src/mainWin.o: src/mainWin.c src/globals.h src/version.h \
 	 src/gui.h src/lists.h src/guifuncs.h \
 	 src/radiopages.h src/podcastpages.h
 
-src/updates.o: src/updates.c src/httpfuncs.h src/stringfuncs.h \
-	
+src/updates.o: src/updates.c src/globals.h src/version.h \
+	 src/gui.h src/httpfuncs.h src/stringfuncs.h \
+	 src/fsfuncs.h src/guifuncs.h
 
 src/aboutWin.o: src/aboutWin.c src/globals.h src/version.h \
 	 src/gui.h
