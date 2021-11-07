@@ -68,55 +68,51 @@ static BOOL getGithubLatestData(void)
   if (responseBody == NULL)
     return FALSE;
 
-  if (responseBody)
+  json_t *jsonRoot;
+  json_error_t jsonError;
+
+  jsonRoot = IJansson->json_loads(responseBody, 0, &jsonError);
+  cleanupHTTPRequest();
+
+  if (jsonRoot)
   {
-    json_t *jsonRoot;
-    json_error_t jsonError;
-
-    jsonRoot = IJansson->json_loads(responseBody, 0, &jsonError);
-    cleanupHTTPRequest();
-
-    if (jsonRoot)
+    if (json_is_object(jsonRoot))
     {
-      if (json_is_object(jsonRoot))
+      json_t *buf, *assets, *assetItem;
+
+      buf = IJansson->json_object_get(jsonRoot, "tag_name");
+      if (json_is_string(buf))
       {
-        json_t *buf, *assets, *assetItem;
-        size_t cnt;
+        IUtility->Strlcpy(release->tag_name, IJansson->json_string_value(buf), sizeof(release->tag_name));
+      }
 
-        buf = IJansson->json_object_get(jsonRoot, "tag_name");
-        if (json_is_string(buf))
-        {
-          IUtility->Strlcpy(release->tag_name, IJansson->json_string_value(buf), sizeof(release->tag_name));
-        }
+      buf = IJansson->json_object_get(jsonRoot, "body");
+      if (json_is_string(buf))
+      {
+        IUtility->Strlcpy(release->changes, IJansson->json_string_value(buf), sizeof(release->changes));
+        strReplace("\r", "", release->changes);
+      }
 
-        buf = IJansson->json_object_get(jsonRoot, "body");
-        if (json_is_string(buf))
+      assets = IJansson->json_object_get(jsonRoot, "assets");
+      if (json_is_array(assets))
+      {
+        for(size_t cnt = 0; cnt < IJansson->json_array_size(assets); cnt++)
         {
-          IUtility->Strlcpy(release->changes, IJansson->json_string_value(buf), sizeof(release->changes));
-          strReplace("\r", "", release->changes);
-        }
-
-        assets = IJansson->json_object_get(jsonRoot, "assets");
-        if (json_is_array(assets))
-        {
-          for(cnt = 0; cnt < IJansson->json_array_size(assets); cnt++)
+          assetItem = IJansson->json_array_get(assets, cnt);
+          if(json_is_object(assetItem))
           {
-            assetItem = IJansson->json_array_get(assets, cnt);
-            if(json_is_object(assetItem))
+            buf = IJansson->json_object_get(assetItem, "browser_download_url");
+            if (json_is_string(buf))
             {
-              buf = IJansson->json_object_get(assetItem, "browser_download_url");
-              if (json_is_string(buf))
-              {
-                IUtility->Strlcpy(release->browser_download_url, IJansson->json_string_value(buf), sizeof(release->browser_download_url));
-              }
+              IUtility->Strlcpy(release->browser_download_url, IJansson->json_string_value(buf), sizeof(release->browser_download_url));
             }
           }
         }
-
-        success = TRUE;
       }
-      IJansson->json_decref(jsonRoot);
+
+      success = TRUE;
     }
+    IJansson->json_decref(jsonRoot);
   }
 
   return success;
@@ -151,12 +147,12 @@ void startUpdateProcess(BOOL muted)
           if (unarcResult >= 0)
           {
             IUtility->Strlcpy(infoMsg, "MediaVault was updated to the latest version.\nPlease, close this window and restart it.\n", infoMsgSize);
-            requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
+            showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, 0);
           }
           else
           {
             IUtility->Strlcpy(infoMsg, "There was an error with the update.\nYou will find in RAM the update.lha file,\nwhich you can use to update MediaVault manually.\n", infoMsgSize);
-            requesterResult = showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
+            showMsgReq(gadgets[GID_MSG_REQ], "MediaVault info", (STRPTR)infoMsg, 0, NULL, REQIMAGE_ERROR);
           }
         }
         else

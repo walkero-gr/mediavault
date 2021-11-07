@@ -436,6 +436,12 @@ size_t getPodcastEpisodeList(struct List *itemsList, int offset)
 
 int getPodcastFavourite(void *unused, int cntCols, char **fields, char **colNames)
 {
+  // Dummy variable usage for gcc happiness
+  if (unused) unused = 0;
+  if (cntCols) cntCols = 0;
+  if (colNames) colNames = NULL;
+  // Dummy variable usage for gcc happiness
+
   struct Node *itemNode;
   struct podcastInfo *itemData = {0};
 
@@ -465,16 +471,17 @@ int getPodcastFavourite(void *unused, int cntCols, char **fields, char **colName
     IExec->AddTail(&podcastFavouriteList, itemNode);
   }
 
-  // Dummy variable usage for gcc happiness
-  if (unused) unused = 0;
-  if (cntCols) cntCols = 0;
-  if (colNames) colNames = NULL;
-
   return 0;
 }
 
 int getPodcastListenLater(void *unused, int cntCols, char **fields, char **colNames)
 {
+  // Dummy variable usage for gcc happiness
+  if (unused) unused = 0;
+  if (cntCols) cntCols = 0;
+  if (colNames) colNames = NULL;
+  // Dummy variable usage for gcc happiness
+
   struct Node *itemNode;
   struct podcastEpisodeInfo *itemData = {0};
 
@@ -510,11 +517,6 @@ int getPodcastListenLater(void *unused, int cntCols, char **fields, char **colNa
   {
     IExec->AddTail(&podcastListenLaterList, itemNode);
   }
-
-  // Dummy variable usage for gcc happiness
-  if (unused) unused = 0;
-  if (cntCols) cntCols = 0;
-  if (colNames) colNames = NULL;
 
   return 0;
 }
@@ -713,9 +715,6 @@ void fillPodcastFavouriteList(void)
         LISTBROWSER_ColumnInfo,     podcastColInfo,
         TAG_DONE);
   }
-  //char notFoundMsg[] = "No Favourite Radio Stations found!";
-  //getRadioFavouriteStations();
-  //listStations((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER], &radioFavouriteList, 0, (char *)notFoundMsg, NULL);
 }
 
 void fillPodcastListenLaterList(void)

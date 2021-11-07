@@ -177,11 +177,10 @@ BOOL downloadFile(STRPTR url, STRPTR filename, STRPTR destination)
         {
           fwrite(response.body, 1, response.size, pagefile);
           result = TRUE;
+          
+          fclose(pagefile);
         }
-
-        fclose(pagefile);
       }
-
     }
     cleanupHTTPRequest();
     curl_global_cleanup();

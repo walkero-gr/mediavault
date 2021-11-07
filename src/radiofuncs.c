@@ -287,6 +287,12 @@ size_t getRadioList(struct List *stationList, int offset)
 
 int getRadioFavouriteStations(void *unused, int cntCols, char **fields, char **colNames)
 {
+  // Dummy variable usage for gcc happiness
+  if (unused) unused = 0;
+  if (cntCols) cntCols = 0;
+  if (colNames) colNames = NULL;
+  // Dummy variable usage for gcc happiness
+
   struct Node *itemNode;
   struct stationInfo *itemData = {0};
 
@@ -323,11 +329,6 @@ int getRadioFavouriteStations(void *unused, int cntCols, char **fields, char **c
   {
     IExec->AddTail(&radioFavouriteList, itemNode);
   }
-
-  // Dummy variable usage for gcc happiness
-  if (unused) unused = 0;
-  if (cntCols) cntCols = 0;
-  if (colNames) colNames = NULL;
 
   return 0;
 }
@@ -494,9 +495,6 @@ void fillRadioFavouriteList(void)
         LISTBROWSER_ColumnInfo,     radioFavouritesColInfo,
         TAG_DONE);
   }
-  //char notFoundMsg[] = "No Favourite Radio Stations found!";
-  //getRadioFavouriteStations();
-  //listStations((struct Gadget*)gadgets[GID_RADIO_FAVOURITE_LISTBROWSER], &radioFavouriteList, 0, (char *)notFoundMsg, NULL);
 }
 
 void fillRadioPopularList(void)
