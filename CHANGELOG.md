@@ -4,22 +4,22 @@ All notable changes to this project will be documented in this file.
 ## [1.5.1] - 2021-11-07
 ### Added
 - Added podcast episode duration at the right sidebar, when one is selected
-- Added HardBass radio station genre after request
+- Added HardBass radio station genre after user request
 
 ### Changed
 - Compiled with SQLite 3.34.0
 - Before show an avatar image, now there is a check if this is already visible
 - Update the Favourite and Listen Later lists in real time
 - Now the podcast episodes appear in the middle section, instead of the right
-  sidebar, so to be more visible and easy to use.
+  sidebar, to be more visible and easy to use.
 - When the application starts, checks automatically for new updates and
   informs the user
 
 ### Fixed
 - Fixed a bug at the update process that could make MediaVault crash
 - Fixed podcast episode number to show higher numbers than 255
-- Fixed showing Season and Episode on podcast episodes from "Listen
-  Later" list
+- Fixed showing Season and Episode on podcast episodes from "Listen Later"
+  list
 
 ## [1.5.0] - 2021-10-29
 ### Added

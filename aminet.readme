@@ -2,7 +2,7 @@ Short:        Discover online radio stations
 Uploader:     walkero@gmail.com (George Sokianos)
 Author:       walkero@gmail.com (George Sokianos)
 Type:         util/wb
-Version:      1.5.0
+Version:      1.5.1
 Architecture: ppc-amigaos
 Distribution: Aminet
 Requires:
@@ -118,6 +118,21 @@ https://ko-fi.com/W7W465887
 
 Changelog
 --------------------------
+v1.5.1 - 2021-11-07
+* Added podcast episode duration at the right sidebar, when one is selected
+* Added HardBass radio station genre after user request
+* Compiled with SQLite 3.34.0
+* Before show an avatar image, now there is a check if this is already visible
+* Update the Favourite and Listen Later lists in real time
+* Now the podcast episodes appear in the middle section, instead of the right
+  sidebar, to be more visible and easy to use.
+* When the application starts, checks automatically for new updates and
+  informs the user
+* Fixed a bug at the update process that could make MediaVault crash
+* Fixed podcast episode number to show higher numbers than 255
+* Fixed showing Season and Episode on podcast episodes from "Listen Later"
+  list
+
 v1.5.0 - 2021-10-29
 * Added the ability to mark favourite radio stations and podcasts.
   A new list is created where you can find them and select one to
