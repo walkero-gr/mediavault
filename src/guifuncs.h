@@ -38,8 +38,6 @@ struct Window *appUnhide(uint32, Object *);
 void freeList(struct List *, int);
 void showAvatarImage(STRPTR, STRPTR, Object *, Object *, struct RenderHook *);
 ULONG renderfunct(struct RenderHook *, Object *, struct gpRender *);
-void startUpdateProcess(void);
-void workOnUpdate(void);
 void switchPage(ULONG, Object *);
 
 #endif

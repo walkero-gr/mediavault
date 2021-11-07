@@ -131,8 +131,8 @@ DONE - [1.5] Add a favorites list of radio stations
 DONE - [1.5] Mark podcasts as favorites
 - Download favourite radio list as .pls/.m3u playlists
 DONE - [1.5] Add listen later episode podcasts
-- When the user selects a podcasrt episode from "Listen Later" list,
-  hide the episodes listbrowser
+INVALID - When the user selects a podcast episode from "Listen Later" list,
+          hide the episodes listbrowser
 DONE - [1.5.1] Update the Favourite and Listen Later lists in real time
 
 

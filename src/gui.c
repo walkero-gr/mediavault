@@ -25,6 +25,7 @@
 #include "radiofuncs.h"
 #include "podcastfuncs.h"
 #include "httpfuncs.h"
+#include "updates.h"
 #include "gui.h"
 
 struct ColumnInfo *columnInfo, *radioFavouritesColInfo, *leftSidebarCI,
@@ -90,7 +91,7 @@ void showGUI(void)
           struct filters lastPodcastFilters = {0};
 
           fillLeftSidebar();
-          startUpdateProcess();
+          startUpdateProcess(TRUE);
 
           columnInfo = IListBrowser->AllocLBColumnInfo( 4,
               LBCIA_Column,                 0,

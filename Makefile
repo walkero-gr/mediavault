@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 30-10-2021 21:02:38
+# Created on: 07-11-2021 14:26:33
 #
 #
 
@@ -19,7 +19,8 @@ MediaVault_OBJ := \
 	 src/mainWin.o src/guifuncs.o src/aboutWin.o \
 	 src/httpfuncs.o src/radiofuncs.o src/stringfuncs.o \
 	 src/fsfuncs.o src/podcastfuncs.o src/sqldb.o \
-	 src/radiopages.o src/podcastpages.o
+	 src/radiopages.o src/podcastpages.o src/updates.o \
+	
 
 
 ###################################################################
@@ -96,8 +97,8 @@ src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h src/globals.h \
 	
 
 src/gui.o: src/gui.c src/globals.h src/version.h \
-	 src/gui.h src/guifuncs.h src/mainWin.h \
-	 src/aboutWin.h src/radiofuncs.h src/podcastfuncs.h \
+	 src/guifuncs.h src/mainWin.h src/aboutWin.h \
+	 src/radiofuncs.h src/podcastfuncs.h src/httpfuncs.h \
 	
 
 src/httpfuncs.o: src/httpfuncs.c src/version.h
@@ -109,8 +110,8 @@ src/sqldb.o: src/sqldb.c src/globals.h src/version.h \
 	 src/radiofuncs.h src/stringfuncs.h
 
 src/guifuncs.o: src/guifuncs.c src/globals.h src/version.h \
-	 src/gui.h src/guifuncs.h src/radiofuncs.h \
-	 src/httpfuncs.h src/stringfuncs.h
+	 src/gui.h src/httpfuncs.h src/stringfuncs.h \
+	 src/fsfuncs.h src/updates.h
 
 src/podcastfuncs.o: src/podcastfuncs.c src/globals.h src/version.h \
 	 src/gui.h src/libshandler.h src/httpfuncs.h \
@@ -119,7 +120,10 @@ src/podcastfuncs.o: src/podcastfuncs.c src/globals.h src/version.h \
 
 src/mainWin.o: src/mainWin.c src/globals.h src/version.h \
 	 src/gui.h src/lists.h src/guifuncs.h \
-	 src/radiopages.h
+	 src/radiopages.h src/podcastpages.h
+
+src/updates.o: src/updates.c src/httpfuncs.h src/stringfuncs.h \
+	
 
 src/aboutWin.o: src/aboutWin.c src/globals.h src/version.h \
 	 src/gui.h
@@ -127,16 +131,16 @@ src/aboutWin.o: src/aboutWin.c src/globals.h src/version.h \
 src/radiofuncs.o: src/radiofuncs.c src/globals.h src/version.h \
 	 src/gui.h src/libshandler.h src/httpfuncs.h \
 	 src/stringfuncs.h src/guifuncs.h src/sqldb.h \
-	
+	 src/fsfuncs.h
 
 src/stringfuncs.o: src/stringfuncs.c src/globals.h src/version.h \
 	 src/libshandler.h
 
 src/radiopages.o: src/radiopages.c src/globals.h src/version.h \
-	 src/gui.h
+	 src/gui.h src/guifuncs.h
 
 src/podcastpages.o: src/podcastpages.c src/globals.h src/version.h \
-	 src/gui.h
+	 src/gui.h src/guifuncs.h
 
 
 ###################################################################

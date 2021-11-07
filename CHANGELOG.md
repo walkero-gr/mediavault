@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.5.1] - future
+## [1.5.1] - 2021-11-07
 ### Added
 - Added podcast episode duration at the right sidebar, when one is selected
 - Added HardBass radio station genre after request
