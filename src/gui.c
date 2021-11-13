@@ -22,6 +22,7 @@
 #include "guifuncs.h"
 #include "mainWin.h"
 #include "aboutWin.h"
+#include "dlnafuncs.h"
 #include "radiofuncs.h"
 #include "podcastfuncs.h"
 #include "httpfuncs.h"
@@ -29,7 +30,7 @@
 #include "gui.h"
 
 struct ColumnInfo *columnInfo, *radioFavouritesColInfo, *leftSidebarCI,
-            *podcastColInfo, *podcastEpisodeColInfo;
+            *podcastColInfo, *podcastEpisodeColInfo, *mediaServerColInfo;
 struct List radioList,
             radioFavouriteList,
             radioPopularList,
@@ -39,7 +40,8 @@ struct List radioList,
             podcastFavouriteList,
             podcastListenLaterList,
             trendingPodcastList,
-            podcastEpisodeList;
+            podcastEpisodeList,
+            mediaServerList;
 
 struct filters  lastFilters = {0},
                 prevFilters = {0};
@@ -49,6 +51,7 @@ struct RenderHook *podcastImageRenderHook;
 
 static void fillLeftSidebar(void);
 static BOOL checkFiltersChanged(void);
+static void setColumnInfo(void);
 
 extern struct memory response;
 
@@ -92,89 +95,7 @@ void showGUI(void)
 
           fillLeftSidebar();
           startUpdateProcess(TRUE);
-
-          columnInfo = IListBrowser->AllocLBColumnInfo( 4,
-              LBCIA_Column,                 0,
-                LBCIA_Title,                " Station",
-                LBCIA_AutoSort,             TRUE,
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Sortable,             TRUE,
-                LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               50,
-              LBCIA_Column,                 1,
-                LBCIA_Title,                " Country",
-                LBCIA_AutoSort,             TRUE,
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Sortable,             TRUE,
-                LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               30,
-              LBCIA_Column,                 2,
-                LBCIA_Title,                " Bitrate",
-                LBCIA_AutoSort,             TRUE,
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Sortable,             TRUE,
-                LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               15,
-              LBCIA_Column,                 3,
-                LBCIA_Title,                " Votes",
-                LBCIA_AutoSort,             TRUE,
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Sortable,             TRUE,
-                LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               5,
-              TAG_DONE);
-
-          radioFavouritesColInfo = IListBrowser->AllocLBColumnInfo( 3,
-              LBCIA_Column,                 0,
-                LBCIA_Title,                " Title",
-                LBCIA_AutoSort,             TRUE,
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Sortable,             TRUE,
-                LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               50,
-              LBCIA_Column,                 1,
-                LBCIA_Title,                " Country",
-                LBCIA_AutoSort,             TRUE,
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Sortable,             TRUE,
-                LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               30,
-              LBCIA_Column,                 2,
-                LBCIA_Title,                " Bitrate",
-                LBCIA_AutoSort,             TRUE,
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Sortable,             TRUE,
-                LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               20,
-              TAG_DONE);
-
-          podcastColInfo = IListBrowser->AllocLBColumnInfo( 2,
-              LBCIA_Column,                 0,
-                LBCIA_Title,                " Title",
-                LBCIA_AutoSort,             TRUE,
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Sortable,             TRUE,
-                LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               80,
-              LBCIA_Column,                 1,
-                LBCIA_Title,                " Language",
-                LBCIA_AutoSort,             TRUE,
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Sortable,             TRUE,
-                LBCIA_SortArrow,            TRUE,
-                LBCIA_Weight,               20,
-              TAG_DONE);
-
-          podcastEpisodeColInfo = IListBrowser->AllocLBColumnInfo( 2,
-              LBCIA_Column,                 0,
-                LBCIA_Title,                " Title",
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Weight,               80,
-              LBCIA_Column,                 1,
-                LBCIA_Title,                " Released",
-                LBCIA_DraggableSeparator,   TRUE,
-                LBCIA_Weight,               20,
-              TAG_DONE);
+          setColumnInfo();
 
           //## Register MediaVault as an application
           if ( (appID = IApplication->RegisterApplication(APPNAME,
@@ -453,6 +374,10 @@ void showGUI(void)
                             switchPage(PAGE_PODCAST_INFO, objects[OID_RIGHT_SIDEBAR_PAGES]);
                             fillPodcastListenLaterList();
                             break;
+                          case PAGE_MAIN_MEDIA_SERVERS:
+                            //discoverUPnPServers();
+                            fillMediaServersList();
+                            break;
                         }
                         switchPage(lsbNodeIdx, objects[OID_MAIN_PAGES]);
                         break;
@@ -650,6 +575,12 @@ void showGUI(void)
             freeList(&podcastEpisodeList, STRUCT_PODCAST_EPISODE_INFO);
           }
 
+          IListBrowser->FreeLBColumnInfo(mediaServerColInfo);
+          if(listCount(&mediaServerList))
+          {
+            freeList(&mediaServerList, STRUCT_MEDIA_SERVER_INFO);
+          }
+
           IIntuition->DisposeObject(objects[OID_ABOUT]);
           IIntuition->DisposeObject(objects[OID_MAIN]);
 
@@ -739,3 +670,95 @@ static void fillLeftSidebar(void)
       TAG_DONE);
 }
 
+static void setColumnInfo(void)
+{
+  columnInfo = IListBrowser->AllocLBColumnInfo( 4,
+      LBCIA_Column,                 0,
+        LBCIA_Title,                " Station",
+        LBCIA_AutoSort,             TRUE,
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Sortable,             TRUE,
+        LBCIA_SortArrow,            TRUE,
+        LBCIA_Weight,               40,
+      LBCIA_Column,                 1,
+        LBCIA_Title,                " Country",
+        LBCIA_AutoSort,             TRUE,
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Sortable,             TRUE,
+        LBCIA_SortArrow,            TRUE,
+        LBCIA_Weight,               30,
+      LBCIA_Column,                 2,
+        LBCIA_Title,                " Bitrate",
+        LBCIA_AutoSort,             TRUE,
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Sortable,             TRUE,
+        LBCIA_SortArrow,            TRUE,
+        LBCIA_Weight,               20,
+      LBCIA_Column,                 3,
+        LBCIA_Title,                " Votes",
+        LBCIA_AutoSort,             TRUE,
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Sortable,             TRUE,
+        LBCIA_SortArrow,            TRUE,
+        LBCIA_Weight,               10,
+      TAG_DONE);
+
+  radioFavouritesColInfo = IListBrowser->AllocLBColumnInfo( 3,
+      LBCIA_Column,                 0,
+        LBCIA_Title,                " Title",
+        LBCIA_AutoSort,             TRUE,
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Sortable,             TRUE,
+        LBCIA_SortArrow,            TRUE,
+        LBCIA_Weight,               50,
+      LBCIA_Column,                 1,
+        LBCIA_Title,                " Country",
+        LBCIA_AutoSort,             TRUE,
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Sortable,             TRUE,
+        LBCIA_SortArrow,            TRUE,
+        LBCIA_Weight,               30,
+      LBCIA_Column,                 2,
+        LBCIA_Title,                " Bitrate",
+        LBCIA_AutoSort,             TRUE,
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Sortable,             TRUE,
+        LBCIA_SortArrow,            TRUE,
+        LBCIA_Weight,               20,
+      TAG_DONE);
+
+  podcastColInfo = IListBrowser->AllocLBColumnInfo( 2,
+      LBCIA_Column,                 0,
+        LBCIA_Title,                " Title",
+        LBCIA_AutoSort,             TRUE,
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Sortable,             TRUE,
+        LBCIA_SortArrow,            TRUE,
+        LBCIA_Weight,               80,
+      LBCIA_Column,                 1,
+        LBCIA_Title,                " Language",
+        LBCIA_AutoSort,             TRUE,
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Sortable,             TRUE,
+        LBCIA_SortArrow,            TRUE,
+        LBCIA_Weight,               20,
+      TAG_DONE);
+
+  podcastEpisodeColInfo = IListBrowser->AllocLBColumnInfo( 2,
+      LBCIA_Column,                 0,
+        LBCIA_Title,                " Title",
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Weight,               80,
+      LBCIA_Column,                 1,
+        LBCIA_Title,                " Released",
+        LBCIA_DraggableSeparator,   TRUE,
+        LBCIA_Weight,               20,
+      TAG_DONE);
+
+  mediaServerColInfo = IListBrowser->AllocLBColumnInfo( 1,
+      LBCIA_Column,                 0,
+        LBCIA_Title,                " Title",
+        //LBCIA_DraggableSeparator,   TRUE,
+        //LBCIA_Weight,               80,
+      TAG_DONE);
+}

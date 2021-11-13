@@ -15,8 +15,8 @@
   *
   */  
 
-#ifndef _PODCASTPAGES_H
-#define _PODCASTPAGES_H
+#ifndef _PODCAST_PAGES_H
+#define _PODCAST_PAGES_H
 
 Object *buildPodcastSearchPage(void);
 Object *buildPodcastFavouritePage(void);

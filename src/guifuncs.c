@@ -259,6 +259,15 @@ void freeList(struct List *listBrowser, int structID)
           IExec->FreeVec(structData);
         }
         break;
+      case STRUCT_MEDIA_SERVER_INFO:
+        {
+          struct mediaServerInfo *structData = NULL;
+          IListBrowser->GetListBrowserNodeAttrs( node,
+                LBNA_UserData, &structData,
+                TAG_DONE);
+          IExec->FreeVec(structData);
+        }
+        break;
     }
 
     IListBrowser->FreeListBrowserNode(node);

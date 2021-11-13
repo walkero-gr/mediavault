@@ -249,3 +249,4 @@ static CONST_STRPTR getContentTypeExt(STRPTR contentType)
   }
   return NULL;
 }
+

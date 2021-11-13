@@ -4,7 +4,7 @@
 #
 # Project: MediaVault
 #
-# Created on: 07-11-2021 16:28:21
+# Created on: 13-11-2021 20:30:55
 #
 #
 
@@ -20,7 +20,7 @@ MediaVault_OBJ := \
 	 src/httpfuncs.o src/radiofuncs.o src/stringfuncs.o \
 	 src/fsfuncs.o src/podcastfuncs.o src/sqldb.o \
 	 src/radiopages.o src/podcastpages.o src/updates.o \
-	
+	 src/dlnafuncs.o src/serverpages.o
 
 
 ###################################################################
@@ -98,8 +98,8 @@ src/upnpfuncs.o: src/upnpfuncs.c src/upnpfuncs.h src/globals.h \
 
 src/gui.o: src/gui.c src/globals.h src/version.h \
 	 src/guifuncs.h src/mainWin.h src/aboutWin.h \
-	 src/radiofuncs.h src/podcastfuncs.h src/httpfuncs.h \
-	 src/updates.h
+	 src/dlnafuncs.h src/radiofuncs.h src/podcastfuncs.h \
+	 src/httpfuncs.h src/updates.h
 
 src/httpfuncs.o: src/httpfuncs.c src/version.h
 
@@ -120,7 +120,14 @@ src/podcastfuncs.o: src/podcastfuncs.c src/globals.h src/version.h \
 
 src/mainWin.o: src/mainWin.c src/globals.h src/version.h \
 	 src/gui.h src/lists.h src/guifuncs.h \
-	 src/radiopages.h src/podcastpages.h
+	 src/radiopages.h src/podcastpages.h src/serverpages.h \
+	
+
+src/serverpages.o: src/serverpages.c src/globals.h src/version.h \
+	 src/gui.h src/guifuncs.h
+
+src/dlnafuncs.o: src/dlnafuncs.c src/globals.h src/version.h \
+	 src/gui.h
 
 src/updates.o: src/updates.c src/globals.h src/version.h \
 	 src/gui.h src/httpfuncs.h src/stringfuncs.h \

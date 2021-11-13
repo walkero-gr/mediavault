@@ -15,8 +15,8 @@
   *
   */  
 
-#ifndef _RADIOPAGES_H
-#define _RADIOPAGES_H
+#ifndef _RADIO_PAGES_H
+#define _RADIO_PAGES_H
 
 Object *buildRadioSearchPage(CONST_STRPTR *, CONST_STRPTR *, CONST_STRPTR *);
 Object *buildRadioFavouritePage(void);

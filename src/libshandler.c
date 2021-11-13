@@ -19,6 +19,7 @@ struct Library *JanssonBase;      struct JanssonIFace       *IJansson;
 struct Library *TTimerBase;       struct TimerIFace         *ITimer;
 struct MsgPort *TimerMP;          struct TimeRequest        *TimeReq;
 struct Library *TimezoneBase;     struct TimezoneIFace      *ITimezone;
+struct Library *SocketBase;       struct SocketIFace        *ISocket;
 
 struct ClassLibrary *BitMapBase;
 struct ClassLibrary *ButtonBase;
@@ -94,6 +95,9 @@ int CleanExit(const char *str)
   if(IUtility)          IExec->DropInterface((struct Interface *) IUtility);
   if(UtilityBase)       IExec->CloseLibrary(UtilityBase);
 
+  if(ISocket)           IExec->DropInterface((struct Interface *) ISocket);
+  if(SocketBase)        IExec->CloseLibrary(SocketBase);
+
   if(IIntuition)        IExec->DropInterface((struct Interface *) IIntuition);
   if(IntuitionBase)     IExec->CloseLibrary(IntuitionBase);
 
@@ -130,7 +134,14 @@ int OpenLibs(void)
     else return CleanExit("Can't open intuition.library version 54.6 and above");
   }
   else return CleanExit("Can't open intuition.library version 54");
-
+  
+  if ((SocketBase = IExec->OpenLibrary( "bsdsocket.library", 4 )))
+  {
+    ISocket = (struct SocketIFace *)IExec->GetInterface( SocketBase, "main", 1, NULL );
+    if(!ISocket) return CleanExit("Can't open bsdsocket.library Interface");
+  }
+  else return CleanExit("Can't open bsdsocket.library version 4");
+  
   if ((UtilityBase = IExec->OpenLibrary( "utility.library", 53 )))
   {
     IUtility = (struct UtilityIFace *)IExec->GetInterface( UtilityBase, "main", 1, NULL );

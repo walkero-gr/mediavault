@@ -97,4 +97,14 @@ struct podcastEpisodeInfo
   char  image[255];
 };
 
+struct mediaServerInfo
+{
+  char id[42];
+  char title[128];
+  char url[255];
+  char image[255];
+  char usn[64];
+  char st[64];
+};
+
 #endif

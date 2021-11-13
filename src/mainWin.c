@@ -23,6 +23,7 @@
 #include "guifuncs.h"
 #include "radiopages.h"
 #include "podcastpages.h"
+#include "serverpages.h"
 #include "mainWin.h"
 
 extern struct List leftSidebarList;
@@ -71,6 +72,7 @@ Object *buildMainWindow(struct MsgPort *appPort, Object *winMenu, struct Screen 
         PAGE_Add, gadgets[GID_PAGE_PODCAST_FAVOURITE]     = buildPodcastFavouritePage(),
         PAGE_Add, gadgets[GID_PAGE_PODCAST_LISTEN_LATER]  = buildPodcastListenLaterPage(),
         PAGE_Add, gadgets[GID_PAGE_PODCAST_TRENDING]      = buildPodcastTrendingPage(podcastCategories, languages),
+        PAGE_Add, gadgets[GID_PAGE_MEDIA_SERVERS]         = buildMediaServersPage(),
         PAGE_Add, gadgets[GID_PAGE_PODCAST_EPISODES]      = buildPodcastEpisodesPage(),
         TAG_DONE);
 
@@ -294,6 +296,18 @@ void getLeftSidebarContent(void)
     LBNA_Column,        0,
       LBNCA_CopyText,   TRUE,
       LBNCA_Text,       "Trending",
+    TAG_DONE);
+  if (node)
+  {
+    IExec->AddTail( &leftSidebarList, node );
+  }
+
+  node = IListBrowser->AllocListBrowserNode(1,
+    LBNA_Generation,    1,
+    //LBNA_Flags,         LBFLG_HASCHILDREN | LBFLG_SHOWCHILDREN,
+    LBNA_Column,        0,
+      LBNCA_CopyText,   TRUE,
+      LBNCA_Text,       "Media Servers",
     TAG_DONE);
   if (node)
   {
