@@ -20,6 +20,7 @@ struct Library *TTimerBase;       struct TimerIFace         *ITimer;
 struct MsgPort *TimerMP;          struct TimeRequest        *TimeReq;
 struct Library *TimezoneBase;     struct TimezoneIFace      *ITimezone;
 struct Library *SocketBase;       struct SocketIFace        *ISocket;
+struct Library *ExpatBase;        struct ExpatIFace       *IExpat;
 
 struct ClassLibrary *BitMapBase;
 struct ClassLibrary *ButtonBase;
@@ -71,6 +72,9 @@ int CleanExit(const char *str)
   //## Close Libraries
   if(IJansson)          IExec->DropInterface((struct Interface *) IJansson);
   if(JanssonBase)       IExec->CloseLibrary(JanssonBase);
+
+  if(IExpat)            IExec->DropInterface((struct Interface *) IExpat);
+  if(ExpatBase)         IExec->CloseLibrary(ExpatBase);
 
   if(ITimer)            IExec->DropInterface((struct Interface *) ITimer);
   if(TimeReq)
@@ -207,6 +211,14 @@ int OpenLibs(void)
     if(!IJansson) return CleanExit("Can't open jansson.library Interface");
   }
   else return CleanExit("Can't open jansson.library version 2");
+
+  if ((ExpatBase = IExec->OpenLibrary( "expat.library", 53 )))
+  {
+    IExpat = (struct ExpatIFace *)IExec->GetInterface( ExpatBase, "main", 1, NULL );
+    if(!IExpat) return CleanExit("Can't open expat.library Interface");
+  }
+  else return CleanExit("Can't open expat.library version 53");
+
 
   //## Classes and Gadgets opening
   if ((ListBrowserBase = IIntuition->OpenClass( "gadgets/listbrowser.gadget", 1, &ListBrowserClass )))
